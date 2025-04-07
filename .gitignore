@@ -1,0 +1,22 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+.vs/
+
+# NuGet Packages
+*.nupkg
+packages/
+*.nuspec
+*.psmdcp
+
+# Visual Studio cache files
+*.cache
+*.config
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Auto-generated assets
+*.assets.json
+*.nuget.cache
