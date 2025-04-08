@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0       # Galite pasirinkti norimą versiją
+    container_name: my_mysql_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=supersecret
+      - MYSQL_DATABASE=komunalinis_db
+      - MYSQL_USER=appuser
+      - MYSQL_PASSWORD=appsecret
+    ports:
+      - "3306:3306"        # Išorinį 3306 prievadą "išmapinti" į konteinerio 3306
+    volumes:
+      - db_data:/var/lib/mysql
+volumes:
+  db_data:
