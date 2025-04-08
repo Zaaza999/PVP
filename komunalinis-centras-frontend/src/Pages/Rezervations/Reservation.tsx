@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom';
 type EmployeeTimeSlot = {
   timeSlotId: number;
   employeeId: number;
-  slotDate: string;  // e.g. "2025-04-10"
-  timeFrom: string;  // "09:00:00"
-  timeTo: string;    // "10:00:00"
+  slotDate: string;  // gali būti "2025-04-10" arba "2025-04-10T00:00:00"
+  timeFrom: string;  // pvz. "09:00:00"
+  timeTo: string;    // pvz. "10:00:00"
 };
 
 type VisitTopic = {
@@ -44,7 +44,7 @@ function addDays(date: Date, days: number): Date {
 
 /** Pagrindinis komponentas */
 const WeeklyScheduleReservation: React.FC = () => {
-  // 1. Savaitės pradžia (apvaliname iki vidurnakčio)
+  // 1. Savaitės pradžia
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() =>
     getMonday(new Date())
   );
@@ -55,7 +55,7 @@ const WeeklyScheduleReservation: React.FC = () => {
 
   // 3. Pasirinkimai
   const [selectedTimeSlotId, setSelectedTimeSlotId] = useState<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);  // čia saugosime tik "YYYY-MM-DD"
   const [selectedTimeRange, setSelectedTimeRange] = useState<string>('');
   const [selectedTopicId, setSelectedTopicId] = useState<number | null>(null);
 
@@ -63,7 +63,7 @@ const WeeklyScheduleReservation: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
 
   // Hardcodintas user ID
-  const currentUserId = 2;
+  const currentUserId = 1;
 
   /** useEffect: užkeliame EmployeeTimeSlots ir VisitTopics */
   useEffect(() => {
@@ -103,10 +103,15 @@ const WeeklyScheduleReservation: React.FC = () => {
     setSelectedTopicId(isNaN(val) ? null : val);
   }
 
-  /** Kai pasirenkame laiko langą */
+  /** Kai pasirenkame laiko langą (paspaudžiame "Pasirinkti") */
   function handleTimeSlotClick(slot: EmployeeTimeSlot) {
+    // Išsitraukiame tik datą be "T"
+    const rawDatePart = slot.slotDate.includes("T")
+      ? slot.slotDate.split("T")[0]   // paliekam tik "YYYY-MM-DD"
+      : slot.slotDate;               // gal jau neturi T
+
     setSelectedTimeSlotId(slot.timeSlotId);
-    setSelectedDate(slot.slotDate);
+    setSelectedDate(rawDatePart);                 // saugome pvz. "2025-04-10"
     setSelectedTimeRange(`${slot.timeFrom} - ${slot.timeTo}`);
   }
 
@@ -115,10 +120,8 @@ const WeeklyScheduleReservation: React.FC = () => {
     e.preventDefault();
     if (!selectedTimeSlotId || !selectedTopicId || !selectedDate) return;
 
-    // Tarkime "reservationDate" = slotDate + timeFrom
-    // (Arba pageidautina su 'timeTo' – pagal poreikį)
+    // Čia konstruojame ISO formatą POST užklausai (t.y. viduje turime T, bet vartotojui to nerodome)
     const newDateTimeString = `${selectedDate}T${selectedTimeRange.split(' - ')[0]}`;
-    // "2025-04-10T09:00:00"
     const isoDateTime = new Date(newDateTimeString).toISOString();
 
     const newReservation = {
@@ -127,7 +130,9 @@ const WeeklyScheduleReservation: React.FC = () => {
       reservationDate: isoDateTime,
       status: "Confirmed",
       topicId: selectedTopicId
-    };
+    }; 
+
+    console.log("Siunčiamas payload:", newReservation);
 
     fetch("http://localhost:5190/Reservations", {
       method: "POST",
@@ -147,19 +152,12 @@ const WeeklyScheduleReservation: React.FC = () => {
       });
   }
 
-  /** Apskaičiuojame savaitės dienas (Mon..Sun) */
+  /** Savaitės dienų skaičiavimas */
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
-  // endOfWeek = next Monday
   const endOfWeek = addDays(currentWeekStart, 7);
 
-  // Dabar rodomi visi laiko langai be savaitės filtro
+  // Jei norite rodyti absoliučiai visus laiko langus, ištraukite filtrą, jei yra.
   const filteredSlots = employeeTimeSlots;
-
-  // Debug log
-  console.log("All slots from DB:", employeeTimeSlots);
-  console.log("Week start:", currentWeekStart);
-  console.log("WeekDays:", weekDays);
-  console.log("Filtered:", filteredSlots);
 
   return (
     <div className="weekly-schedule-container">
@@ -220,8 +218,17 @@ const WeeklyScheduleReservation: React.FC = () => {
                   </tr>
                 ) : (
                   filteredSlots.map((slot) => {
-                    const displayDate = new Date(slot.slotDate + "T00:00:00")
-                      .toLocaleDateString('lt-LT');
+                    // Išsitraukiam tik datą be laiko dalies
+                    const rawDatePart = slot.slotDate.includes("T")
+                      ? slot.slotDate.split("T")[0]
+                      : slot.slotDate; // pvz. "2025-04-10"
+
+                    // Jei norime rodyti vartotojui 09/04/2025 formatu:
+                    // konstruojame new Date(...) ir paverčiame localeString
+                    const [year, month, day] = rawDatePart.split("-");
+                    const dateObj = new Date(+year, +month - 1, +day);
+                    const displayDate = dateObj.toLocaleDateString("lt-LT");
+
                     const timeRange = `${slot.timeFrom} - ${slot.timeTo}`;
                     const isSelected = (slot.timeSlotId === selectedTimeSlotId);
 
@@ -248,8 +255,14 @@ const WeeklyScheduleReservation: React.FC = () => {
             {/* Rodyti, ką vartotojas pasirinko */}
             {selectedTimeSlotId && (
               <div className="selected-info">
-                <p>Laiko lango ID = {selectedTimeSlotId}</p>
-                <p>Data: {selectedDate}, Laikas: {selectedTimeRange}</p>
+                <p>Laiko lango ID: {selectedTimeSlotId}</p>
+                {/* Čia rodome vartotojui datą be T00:00:00 */}
+                {selectedDate && (
+                  <p>
+                    Data: {new Date(selectedDate).toLocaleDateString("lt-LT")}
+                    , Laikas: {selectedTimeRange}
+                  </p>
+                )}
               </div>
             )}
 

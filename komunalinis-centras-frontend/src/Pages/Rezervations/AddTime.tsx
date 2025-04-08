@@ -15,32 +15,54 @@ const EmployeeTimeSlotsPage: React.FC = () => {
   const [timeFrom, setTimeFrom] = useState("");
   const [timeTo, setTimeTo] = useState("");
 
+  // Uždarbame visus laiko intervalus
   const loadTimeSlots = () => {
     fetch("http://localhost:5190/EmployeeTimeSlots")
-      .then((r) => r.json())
+      .then((res) => res.json())
       .then((data) => setTimeSlots(data))
-      .catch((error) => console.error("Error loading time slots:", error));
+      .catch((error) => console.error("Klaida įkeliant laiko intervalus:", error));
   };
 
   useEffect(() => {
     loadTimeSlots();
   }, []);
 
+  // Apdorojame formos užklausą
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Sujungiame datą ir pradinį laiką (pavyzdžiui, "2025-04-08" ir "18:21") 
+    // ir pridedame sekundžių dalį, jei jos nėra (t.y. "18:21:00")
+    const formattedTimeFrom = timeFrom.length === 5 ? timeFrom + ":00" : timeFrom;
+    const formattedTimeTo = timeTo.length === 5 ? timeTo + ":00" : timeTo;
+
+    // Sukuriame pilną datos ir laiko string'ą, pavyzdžiui, "2025-04-08T18:21:00"
+    const dateTimeString = `${slotDate}T${formattedTimeFrom}`;
+    const slotDateISO = new Date(dateTimeString).toISOString();
+
+    // Formuojame naujo laiko intervalo objektą
     const newSlot = {
       employeeId: parseInt(employeeId),
-      slotDate,
-      timeFrom,
-      timeTo,
+      slotDate: slotDateISO,         // ISO formatas, pvz.: "2025-04-08T18:21:57.638Z"
+      timeFrom: formattedTimeFrom,     // "HH:mm:ss"
+      timeTo: formattedTimeTo,         // "HH:mm:ss"
     };
+
+    console.log("Siunčiamas payload:", newSlot);
 
     fetch("http://localhost:5190/EmployeeTimeSlots", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newSlot),
     })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) {
+          return r.json().then((err) => {
+            throw err;
+          });
+        }
+        return r.json();
+      })
       .then(() => {
         loadTimeSlots();
         setEmployeeId("");
@@ -48,25 +70,26 @@ const EmployeeTimeSlotsPage: React.FC = () => {
         setTimeFrom("");
         setTimeTo("");
       })
-      .catch((error) => console.error("Error creating time slot:", error));
+      .catch((error) => console.error("Klaida kuriant laiko intervalą:", error));
   };
 
+  // Ištrinti laiko intervalą pagal ID
   const handleDelete = (id: number) => {
     fetch(`http://localhost:5190/EmployeeTimeSlots/${id}`, {
       method: "DELETE",
     })
       .then(() => loadTimeSlots())
-      .catch((error) => console.error("Error deleting time slot:", error));
+      .catch((error) => console.error("Klaida trinant laiko intervalą:", error));
   };
 
   return (
     <div className="container">
-      <h2>Employee Time Slots</h2>
+      <h2>Laiko intervalai darbuotojams</h2>
 
       <div className="card">
         <form onSubmit={handleCreate} className="form">
           <div className="form-group">
-            <label htmlFor="employeeId">Employee ID:</label>
+            <label htmlFor="employeeId">Darbuotojo ID:</label>
             <input
               id="employeeId"
               type="number"
@@ -76,7 +99,7 @@ const EmployeeTimeSlotsPage: React.FC = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="slotDate">Date:</label>
+            <label htmlFor="slotDate">Data:</label>
             <input
               id="slotDate"
               type="date"
@@ -86,7 +109,7 @@ const EmployeeTimeSlotsPage: React.FC = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="timeFrom">From:</label>
+            <label htmlFor="timeFrom">Nuo:</label>
             <input
               id="timeFrom"
               type="time"
@@ -96,7 +119,7 @@ const EmployeeTimeSlotsPage: React.FC = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="timeTo">To:</label>
+            <label htmlFor="timeTo">Iki:</label>
             <input
               id="timeTo"
               type="time"
@@ -106,7 +129,7 @@ const EmployeeTimeSlotsPage: React.FC = () => {
             />
           </div>
           <button type="submit" className="btn">
-            Create Time Slot
+            Sukurti laiko intervalą
           </button>
         </form>
       </div>
@@ -116,11 +139,11 @@ const EmployeeTimeSlotsPage: React.FC = () => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Employee ID</th>
-              <th>Date</th>
-              <th>From</th>
-              <th>To</th>
-              <th>Actions</th>
+              <th>Darbuotojo ID</th>
+              <th>Data</th>
+              <th>Nuo</th>
+              <th>Iki</th>
+              <th>Veiksmai</th>
             </tr>
           </thead>
           <tbody>
@@ -136,7 +159,7 @@ const EmployeeTimeSlotsPage: React.FC = () => {
                     className="btn btn-delete"
                     onClick={() => handleDelete(slot.timeSlotId)}
                   >
-                    Delete
+                    Ištrinti
                   </button>
                 </td>
               </tr>
