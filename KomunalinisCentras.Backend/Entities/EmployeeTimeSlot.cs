@@ -1,15 +1,33 @@
+using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations; 
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace KomunalinisCentras.Backend.Entities
 {
     public class EmployeeTimeSlot
     {
-        public int TimeSlotId { get; set; }
-        public int EmployeeId { get; set; }
-        public DateTime SlotDate { get; set; }
-        public TimeSpan TimeFrom { get; set; }
-        public TimeSpan TimeTo { get; set; }
-        public int TopicId { get; set; }
+        [Key] 
+        [Column("timeslot_id")]
+        public int TimeSlotId { get; set; }   // <-- EF atpažins kaip PK
 
+        [Column("employee_id")]
+        public int EmployeeId { get; set; } 
+
+        [Column("slot_date")]
+        public DateTime SlotDate { get; set; } 
+
+        [Column("time_from")]
+        public TimeSpan TimeFrom { get; set; } 
+
+        [Column("time_to")]
+        public TimeSpan TimeTo { get; set; } 
+
+        //[Column("topic_id")]
+        //public int TopicId { get; set; }
+
+        // Navigacinės savybės 
+        [JsonIgnore]
         public User? Employee { get; set; }
-        public VisitTopic? Topic { get; set; }
+        //public VisitTopic? Topic { get; set; }
     }
 }

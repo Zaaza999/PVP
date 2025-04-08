@@ -22,7 +22,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // 5. Register repositories
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>(); 
+builder.Services.AddScoped<IEmployeeTimeSlotRepository, EmployeeTimeSlotRepository>();
 
 // Build the app
 var app = builder.Build();
