@@ -65,7 +65,9 @@ const App: React.FC = () => {
         <ul>
           <li><a href="#">Forumai</a></li>
           <li><a href="#">Sąskaitos</a></li>
-          <li><a href="#">Prašymai</a></li>
+          <li>
+            <Link to="/application">Prašymai</Link>
+          </li>
           <li>
             <Link to="/reservation">Rezervacijos</Link>
           </li> 

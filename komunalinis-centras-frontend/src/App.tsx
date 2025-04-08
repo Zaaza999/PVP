@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Main from './Pages/Main/Main';
 import Reservation from './Pages/Rezervations/Reservation'; 
 import AddTime from './Pages/Rezervations/AddTime';
+import Application from './Pages/Applications/Application';
 
 function App() {
   return (
@@ -16,6 +17,9 @@ function App() {
         {/* This route will show the Reservation component at /reservation */}
         <Route path="/reservation" element={<Reservation />} /> 
         <Route path="/addTime" element={<AddTime />} />
+
+        {/* This route will show the Reservation component at /reservation */}
+        <Route path="/application" element={<Application />} />
       </Routes>
     </Router>
   );

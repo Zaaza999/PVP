@@ -458,3 +458,78 @@ body {
 .time-slots-table tr:nth-child(even) {
   background-color: #f9f9f9;
 }
+
+
+/* ------ */
+
+/* Form List Styling */
+.form-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 15px;
+}
+
+.form-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.3s;
+}
+
+.form-list-item:last-child {
+  border-bottom: none;
+}
+
+.form-list-item:hover {
+  background-color: #fdf5e6;
+}
+
+.form-list-item span {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Form Link Button */
+.form-link-button {
+  background-color: #FFC107;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.form-link-button:hover {
+  background-color: #ffb300;
+}
+
+/* Circle Toggle Button */
+.circular-toggle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #FFC107;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.circular-toggle:hover {
+  background-color: #ffb300;
+}
