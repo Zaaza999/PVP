@@ -1,71 +1,44 @@
 using KomunalinisCentras.Backend.Data;
-using Microsoft.EntityFrameworkCore; 
 using KomunalinisCentras.Backend.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Įkeliame ConnectionString iš appsettings.json (MySQL)
+// 1. Load MySQL connection string from appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// 2. Registruojame DbContext (pvz., MySQL su Pomelo)
+// 2. Register DbContext (MySQL via Pomelo)
 builder.Services.AddDbContext<KomunalinisDbContext>(options =>
 {
     var serverVersion = new MySqlServerVersion(new Version(8, 0, 32));
     options.UseMySql(connectionString, serverVersion);
 });
 
-// 3. Įdedame kontrolerius
+// 3. Add controllers
 builder.Services.AddControllers();
 
-// 4. Pridedame „Swashbuckle“ / „EndpointsApiExplorer“ tam, kad generuotume OpenAPI/Swagger
+// 4. (Optional) Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
- 
-builder.Services.AddScoped<IPersonRepository, PersonRepository>();
-// Sukuriame programą
+
+// 5. Register repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// Build the app
 var app = builder.Build();
 
-// 5. Jei Development aplinka – generuojame Swagger/OpenAPI endpointą
+// 6. (Optional) Swagger in Development
 if (app.Environment.IsDevelopment())
 {
-    // Klasikinis būdas su Swashbuckle
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// 6. Papildomas middleware
+// 7. Additional middlewares
 app.UseHttpsRedirection();
 
-// 7. Priskiriame maršrutus (controllerius)
+// 8. Map controllers
 app.MapControllers();
 
-// 8. Pavyzdinis minimal API endpoint'as (WeatherForecast)
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild",
-    "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-// 9. Paleidžiame programą
+// 9. Run application
 app.Run();
-
-// Papildomas pavyzdinis „record“ modelis
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
