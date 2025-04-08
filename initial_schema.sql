@@ -36,9 +36,7 @@ CREATE TABLE IF NOT EXISTS EmployeeTimeSlots (
     slot_date DATE NOT NULL,
     time_from TIME NOT NULL,
     time_to TIME NOT NULL,
-    topic_id INT NOT NULL,
-    FOREIGN KEY (employee_id) REFERENCES Users(user_id),
-    FOREIGN KEY (topic_id) REFERENCES VisitTopics(topic_id)
+    FOREIGN KEY (employee_id) REFERENCES Users(user_id)
 );
 
 -- 5. Reservations
@@ -47,9 +45,11 @@ CREATE TABLE IF NOT EXISTS Reservations (
     user_id INT NOT NULL,
     timeslot_id INT NOT NULL,
     reservation_date DATE NOT NULL,
+    topic_id INT NOT NULL,
     status VARCHAR(50) DEFAULT 'Confirmed',
     FOREIGN KEY (user_id) REFERENCES Users(user_id),
-    FOREIGN KEY (timeslot_id) REFERENCES EmployeeTimeSlots(timeslot_id)
+    FOREIGN KEY (timeslot_id) REFERENCES EmployeeTimeSlots(timeslot_id), 
+    FOREIGN KEY (topic_id) REFERENCES VisitTopics(topic_id)
 );
 
 -- 6. Locations (towns, villages, districts, etc.)
@@ -87,3 +87,8 @@ INSERT INTO WasteTypes (waste_name) VALUES
 ('Household'),
 ('Plastic/Metal/Paper'),
 ('Glass');
+
+INSERT INTO VisitTopics (topic_name, description) VALUES
+('Sutarčių sudarymas', 'Pasirašyti naują sutartį ar pratęsti seną'),
+('Klaidos sąskaitose', 'Sąskaitų tikslinimas, korekcijos'),
+('Bendros konsultacijos', 'Bendro pobūdžio klausimai ir konsultacijos');

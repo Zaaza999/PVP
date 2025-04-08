@@ -44,10 +44,10 @@ namespace KomunalinisCentras.Backend.Data
                 .WithMany()
                 .HasForeignKey(e => e.EmployeeId);
 
-            modelBuilder.Entity<EmployeeTimeSlot>()
-                .HasOne(e => e.Topic)
-                .WithMany()
-                .HasForeignKey(e => e.TopicId);
+            //modelBuilder.Entity<EmployeeTimeSlot>()
+            //    .HasOne(e => e.Topic)
+            //    .WithMany()
+            //    .HasForeignKey(e => e.TopicId);
 
             modelBuilder.Entity<Reservation>()
                 .HasOne(r => r.User)

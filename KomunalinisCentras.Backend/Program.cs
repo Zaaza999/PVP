@@ -22,11 +22,27 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // 5. Register repositories
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>(); 
+builder.Services.AddScoped<IEmployeeTimeSlotRepository, EmployeeTimeSlotRepository>(); 
+builder.Services.AddScoped<IVisitTopicRepository, VisitTopicRepository>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
+
+
 
 // Build the app
 var app = builder.Build();
 
+app.UseCors("AllowAll");
 // 6. (Optional) Swagger in Development
 if (app.Environment.IsDevelopment())
 {

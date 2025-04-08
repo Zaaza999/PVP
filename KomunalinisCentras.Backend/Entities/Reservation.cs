@@ -1,14 +1,37 @@
+using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace KomunalinisCentras.Backend.Entities
 {
     public class Reservation
-    {
+    { 
+        [Key] 
+        [Column("reservation_id")]
         public int ReservationId { get; set; }
+        
+        [Column("user_id")]
         public int UserId { get; set; }
+        
+        [Column("timeslot_id")]
         public int TimeSlotId { get; set; }
+        
+        [Column("reservation_date")]
         public DateTime ReservationDate { get; set; }
-        public string Status { get; set; } = "Confirmed";
+        
+        [Column("status")]
+        public string Status { get; set; } = "Confirmed"; 
+        
+        [Column("topic_id")]
+        public int TopicId { get; set; } 
 
-        public User? User { get; set; }
-        public EmployeeTimeSlot? TimeSlot { get; set; }
+        [JsonIgnore]
+        public User? User { get; set; } 
+
+        [JsonIgnore]
+        public EmployeeTimeSlot? TimeSlot { get; set; } 
+
+        [JsonIgnore]
+        public VisitTopic? Topic { get; set; }
     }
 }

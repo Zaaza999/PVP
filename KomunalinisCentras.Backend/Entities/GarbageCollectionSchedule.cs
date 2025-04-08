@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace KomunalinisCentras.Backend.Entities
 {
     public class GarbageCollectionSchedule
     {
+        [Key]
         public int ScheduleId { get; set; }
         public int LocationId { get; set; }
         public int WasteId { get; set; }
