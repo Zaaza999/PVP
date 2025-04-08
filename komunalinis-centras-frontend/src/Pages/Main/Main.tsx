@@ -68,6 +68,9 @@ const App: React.FC = () => {
           <li><a href="#">Prašymai</a></li>
           <li>
             <Link to="/reservation">Rezervacijos</Link>
+          </li> 
+          <li>
+            <Link to="/addTime">Pridėti laiką</Link>
           </li>
         </ul>
       </nav>
