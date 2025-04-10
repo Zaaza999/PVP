@@ -1,6 +1,6 @@
 # PVP
 # Prerequisite
-Install docker;
+Install docker; 
 Install dbeaver;
 Install dotnet sdk 8; 
 
