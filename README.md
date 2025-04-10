@@ -1,10 +1,10 @@
 # PVP
-#Prerequisite 
+# Prerequisite
 Install docker;
 Install dbeaver;
 Install dotnet sdk 8; 
 
-# Prerequisite
+# Setup database
 In the terminal go to the backend directory and enter the command: docker-compose up -d 
 
 
