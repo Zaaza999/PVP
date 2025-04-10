@@ -64,7 +64,9 @@ namespace KomunalinisCentras.Backend.Controllers
             existing.RoleId = updatedUser.RoleId;
 
             await _userRepository.UpdateAsync(existing);
-            return NoContent();
+
+            // Grąžiname 200 OK ir atnaujinto vartotojo duomenis
+            return Ok(existing);
         }
 
         // DELETE /users/1

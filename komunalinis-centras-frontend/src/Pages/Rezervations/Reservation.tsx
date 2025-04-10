@@ -1,14 +1,19 @@
+// src/Pages/Reservation.tsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ENDPOINTS } from "../Config/Config"; // Importuojame konfigūracijos konstantas
+import {
+  addReservation,
+  getTimeSlots, 
+  getVisitTopics 
+} from "../Axios/apiServises";
+import '../styles.css';
 
-/** Duomenų tipai **/
 type EmployeeTimeSlot = {
   timeSlotId: number;
   employeeId: number;
-  slotDate: string;  // gali būti "2025-04-10" arba "2025-04-10T00:00:00"
-  timeFrom: string;  // pvz. "09:00:00"
-  timeTo: string;    // pvz. "10:00:00"
+  slotDate: string;
+  timeFrom: string;
+  timeTo: string;
 };
 
 type VisitTopic = {
@@ -17,14 +22,10 @@ type VisitTopic = {
   description?: string;
 };
 
-/** Pagalbinės funkcijos **/
-
-// Funkcija, kuri grąžina tą pačią datą, bet su laiku 00:00:00
 function setToMidnight(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
-// Funkcija, kuri randa pirmadienį pagal nurodytą datą
 function getMonday(date: Date): Date {
   const temp = setToMidnight(new Date(date));
   const day = temp.getDay();
@@ -32,90 +33,69 @@ function getMonday(date: Date): Date {
   return new Date(temp.setDate(diff));
 }
 
-// Funkcija, kuri prideda n dienų prie datos (laikas lieka 00:00:00)
 function addDays(date: Date, days: number): Date {
   const d = setToMidnight(date);
   d.setDate(d.getDate() + days);
   return d;
 }
 
-/** Pagrindinis komponentas **/
 const WeeklyScheduleReservation: React.FC = () => {
-  // Savaitės pradžia
-  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() =>
-    getMonday(new Date())
-  );
-
-  // Gaunami laiko langai ir vizito temos
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => getMonday(new Date()));
   const [employeeTimeSlots, setEmployeeTimeSlots] = useState<EmployeeTimeSlot[]>([]);
   const [topics, setTopics] = useState<VisitTopic[]>([]);
-
-  // Pasirinkimai rezervacijai
   const [selectedTimeSlotId, setSelectedTimeSlotId] = useState<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);  // saugoma data formatu "YYYY-MM-DD"
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState<string>('');
   const [selectedTopicId, setSelectedTopicId] = useState<number | null>(null);
-
-  // Ar rezervacija atlikta sėkmingai?
   const [submitted, setSubmitted] = useState(false);
 
-  // Hardcodintas user ID (gali būti pakeistas pagal poreikį)
-  const currentUserId = 1;
+  const currentUserId = 1; // Hardcodintas naudotojo ID – realiame projekte naudokite autentifikaciją
 
-  /** useEffect: gaunami duomenys iš API **/
+  // Užkraunami laiko langai ir vizito temos iš API
   useEffect(() => {
-    // Gaunami laiko langai
-    fetch(ENDPOINTS.EMPLOYEE_TIME_SLOTS)
-      .then(resp => resp.json())
+    getTimeSlots()
       .then((data: EmployeeTimeSlot[]) => setEmployeeTimeSlots(data))
-      .catch(err => console.error("Klaida gaunant laiko langus:", err));
-
-    // Gaunami vizito temų duomenys
-    fetch(ENDPOINTS.VISIT_TOPICS)
-      .then(resp => resp.json())
+      .catch((err) => console.error("Klaida gaunant laiko langus:", err));
+  
+    getVisitTopics()
       .then((data: VisitTopic[]) => setTopics(data))
-      .catch(err => console.error("Klaida gaunant temų sąrašą:", err));
+      .catch((err) => console.error("Klaida gaunant temų sąrašą:", err));
   }, []);
 
-  /** Savaitės naravimo funkcijos **/
   const handlePreviousWeek = () => {
     setCurrentWeekStart(addDays(currentWeekStart, -7));
     resetSelection();
   };
+
   const handleNextWeek = () => {
     setCurrentWeekStart(addDays(currentWeekStart, 7));
     resetSelection();
   };
-  function resetSelection() {
+
+  const resetSelection = () => {
     setSelectedTimeSlotId(null);
     setSelectedDate(null);
     setSelectedTimeRange('');
-  }
+  };
 
-  /** Pasirinkus temą iš drop-down meniu **/
-  function handleTopicChange(e: React.ChangeEvent<HTMLSelectElement>) {
+  const handleTopicChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = parseInt(e.target.value);
     setSelectedTopicId(isNaN(val) ? null : val);
-  }
+  };
 
-  /** Laiko lango pasirinkimo funkcija **/
-  function handleTimeSlotClick(slot: EmployeeTimeSlot) {
-    // Ištraukiame tik datos dalį be "T"
+  const handleTimeSlotClick = (slot: EmployeeTimeSlot) => {
     const rawDatePart = slot.slotDate.includes("T")
       ? slot.slotDate.split("T")[0]
       : slot.slotDate;
-
     setSelectedTimeSlotId(slot.timeSlotId);
     setSelectedDate(rawDatePart);
     setSelectedTimeRange(`${slot.timeFrom} - ${slot.timeTo}`);
-  }
+  };
 
-  /** Rezervacijos pateikimas -> POST /Reservations **/
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedTimeSlotId || !selectedTopicId || !selectedDate) return;
 
-    // Konstruojame ISO formato datą rezervacijos užklausai
     const newDateTimeString = `${selectedDate}T${selectedTimeRange.split(' - ')[0]}`;
     const isoDateTime = new Date(newDateTimeString).toISOString();
 
@@ -125,56 +105,39 @@ const WeeklyScheduleReservation: React.FC = () => {
       reservationDate: isoDateTime,
       status: "Confirmed",
       topicId: selectedTopicId
-    }; 
+    };
 
-    console.log("Siunčiamas payload:", newReservation);
-
-    fetch(ENDPOINTS.RESERVATIONS, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newReservation)
-    })
-      .then(r => {
-        if (!r.ok) throw new Error("Nepavyko sukurti rezervacijos");
-        return r.json();
-      })
-      .then(created => {
-        console.log("Rezervacija sukurta:", created);
+    addReservation(newReservation)
+      .then((data) => {
+        console.log("Rezervacija sukurta:", data);
         setSubmitted(true);
       })
-      .catch(err => console.error("Klaida kuriant rezervaciją:", err));
-  }
+      .catch((err) => console.error("Klaida kuriant rezervaciją:", err));
+  };
 
-  /** Savaitės dienų skaičiavimas **/
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
-  const endOfWeek = addDays(currentWeekStart, 7);
-
-  // Jei nėra papildomo filtro – rodomi visi laiko langai
-  const filteredSlots = employeeTimeSlots;
 
   return (
     <div className="weekly-schedule-container">
       <h2>Rezervacija vizitui į centrą</h2>
-
       {submitted ? (
         <div className="success-message">
           <p>Dėkojame už rezervaciją! Jūsų vizitas patvirtintas.</p>
-          <li>
-            <button type="button"><Link to="/">Atgal</Link></button>
-          </li>
+          <button className="btn">
+            <Link to="/">Atgal</Link>
+          </button>
         </div>
       ) : (
         <div>
-          {/* Savaitės navigacija */}
           <div className="week-navigation">
             <button onClick={handlePreviousWeek}>Ankstesnė savaitė</button>
             <span>
-              {currentWeekStart.toLocaleDateString()} - {addDays(currentWeekStart, 6).toLocaleDateString()}
+              {currentWeekStart.toLocaleDateString()} -{" "}
+              {addDays(currentWeekStart, 6).toLocaleDateString()}
             </span>
             <button onClick={handleNextWeek}>Kita savaitė</button>
           </div>
 
-          {/* Rezervacijos forma */}
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="topic">Pasirinkite vizito temą:</label>
@@ -194,7 +157,6 @@ const WeeklyScheduleReservation: React.FC = () => {
               </select>
             </div>
 
-            {/* Laiko langų lentelė */}
             <table className="schedule-table">
               <thead>
                 <tr>
@@ -205,21 +167,20 @@ const WeeklyScheduleReservation: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredSlots.length === 0 ? (
+                {employeeTimeSlots.length === 0 ? (
                   <tr>
                     <td colSpan={4}>Nėra laiko langų</td>
                   </tr>
                 ) : (
-                  filteredSlots.map((slot) => {
+                  employeeTimeSlots.map((slot) => {
                     const rawDatePart = slot.slotDate.includes("T")
                       ? slot.slotDate.split("T")[0]
                       : slot.slotDate;
                     const [year, month, day] = rawDatePart.split("-");
                     const dateObj = new Date(+year, +month - 1, +day);
                     const displayDate = dateObj.toLocaleDateString("lt-LT");
-
                     const timeRange = `${slot.timeFrom} - ${slot.timeTo}`;
-                    const isSelected = (slot.timeSlotId === selectedTimeSlotId);
+                    const isSelected = slot.timeSlotId === selectedTimeSlotId;
 
                     return (
                       <tr key={slot.timeSlotId} className={isSelected ? "selected" : ""}>
@@ -227,7 +188,11 @@ const WeeklyScheduleReservation: React.FC = () => {
                         <td>{timeRange}</td>
                         <td>{slot.employeeId}</td>
                         <td>
-                          <button type="button" onClick={() => handleTimeSlotClick(slot)}>
+                          <button
+                            type="button"
+                            className="btn"
+                            onClick={() => handleTimeSlotClick(slot)}
+                          >
                             Pasirinkti
                           </button>
                         </td>
@@ -238,7 +203,6 @@ const WeeklyScheduleReservation: React.FC = () => {
               </tbody>
             </table>
 
-            {/* Rodymas, ką vartotojas pasirinko */}
             {selectedTimeSlotId && (
               <div className="selected-info">
                 <p>Laiko lango ID: {selectedTimeSlotId}</p>
@@ -250,7 +214,7 @@ const WeeklyScheduleReservation: React.FC = () => {
               </div>
             )}
 
-            <button type="submit" disabled={!selectedTimeSlotId || !selectedTopicId}>
+            <button type="submit" className="btn" disabled={!selectedTimeSlotId || !selectedTopicId}>
               Rezervuoti
             </button>
           </form>
