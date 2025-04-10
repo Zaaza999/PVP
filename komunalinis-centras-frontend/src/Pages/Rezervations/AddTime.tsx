@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { ENDPOINTS } from "../Config/Config"; // Importuojame konfigūracijos konstantas
 
 type TimeSlot = {
   timeSlotId: number;
@@ -15,9 +16,9 @@ const EmployeeTimeSlotsPage: React.FC = () => {
   const [timeFrom, setTimeFrom] = useState("");
   const [timeTo, setTimeTo] = useState("");
 
-  // Uždarbame visus laiko intervalus
+  // Uždarbame visus laiko intervalus naudojant endpoint'ą iš konfigūracijos
   const loadTimeSlots = () => {
-    fetch("http://localhost:5190/EmployeeTimeSlots")
+    fetch(ENDPOINTS.EMPLOYEE_TIME_SLOTS)
       .then((res) => res.json())
       .then((data) => setTimeSlots(data))
       .catch((error) => console.error("Klaida įkeliant laiko intervalus:", error));
@@ -27,30 +28,29 @@ const EmployeeTimeSlotsPage: React.FC = () => {
     loadTimeSlots();
   }, []);
 
-  // Apdorojame formos užklausą
+  // Formos užklausos apdorojimas
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Sujungiame datą ir pradinį laiką (pavyzdžiui, "2025-04-08" ir "18:21") 
-    // ir pridedame sekundžių dalį, jei jos nėra (t.y. "18:21:00")
+    // Sujungiame datą ir pradžią (pvz., "2025-04-08" ir "18:21") ir pridedame sekundžių dalį, jei jos nėra ("18:21:00")
     const formattedTimeFrom = timeFrom.length === 5 ? timeFrom + ":00" : timeFrom;
     const formattedTimeTo = timeTo.length === 5 ? timeTo + ":00" : timeTo;
 
-    // Sukuriame pilną datos ir laiko string'ą, pavyzdžiui, "2025-04-08T18:21:00"
+    // Sukuriame pilną datos ir laiko string'ą (pvz., "2025-04-08T18:21:00")
     const dateTimeString = `${slotDate}T${formattedTimeFrom}`;
     const slotDateISO = new Date(dateTimeString).toISOString();
 
     // Formuojame naujo laiko intervalo objektą
     const newSlot = {
       employeeId: parseInt(employeeId),
-      slotDate: slotDateISO,         // ISO formatas, pvz.: "2025-04-08T18:21:57.638Z"
-      timeFrom: formattedTimeFrom,     // "HH:mm:ss"
-      timeTo: formattedTimeTo,         // "HH:mm:ss"
+      slotDate: slotDateISO,      // ISO formatas, pvz.: "2025-04-08T18:21:57.638Z"
+      timeFrom: formattedTimeFrom,  // "HH:mm:ss"
+      timeTo: formattedTimeTo,      // "HH:mm:ss"
     };
 
     console.log("Siunčiamas payload:", newSlot);
 
-    fetch("http://localhost:5190/EmployeeTimeSlots", {
+    fetch(ENDPOINTS.EMPLOYEE_TIME_SLOTS, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newSlot),
@@ -73,9 +73,9 @@ const EmployeeTimeSlotsPage: React.FC = () => {
       .catch((error) => console.error("Klaida kuriant laiko intervalą:", error));
   };
 
-  // Ištrinti laiko intervalą pagal ID
+  // Ištrina laiko intervalą pagal ID, naudojant endpoint'ą iš konfigūracijos
   const handleDelete = (id: number) => {
-    fetch(`http://localhost:5190/EmployeeTimeSlots/${id}`, {
+    fetch(`${ENDPOINTS.EMPLOYEE_TIME_SLOTS}/${id}`, {
       method: "DELETE",
     })
       .then(() => loadTimeSlots())
