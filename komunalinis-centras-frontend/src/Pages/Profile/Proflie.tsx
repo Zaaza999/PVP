@@ -1,48 +1,59 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ENDPOINTS } from "../Config/Config";
+import '../styles.css';
 
-/** Vartotojo tipas (pagal jūsų duomenų bazę) */
+// Vartotojo duomenų tipas pagal DB modelį
 type User = {
   userId: number;
   roleId: number;
   firstName: string;
   lastName: string;
   username: string;
-  userPassword: string; // Paprastai slaptažodžių viešai nerodome, čia tik pavyzdys
+  userPassword: string; // Paprastai slaptažodžių nerodykite – tai tik pavyzdys
   address: string;
   phone: string;
   email: string;
 };
 
+// Rezervacijos tipas – pritaikykite pagal savo duomenų bazės struktūrą
+type Reservation = {
+  reservationId: number;
+  userId: number;
+  timeSlotId: number;
+  reservationDate: string;
+  status: string;
+  topicId: number;
+};
+
 const UserProfile: React.FC = () => {
-  // Čia saugosime duomenis, užkrautus iš serverio
+  // Naudotojo informacija
   const [user, setUser] = useState<User | null>(null);
-
-  // Ar leidžiame redaguoti laukus
+  // Redagavimo režimo valdymas
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  // Laikinai saugomi redaguojami laukai
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [address, setAddress] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
 
-  // Laikinos būsenos, skirtos redagavimui (jei norime leisti atnaujinti duomenis)
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [address, setAddress] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  // Rezervacijų sąrašas
+  const [reservations, setReservations] = useState<Reservation[]>([]);
 
-  // Pvz., prisijungusio vartotojo ID – realiame projekte gali būti iš session, JWT, route param ir t. t.
+  // Pvz., nustatytas naudotojo ID – realiame projekte imkite iš autentifikacijos (JWT, sesijos ir pan.)
   const currentUserId = 1;
 
-  /** Komponentui užsikrovus, kreipiamės į API, kad gautume vartotojo duomenis */
+  // Pakraunami naudotojo duomenys
   useEffect(() => {
     fetch(`${ENDPOINTS.USERS}/${currentUserId}`)
       .then((res) => {
         if (!res.ok) {
-          throw new Error("Nepavyko gauti vartotojo informacijos.");
+          throw new Error("Nepavyko gauti vartotojo duomenų.");
         }
         return res.json();
       })
       .then((data: User) => {
         setUser(data);
-        // Užpildome ir laikinus laukus
         setFirstName(data.firstName);
         setLastName(data.lastName);
         setAddress(data.address);
@@ -54,17 +65,36 @@ const UserProfile: React.FC = () => {
       });
   }, [currentUserId]);
 
-  /** Paspaudus „Redaguoti“ -> leidžiame koreguoti laukus */
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
+  // Pakraunami naudotojo rezervacijos – darant prielaidą, kad backend palaiko filtravimą pagal userId
+  useEffect(() => {
+    fetch(`${ENDPOINTS.RESERVATIONS}?userId=${currentUserId}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Nepavyko gauti rezervacijų.");
+        }
+        return res.json();
+      })
+      .then((data: Reservation[]) => {
+        setReservations(data);
+      })
+      .catch((err) => {
+        console.error("Klaida gaunant rezervacijas:", err);
+      });
+  }, [currentUserId]);
 
-  /** Paspaudus „Išsaugoti“ -> POST ar PUT užklausa į serverį */
+  // Jei duomenys dar nėra įkrauti, rodome užkrovimo žinutę – taip užtikriname, kad vėlesniose renderiuojamuose elementuose user tikrai bus ne null.
+  if (!user) {
+    return (
+      <div className="container user-profile">
+        <h2>Naudotojo profilis</h2>
+        <p>Kraunama...</p>
+      </div>
+    );
+  }
+
+  // Funkcija atnaujinti naudotojo duomenis
   const handleSaveClick = () => {
-    if (!user) return;
-
-    // Sudedame atnaujintas reikšmes į vieną objektą
-    const updatedUser = {
+    const updatedUser: User = {
       ...user,
       firstName,
       lastName,
@@ -73,37 +103,33 @@ const UserProfile: React.FC = () => {
       email,
     };
 
-    // Jei turite atskirą endpoint'ą keitimui: pvz., PATCH /Users/{id} arba PUT /Users/{id}
     fetch(`${ENDPOINTS.USERS}/${user.userId}`, {
-        method: "PUT", // arba PATCH, priklausomai nuo jūsų API
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedUser),
+      method: "PUT", // arba PATCH
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedUser),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Nepavyko atnaujinti vartotojo duomenų.");
+        }
+        // Jei backend grąžina 204 (No Content), grąžiname updatedUser objektą
+        if (res.status === 204) {
+          return updatedUser;
+        }
+        return res.json();
       })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error("Nepavyko atnaujinti vartotojo duomenų.");
-          }
-          // Jei backend grąžina 204 (No Content), grąžiname updatedUser objektą
-          if (res.status === 204) {
-            return updatedUser;
-          }
-          return res.json();
-        })
-        .then((data: User) => {
-          console.log("Vartotojo duomenys atnaujinti:", data);
-          setUser(data);
-          setIsEditing(false);
-        })
-        .catch((err) => {
-          console.error("Klaida atnaujinant vartotojo duomenis:", err);
-        });
-      
+      .then((data: User) => {
+        console.log("Vartotojo duomenys atnaujinti:", data);
+        setUser(data);
+        setIsEditing(false);
+      })
+      .catch((err) => {
+        console.error("Klaida atnaujinant vartotojo duomenis:", err);
+      });
   };
 
-  /** Jei norime atšaukti redagavimą be išsaugojimo */
+  // Atšaukti redagavimą – grąžinti lauko reikšmes į pradinius duomenis
   const handleCancelClick = () => {
-    if (!user) return;
-    // Grąžiname formą į pradinius duomenis
     setFirstName(user.firstName);
     setLastName(user.lastName);
     setAddress(user.address);
@@ -112,102 +138,153 @@ const UserProfile: React.FC = () => {
     setIsEditing(false);
   };
 
+  // Rezervacijos atšaukimo funkcija
+  const cancelReservation = (reservationId: number) => {
+    fetch(`${ENDPOINTS.RESERVATIONS}/${reservationId}`, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Nepavyko atšaukti rezervacijos.");
+        }
+        if (res.status === 204) {
+          return {};
+        }
+        return res.json();
+      })
+      .then(() => {
+        // Pašaliname atšauktą rezervaciją iš sąrašo
+        setReservations((prev) =>
+          prev.filter(
+            (reservation) => reservation.reservationId !== reservationId
+          )
+        );
+      })
+      .catch((err) => {
+        console.error("Klaida atšaukiant rezervaciją:", err);
+      });
+  };
+
   return (
-    <div className="container">
+    <div className="container user-profile">
       <h2>Naudotojo profilis</h2>
 
-      {!user ? (
-        <p>Kraunama...</p>
-      ) : (
-        <div className="card">
+      {/* Profilio kortelė */}
+      <div className="card">
+        {isEditing ? (
           <div className="form">
-            {/* 
-              Čia, jeigu norite rodyti username, role ar kita, galite pridėti 
-              <p>Vartotojo vardas: {user.username}</p>
-              <p>Rolė (ID): {user.roleId}</p>
-              ...
-            */}
-
             <div className="form-group">
               <label>Vardas:</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                />
-              ) : (
-                <p>{user.firstName}</p>
-              )}
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
             </div>
-
             <div className="form-group">
               <label>Pavardė:</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                />
-              ) : (
-                <p>{user.lastName}</p>
-              )}
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
             </div>
-
             <div className="form-group">
               <label>Adresas:</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-              ) : (
-                <p>{user.address}</p>
-              )}
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
             </div>
-
             <div className="form-group">
               <label>Telefonas:</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              ) : (
-                <p>{user.phone}</p>
-              )}
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
             </div>
-
             <div className="form-group">
               <label>El. paštas:</label>
-              {isEditing ? (
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              ) : (
-                <p>{user.email}</p>
-              )}
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
-
-            {!isEditing ? (
-              <button className="btn" onClick={handleEditClick}>
-                Redaguoti
+            <div>
+              <button className="btn" onClick={handleSaveClick}>
+                Išsaugoti
               </button>
-            ) : (
-              <div>
-                <button className="btn" onClick={handleSaveClick}>
-                  Išsaugoti
-                </button>
-                <button className="btn btn-delete" onClick={handleCancelClick}>
-                  Atšaukti
-                </button>
-              </div>
-            )}
+              <button className="btn btn-delete" onClick={handleCancelClick}>
+                Atšaukti
+              </button>
+            </div>
           </div>
+        ) : (
+          <div className="profile-details">
+            <p>
+              <strong>Vardas:</strong> {user.firstName}
+            </p>
+            <p>
+              <strong>Pavardė:</strong> {user.lastName}
+            </p>
+            <p>
+              <strong>Adresas:</strong> {user.address}
+            </p>
+            <p>
+              <strong>Telefonas:</strong> {user.phone}
+            </p>
+            <p>
+              <strong>El. paštas:</strong> {user.email}
+            </p>
+            <button className="btn" onClick={() => setIsEditing(true)}>
+              Redaguoti
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Rezervacijų sąrašo rodymas */}
+      <h3>Mano rezervacijos</h3>
+      {reservations.length === 0 ? (
+        <p>Nėra rezervacijų</p>
+      ) : (
+        <div className="table-container">
+          <table className="reservations-table">
+            <thead>
+              <tr>
+                <th>Rezervacijos ID</th>
+                <th>Laiko lango ID</th>
+                <th>Rezervacijos data</th>
+                <th>Statusas</th>
+                <th>Veiksmai</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reservations.map((reservation) => (
+                <tr key={reservation.reservationId}>
+                  <td>{reservation.reservationId}</td>
+                  <td>{reservation.timeSlotId}</td>
+                  <td>
+                    {new Date(reservation.reservationDate).toLocaleString()}
+                  </td>
+                  <td>{reservation.status}</td>
+                  <td>
+                    <button
+                      className="btn btn-delete"
+                      onClick={() =>
+                        cancelReservation(reservation.reservationId)
+                      }
+                    >
+                      Atšaukti
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
