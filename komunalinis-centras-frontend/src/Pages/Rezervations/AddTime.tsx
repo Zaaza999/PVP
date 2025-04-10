@@ -1,5 +1,11 @@
+// src/Pages/AddTime.tsx
 import React, { useState, useEffect } from "react";
-import { ENDPOINTS } from "../Config/Config"; // Importuojame konfigūracijos konstantas
+import {
+  getTimeSlots,
+  addTimeSlot,
+  deleteTimeSlot
+} from "../Axios/apiServises";  // Importuojame laiko intervalų API funkcijas
+import "../../App.css"; // Importuojame bendrą CSS (arba specialų stiliaus failą)
 
 type TimeSlot = {
   timeSlotId: number;
@@ -16,53 +22,38 @@ const EmployeeTimeSlotsPage: React.FC = () => {
   const [timeFrom, setTimeFrom] = useState("");
   const [timeTo, setTimeTo] = useState("");
 
-  // Uždarbame visus laiko intervalus naudojant endpoint'ą iš konfigūracijos
+  // Užkraunami laiko intervalai iš API
   const loadTimeSlots = () => {
-    fetch(ENDPOINTS.EMPLOYEE_TIME_SLOTS)
-      .then((res) => res.json())
-      .then((data) => setTimeSlots(data))
-      .catch((error) => console.error("Klaida įkeliant laiko intervalus:", error));
+    getTimeSlots()
+      .then((data: TimeSlot[]) => setTimeSlots(data))
+      .catch((error) =>
+        console.error("Klaida įkeliant laiko intervalus:", error)
+      );
   };
 
   useEffect(() => {
     loadTimeSlots();
   }, []);
 
-  // Formos užklausos apdorojimas
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Sujungiame datą ir pradžią (pvz., "2025-04-08" ir "18:21") ir pridedame sekundžių dalį, jei jos nėra ("18:21:00")
+    // Suformatuojame laiką (jei pateikiamas tik HH:mm – pridedame ":00")
     const formattedTimeFrom = timeFrom.length === 5 ? timeFrom + ":00" : timeFrom;
     const formattedTimeTo = timeTo.length === 5 ? timeTo + ":00" : timeTo;
 
-    // Sukuriame pilną datos ir laiko string'ą (pvz., "2025-04-08T18:21:00")
+    // Sukuriame pilną ISO formatą
     const dateTimeString = `${slotDate}T${formattedTimeFrom}`;
     const slotDateISO = new Date(dateTimeString).toISOString();
 
-    // Formuojame naujo laiko intervalo objektą
     const newSlot = {
       employeeId: parseInt(employeeId),
-      slotDate: slotDateISO,      // ISO formatas, pvz.: "2025-04-08T18:21:57.638Z"
-      timeFrom: formattedTimeFrom,  // "HH:mm:ss"
-      timeTo: formattedTimeTo,      // "HH:mm:ss"
+      slotDate: slotDateISO,
+      timeFrom: formattedTimeFrom,
+      timeTo: formattedTimeTo,
     };
 
-    console.log("Siunčiamas payload:", newSlot);
-
-    fetch(ENDPOINTS.EMPLOYEE_TIME_SLOTS, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newSlot),
-    })
-      .then((r) => {
-        if (!r.ok) {
-          return r.json().then((err) => {
-            throw err;
-          });
-        }
-        return r.json();
-      })
+    addTimeSlot(newSlot)
       .then(() => {
         loadTimeSlots();
         setEmployeeId("");
@@ -70,22 +61,22 @@ const EmployeeTimeSlotsPage: React.FC = () => {
         setTimeFrom("");
         setTimeTo("");
       })
-      .catch((error) => console.error("Klaida kuriant laiko intervalą:", error));
+      .catch((error) =>
+        console.error("Klaida kuriant laiko intervalą:", error)
+      );
   };
 
-  // Ištrina laiko intervalą pagal ID, naudojant endpoint'ą iš konfigūracijos
   const handleDelete = (id: number) => {
-    fetch(`${ENDPOINTS.EMPLOYEE_TIME_SLOTS}/${id}`, {
-      method: "DELETE",
-    })
+    deleteTimeSlot(id)
       .then(() => loadTimeSlots())
-      .catch((error) => console.error("Klaida trinant laiko intervalą:", error));
+      .catch((error) =>
+        console.error("Klaida trinant laiko intervalą:", error)
+      );
   };
 
   return (
     <div className="container">
       <h2>Laiko intervalai darbuotojams</h2>
-
       <div className="card">
         <form onSubmit={handleCreate} className="form">
           <div className="form-group">
@@ -147,23 +138,29 @@ const EmployeeTimeSlotsPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {timeSlots.map((slot) => (
-              <tr key={slot.timeSlotId}>
-                <td>{slot.timeSlotId}</td>
-                <td>{slot.employeeId}</td>
-                <td>{slot.slotDate}</td>
-                <td>{slot.timeFrom}</td>
-                <td>{slot.timeTo}</td>
-                <td>
-                  <button
-                    className="btn btn-delete"
-                    onClick={() => handleDelete(slot.timeSlotId)}
-                  >
-                    Ištrinti
-                  </button>
-                </td>
+            {timeSlots.length === 0 ? (
+              <tr>
+                <td colSpan={6}>Nėra laiko intervalų</td>
               </tr>
-            ))}
+            ) : (
+              timeSlots.map((slot) => (
+                <tr key={slot.timeSlotId}>
+                  <td>{slot.timeSlotId}</td>
+                  <td>{slot.employeeId}</td>
+                  <td>{new Date(slot.slotDate).toLocaleDateString()}</td>
+                  <td>{slot.timeFrom}</td>
+                  <td>{slot.timeTo}</td>
+                  <td>
+                    <button
+                      className="btn btn-delete"
+                      onClick={() => handleDelete(slot.timeSlotId)}
+                    >
+                      Ištrinti
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
