@@ -53,7 +53,7 @@ const App: React.FC = () => {
           <div className="dropdown">
             <button className="dropbtn">[ ]</button>
             <div className="dropdown-content">
-              <a href="#">Profilis</a>
+              <a href="#"><Link to="/profile">Profilis</Link></a>
               <a href="#">Atsijungti</a>
             </div>
           </div>

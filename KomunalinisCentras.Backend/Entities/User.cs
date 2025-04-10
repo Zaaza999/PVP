@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -33,6 +34,7 @@ namespace KomunalinisCentras.Backend.Entities
         [Column("email")]
         public string? Email { get; set; }
 
+        [JsonIgnore]
         public Role? Role { get; set; }
     }
 }

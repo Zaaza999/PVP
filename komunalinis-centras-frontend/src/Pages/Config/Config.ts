@@ -7,5 +7,6 @@ export const API_URL = "http://localhost:5190";
 export const ENDPOINTS = {
   EMPLOYEE_TIME_SLOTS: `${API_URL}/EmployeeTimeSlots`,
   VISIT_TOPICS: `${API_URL}/VisitTopics`,
-  RESERVATIONS: `${API_URL}/Reservations`,
+  RESERVATIONS: `${API_URL}/Reservations`, 
+  USERS: `${API_URL}/Users`, 
 };
