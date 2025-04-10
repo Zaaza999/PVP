@@ -4,7 +4,7 @@ Install docker;
 Install dbeaver;
 Install dotnet sdk 8; 
 
-#Setup database 
+# Prerequisite
 In the terminal go to the backend directory and enter the command: docker-compose up -d 
 
 
