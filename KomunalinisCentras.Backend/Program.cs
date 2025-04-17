@@ -25,7 +25,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserRepository, UserRepository>(); 
 builder.Services.AddScoped<IEmployeeTimeSlotRepository, EmployeeTimeSlotRepository>(); 
 builder.Services.AddScoped<IVisitTopicRepository, VisitTopicRepository>();
-builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>(); 
+builder.Services.AddScoped<ILocationRepository, LocationRepository>(); 
+builder.Services.AddScoped<IWasteTypeRepository, WasteTypeRepository>(); 
+builder.Services.AddScoped<IGarbageScheduleRepository, GarbageScheduleRepository>();
 
 
 
