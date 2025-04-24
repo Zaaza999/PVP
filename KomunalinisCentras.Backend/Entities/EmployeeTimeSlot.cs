@@ -20,7 +20,10 @@ namespace KomunalinisCentras.Backend.Entities
         public TimeSpan TimeFrom { get; set; } 
 
         [Column("time_to")]
-        public TimeSpan TimeTo { get; set; } 
+        public TimeSpan TimeTo { get; set; }  
+
+        [Column("is_taken")]
+        public bool IsTaken { get; set; }
 
         //[Column("topic_id")]
         //public int TopicId { get; set; }

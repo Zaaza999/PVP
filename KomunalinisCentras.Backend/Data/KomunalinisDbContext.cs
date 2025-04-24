@@ -17,7 +17,8 @@ namespace KomunalinisCentras.Backend.Data
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<WasteType> WasteTypes { get; set; }
-        public DbSet<GarbageCollectionSchedule> GarbageCollectionSchedules { get; set; }
+        public DbSet<GarbageCollectionSchedule> GarbageCollectionSchedules { get; set; } 
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

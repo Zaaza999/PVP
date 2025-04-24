@@ -19,5 +19,12 @@ export const addTimeSlot = (data: any) => apiCall("add", "EmployeeTimeSlots", ""
 export const updateTimeSlot = (id: number, data: any) => apiCall("update", "EmployeeTimeSlots", id, data);
 export const deleteTimeSlot = (id: number) => apiCall("delete", "EmployeeTimeSlots", id); 
 
-export const getVisitTopics = () => apiCall("get", "VisitTopics");
+export const getVisitTopics = () => apiCall("get", "VisitTopics"); 
+
+
+export const getLocations = () => apiCall("get", "Locations");
+  
+export const getWasteTypes = () => apiCall("get", "WasteTypes");
+  
+export const getSchedules = () => apiCall("get", "GarbageCollectionSchedules");
 

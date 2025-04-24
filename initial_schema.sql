@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS Users (
     user_password VARCHAR(255) NOT NULL,
     address VARCHAR(100),
     phone VARCHAR(20),
-    email VARCHAR(100),
+    email VARCHAR(100), 
     FOREIGN KEY (role_id) REFERENCES Roles(role_id)
 );
 
@@ -35,7 +35,8 @@ CREATE TABLE IF NOT EXISTS EmployeeTimeSlots (
     employee_id INT NOT NULL,
     slot_date DATE NOT NULL,
     time_from TIME NOT NULL,
-    time_to TIME NOT NULL,
+    time_to TIME NOT NULL, 
+    is_taken BOOLEAN NOT NULL DEFAULT FALSE,  -- ar laikas užimtas? FALSE = laisvas
     FOREIGN KEY (employee_id) REFERENCES Users(user_id)
 );
 
