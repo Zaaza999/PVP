@@ -6,7 +6,9 @@ import Main from './Pages/Main/Main';
 import Reservation from './Pages/Rezervations/Reservation'; 
 import AddTime from './Pages/Rezervations/AddTime';
 import Application from './Pages/Applications/Application'; 
-import Profile from './Pages/Profile/Proflie'
+import Profile from './Pages/Profile/Profile'
+import LoginPage from "./Pages/Login/LoginPage";
+import RegisterPage from "./Pages/Register/RegisterPage";
 
 function App() {
   return (
@@ -14,12 +16,13 @@ function App() {
       <Routes>
         {/* This route will show the Main component at the root path */}
         <Route path="/" element={<Main />} />
-        
+        <Route path="/profile" element={<Profile />} />
         {/* This route will show the Reservation component at /reservation */}
         <Route path="/reservation" element={<Reservation />} /> 
         <Route path="/addTime" element={<AddTime />} /> 
         <Route path="/profile" element={<Profile />} />
-
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         {/* This route will show the Reservation component at /reservation */}
         <Route path="/application" element={<Application />} />
       </Routes>

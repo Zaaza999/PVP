@@ -25,7 +25,7 @@ namespace KomunalinisCentras.Backend.Controllers
 
         // GET /users/1
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(string id)
         {
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null) return NotFound();
@@ -39,15 +39,15 @@ namespace KomunalinisCentras.Backend.Controllers
         {
             await _userRepository.CreateAsync(newUser);
             return CreatedAtAction(nameof(GetById),
-                new { id = newUser.UserId },
+                new { id = newUser.Id },
                 newUser);
         }
 
         // PUT /users/1
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] User updatedUser)
+        public async Task<IActionResult> Update(string id, [FromBody] User updatedUser)
         {
-            if (id != updatedUser.UserId)
+            if (id != updatedUser.Id)
                 return BadRequest("ID mismatch.");
 
             var existing = await _userRepository.GetByIdAsync(id);
@@ -56,10 +56,9 @@ namespace KomunalinisCentras.Backend.Controllers
             // Example of updating fields:
             existing.FirstName = updatedUser.FirstName;
             existing.LastName = updatedUser.LastName;
-            existing.Username = updatedUser.Username;
-            existing.UserPassword = updatedUser.UserPassword;
+            existing.UserName = updatedUser.UserName;
             existing.Address = updatedUser.Address;
-            existing.Phone = updatedUser.Phone;
+            existing.PhoneNumber = updatedUser.PhoneNumber;
             existing.Email = updatedUser.Email;
             existing.RoleId = updatedUser.RoleId;
 
@@ -71,7 +70,7 @@ namespace KomunalinisCentras.Backend.Controllers
 
         // DELETE /users/1
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
             var existing = await _userRepository.GetByIdAsync(id);
             if (existing == null) return NotFound();

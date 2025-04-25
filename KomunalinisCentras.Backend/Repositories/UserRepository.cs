@@ -20,11 +20,10 @@ namespace KomunalinisCentras.Backend.Repositories
                 .ToListAsync();
         }
 
-        public async Task<User?> GetByIdAsync(int id)
+        public async Task<User?> GetByIdAsync(string id)
         {
             return await _context.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.UserId == id);
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task CreateAsync(User user)
@@ -39,7 +38,7 @@ namespace KomunalinisCentras.Backend.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(string id)
         {
             var existing = await GetByIdAsync(id);
             if (existing != null)

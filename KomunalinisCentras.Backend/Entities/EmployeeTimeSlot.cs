@@ -11,7 +11,7 @@ namespace KomunalinisCentras.Backend.Entities
         public int TimeSlotId { get; set; }   // <-- EF atpažins kaip PK
 
         [Column("employee_id")]
-        public int EmployeeId { get; set; } 
+        public string EmployeeId { get; set; } 
 
         [Column("slot_date")]
         public DateTime SlotDate { get; set; } 
