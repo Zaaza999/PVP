@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using KomunalinisCentras.Backend.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace KomunalinisCentras.Backend.Data
 {
-    public class KomunalinisDbContext : DbContext
+    public class KomunalinisDbContext : IdentityDbContext<User, Role, string>
     {
         public KomunalinisDbContext(DbContextOptions<KomunalinisDbContext> options)
             : base(options)
@@ -23,7 +24,7 @@ namespace KomunalinisCentras.Backend.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+            
             // Map to the new table names from the SQL script
             modelBuilder.Entity<Role>().ToTable("Roles");
             modelBuilder.Entity<User>().ToTable("Users");
@@ -43,7 +44,8 @@ namespace KomunalinisCentras.Backend.Data
             modelBuilder.Entity<EmployeeTimeSlot>()
                 .HasOne(e => e.Employee)
                 .WithMany()
-                .HasForeignKey(e => e.EmployeeId);
+                .HasForeignKey(e => e.EmployeeId)
+                .HasPrincipalKey(u => u.Id);
 
             //modelBuilder.Entity<EmployeeTimeSlot>()
             //    .HasOne(e => e.Topic)
@@ -53,7 +55,8 @@ namespace KomunalinisCentras.Backend.Data
             modelBuilder.Entity<Reservation>()
                 .HasOne(r => r.User)
                 .WithMany()
-                .HasForeignKey(r => r.UserId);
+                .HasForeignKey(r => r.UserId)
+                .HasPrincipalKey(u => u.Id);
 
             modelBuilder.Entity<Reservation>()
                 .HasOne(r => r.TimeSlot)

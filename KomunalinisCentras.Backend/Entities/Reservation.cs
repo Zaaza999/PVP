@@ -6,12 +6,11 @@ namespace KomunalinisCentras.Backend.Entities
 {
     public class Reservation
     { 
-        [Key] 
-        [Column("reservation_id")]
+        [Key]
         public int ReservationId { get; set; }
         
         [Column("user_id")]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         
         [Column("timeslot_id")]
         public int TimeSlotId { get; set; }
@@ -24,8 +23,7 @@ namespace KomunalinisCentras.Backend.Entities
         
         [Column("topic_id")]
         public int TopicId { get; set; } 
-
-        [JsonIgnore]
+        
         public User? User { get; set; } 
 
         [JsonIgnore]

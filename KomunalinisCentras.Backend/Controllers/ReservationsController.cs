@@ -26,7 +26,20 @@ namespace KomunalinisCentras.Backend.Controllers
             var reservations = await _reservationRepository.GetAllAsync();
             return Ok(reservations);
         }
-
+        
+        // GET /reservations?userId={userId}
+        [HttpGet("ByUser")]
+        public async Task<IActionResult> GetByUserId([FromQuery] string? userId)
+        {
+            if (userId == null)
+            {
+                var reservations = await _reservationRepository.GetAllAsync();
+                return Ok(reservations);
+            }
+            var userReservations = await _reservationRepository.GetByUserIdAsync(userId);
+            return Ok(userReservations);
+        }
+        
         // GET /reservations/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)

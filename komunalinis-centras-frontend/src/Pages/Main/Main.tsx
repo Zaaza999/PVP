@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
 import '../styles.css';
 import {
   getLocations,
@@ -52,6 +53,8 @@ const App: React.FC = () => {
   const [wasteTypes, setWasteTypes] = useState<Map<number, WasteTypeDto>>(new Map());
   const [schedules,  setSchedules]  = useState<ScheduleDto[]>([]);
   const [selectedLoc, setSelectedLoc] = useState<number | null>(null);
+  const [username, setUsername] = useState<string>('Svečias');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   /* --- mėnesio valdymas (start = dabartinis) --- */
   const [viewDate, setViewDate] = useState<Date>(() => {
@@ -94,6 +97,30 @@ const App: React.FC = () => {
       .catch(console.error);
   }, [selectedLoc]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token);
+        const fullName = `${decoded.firstName || ""} ${decoded.lastName || ""}`.trim();
+        setUsername(fullName || "Svečias");
+        setIsLoggedIn(true);
+      } catch (e) {
+        console.error("Invalid token:", e);
+        setUsername("Svečias");
+        setIsLoggedIn(false);
+      }
+    } else {
+      setUsername("Svečias");
+      setIsLoggedIn(false);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.reload();
+  };
+
   /* === Map date -> WasteType[] (max 3) === */
   const dateWts = new Map<string, WasteTypeDto[]>();
   schedules.forEach((s: ScheduleDto) => {
@@ -116,21 +143,32 @@ const App: React.FC = () => {
         <div className="header-left"><h1>KPC</h1></div>
         <div className="header-right">
           <CircularProgress progress={70} />
-          <span>Vartotojas</span>
-          <div className="dropdown">
-            <button className="dropbtn">[ ]</button>
-            <div className="dropdown-content">
-              <Link className="dropdown-item" to="/profile">Profilis</Link>
-              <button className="dropdown-item" onClick={() => alert('Logout')}>Atsijungti</button>
-            </div>
-          </div>
+          <span>{username}</span>
+          {isLoggedIn ? (
+              <div className="dropdown">
+                <button className="dropbtn">[ ☰ ]</button>
+                <div className="dropdown-content">
+                  <Link to="/profile">Profilis</Link>
+                  <Link to="/" onClick={(e) => {
+                    e.preventDefault();
+                    handleLogout();
+                  }}>Atsijungti</Link>
+                </div>
+              </div>
+          ) : (
+              <div className="auth-buttons">
+                <Link to="/login" className="auth-link">Prisijungti</Link>
+                <Link to="/register" className="auth-link">Registruotis</Link>
+              </div>
+          )}
         </div>
       </header>
 
       {/* ---------- MENIU ---------- */}
       <nav>
         <ul>
-          <li><a>Forumai</a></li><li><a>Sąskaitos</a></li>
+          <li><a>Forumai</a></li>
+          <li><a>Sąskaitos</a></li>
           <li><Link to="/application">Prašymai</Link></li>
           <li><Link to="/reservation">Rezervacijos</Link></li>
           <li><Link to="/addTime">Pridėti laiką</Link></li>

@@ -21,7 +21,14 @@ namespace KomunalinisCentras.Backend.Repositories
                 .Include(r => r.Topic)
                 .ToListAsync();
         }
-
+        
+        public async Task<IEnumerable<Reservation>> GetByUserIdAsync(string userId)
+        {
+            return await _context.Reservations
+                .Where(r => r.UserId == userId)
+                .ToListAsync();
+        }
+        
         public async Task<Reservation?> GetByIdAsync(int id)
         {
             return await _context.Reservations
