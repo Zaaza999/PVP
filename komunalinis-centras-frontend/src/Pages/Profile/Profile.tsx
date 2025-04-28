@@ -1,208 +1,173 @@
-// src/Pages/Profile/UserProfile.tsx
-import React, { useState, useEffect } from "react";
-import { getUser, updateUser, getUserReservations, deleteReservation } from "../Axios/apiServises";
-import { jwtDecode } from 'jwt-decode';
-import { useNavigate } from "react-router-dom";
-import '../styles.css';
+// src/Pages/Profile/UserProfile.tsx – telefonas → PhoneNumber
+//-------------------------------------------------------------------
 
-type User = {
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import {
+  getUser,
+  updateUser,
+  getUserReservations,
+  deleteReservation,
+} from "../Axios/apiServises";
+import "../styles.css";
+
+/* ===== DTO ===== */
+interface User {
   id: string;
   roleId: number;
-  firstName: string;
-  lastName: string;
+  firstName: string | null;
+  lastName: string | null;
   username: string;
-  userPassword: string;
-  address: string;
-  phone: string;
-  email: string;
-};
-
-type Reservation = {
+  address: string | null;
+  phoneNumber: string | null; // ← IdentityUser field
+  email: string | null;
+}
+interface Reservation {
   reservationId: number;
   userId: number;
   timeSlotId: number;
   reservationDate: string;
   status: string;
   topicId: number;
-};
+}
 
-const getCurrentUserId = () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-        const decodedToken: any = jwtDecode(token)
-        console.log(decodedToken);
-        return decodedToken.userId;
-    }
+/* ===== auth helper ===== */
+const getCurrentUserId = (): string | null => {
+  const t = localStorage.getItem("token");
+  if (!t) return null;
+  try {
+    const d: any = jwtDecode(t);
+    return d.userId ?? d.id ?? d.sub ?? d.nameid ?? null;
+  } catch {
     return null;
+  }
 };
 
+/* ===== COMPONENT ===== */
 const UserProfile: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [address, setAddress] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [reservations, setReservations] = useState<Reservation[]>([]);
   const navigate = useNavigate();
+  const currentUserId = getCurrentUserId();
 
-    const currentUserId = getCurrentUserId();
+  const [user, setUser] = useState<User | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-    useEffect(() => {
-        if (currentUserId) {
-            getUser(currentUserId)
-                .then((data: User) => {
-                    setUser(data);
-                    setFirstName(data.firstName);
-                    setLastName(data.lastName);
-                    setAddress(data.address);
-                    setPhone(data.phone);
-                    setEmail(data.email);
-                })
-                .catch(console.error);
+  const [firstName, setFirstName]       = useState<string | null>(null);
+  const [lastName, setLastName]         = useState<string | null>(null);
+  const [address, setAddress]           = useState<string | null>(null);
+  const [phoneNumber, setPhoneNumber]   = useState<string | null>(null);
+  const [email, setEmail]               = useState<string | null>(null);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
 
-            getUserReservations(currentUserId)
-                .then((data: Reservation[]) => {
-                    setReservations(data);
-                })
-                .catch(console.error);
-        }
-    }, [currentUserId]);
+  /* --- load user --- */
+  useEffect(() => {
+    if (!currentUserId) return;
 
-  if (!user) {
-    return (
-      <div className="container user-profile">
-        <h2>Naudotojo profilis</h2>
-        <p>Kraunama...</p>
-      </div>
-    );
-  }
+    getUser(currentUserId)
+      .then((u: User) => {
+        setUser(u);
+        setFirstName(u.firstName);
+        setLastName(u.lastName);
+        setAddress(u.address);
+        setPhoneNumber(u.phoneNumber);
+        setEmail(u.email);
+      })
+      .catch(console.error);
 
-  const handleSaveClick = () => {
-    const updatedUser = {
+    getUserReservations(currentUserId as string)
+      .then(setReservations)
+      .catch(console.error);
+  }, [currentUserId]);
+
+  if (!user) return <p>Kraunama...</p>;
+
+  /* --- save */
+  const save = () => {
+    updateUser(user.id, {
       ...user,
-      firstName,
-      lastName,
-      address,
-      phone,
-      email,
-    };
-
-    updateUser(user.id, updatedUser)
-      .then((data: User) => {
-        setUser(data);
+      firstName:   firstName   ?? "",
+      lastName:    lastName    ?? "",
+      address:     address     ?? "",
+      phoneNumber: phoneNumber ?? "",
+      email:       email       ?? "",
+    })
+      .then((u: User) => {
+        setUser(u);
         setIsEditing(false);
       })
       .catch(console.error);
   };
-
-  const handleCancelClick = () => {
+  const cancel = () => {
     setFirstName(user.firstName);
     setLastName(user.lastName);
     setAddress(user.address);
-    setPhone(user.phone);
+    setPhoneNumber(user.phoneNumber);
     setEmail(user.email);
     setIsEditing(false);
   };
 
-  // Nauja funkcija rezervacijos trynimui
-  const handleDeleteReservation = (reservationId: number) => {
-    deleteReservation(reservationId)
-      .then(() => {
-        // Atnaujiname rezervacijų sąrašą pašalinus ištrintą rezervaciją
-        setReservations(prev =>
-          prev.filter(reservation => reservation.reservationId !== reservationId)
-        );
-      })
-      .catch(error => {
-        console.error("Rezervacijos trinimo klaida:", error);
-      });
-  };
+  const delRes = (id: number) =>
+    deleteReservation(id)
+      .then(() => setReservations(r => r.filter(x => x.reservationId !== id)))
+      .catch(console.error);
 
+  /* ===== render ===== */
   return (
-      <div className="container user-profile">
-          <h2>Naudotojo profilis</h2>
-          <button className="btn" onClick={() => navigate("/")}>
-              Grįžti į pagrindinį puslapį
-          </button>
-          <div className="card">
-              {isEditing ? (
-                  <div className="form">
-                      <div className="form-group">
-                          <label>Vardas:</label>
-                          <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)}/>
-                      </div>
-                      <div className="form-group">
-                          <label>Pavardė:</label>
-                          <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)}/>
-                      </div>
-                      <div className="form-group">
-                          <label>Adresas:</label>
-                          <input type="text" value={address} onChange={(e) => setAddress(e.target.value)}/>
-                      </div>
-                      <div className="form-group">
-                          <label>Telefonas:</label>
-                          <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)}/>
-                      </div>
-                      <div className="form-group">
-                          <label>El. paštas:</label>
-                          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}/>
-                      </div>
-                      <div>
-                          <button className="btn" onClick={handleSaveClick}>Išsaugoti</button>
-                          <button className="btn btn-delete" onClick={handleCancelClick}>Atšaukti</button>
-                      </div>
-                  </div>
-              ) : (
-                  <div className="profile-details">
-                      <p><strong>Vardas:</strong> {user.firstName}</p>
-                      <p><strong>Pavardė:</strong> {user.lastName}</p>
-                      <p><strong>Adresas:</strong> {user.address}</p>
-                      <p><strong>Telefonas:</strong> {user.phone}</p>
-                      <p><strong>El. paštas:</strong> {user.email}</p>
-                      <button className="btn" onClick={() => setIsEditing(true)}>Redaguoti</button>
-                  </div>
-              )}
+    <div className="container user-profile">
+      <h2>Naudotojo profilis</h2>
+      <button className="btn" onClick={() => navigate("/")}>Grįžti</button>
+
+      <div className="card">
+        {isEditing ? (
+          <div className="form">
+            {/* Vardas */}
+            <div className="form-group"><label>Vardas:</label><input type="text" value={firstName ?? ""} onChange={e => setFirstName(e.target.value)} /></div>
+            {/* Pavardė */}
+            <div className="form-group"><label>Pavardė:</label><input type="text" value={lastName ?? ""} onChange={e => setLastName(e.target.value)} /></div>
+            {/* Adresas */}
+            <div className="form-group"><label>Adresas:</label><input type="text" value={address ?? ""} onChange={e => setAddress(e.target.value)} /></div>
+            {/* Telefonas */}
+            <div className="form-group"><label>Telefonas:</label><input type="text" value={phoneNumber ?? ""} onChange={e => setPhoneNumber(e.target.value)} /></div>
+            {/* El. paštas */}
+            <div className="form-group"><label>El. paštas:</label><input type="email" value={email ?? ""} onChange={e => setEmail(e.target.value)} /></div>
+            <button className="btn" onClick={save}>Išsaugoti</button>
+            <button className="btn btn-delete" onClick={cancel}>Atšaukti</button>
           </div>
-          <h3>Mano rezervacijos</h3>
-          {reservations.length === 0 ? (
-              <p>Nėra rezervacijų</p>
-          ) : (
-              <div className="table-container">
-                  <table className="reservations-table">
-                      <thead>
-                      <tr>
-                          <th>Rezervacijos ID</th>
-                          <th>Laiko lango ID</th>
-                          <th>Rezervacijos data</th>
-                          <th>Statusas</th>
-                          <th>Veiksmai</th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      {reservations.map((reservation) => (
-                          <tr key={reservation.reservationId}>
-                              <td>{reservation.reservationId}</td>
-                              <td>{reservation.timeSlotId}</td>
-                              <td>{new Date(reservation.reservationDate).toLocaleString()}</td>
-                              <td>{reservation.status}</td>
-                              <td>
-                                  {/* Mygtuko atnaujinimas su rezervacijos trynimo funkcija */}
-                                  <button
-                                      className="btn btn-delete"
-                                      onClick={() => handleDeleteReservation(reservation.reservationId)}
-                                  >
-                                      Atšaukti
-                                  </button>
-                              </td>
-                          </tr>
-                      ))}
-                      </tbody>
-                  </table>
-              </div>
-          )}
+        ) : (
+          <div className="profile-details">
+            <p><strong>Vardas:</strong> {user.firstName}</p>
+            <p><strong>Pavardė:</strong> {user.lastName}</p>
+            <p><strong>Adresas:</strong> {user.address}</p>
+            <p><strong>Telefonas:</strong> {user.phoneNumber}</p>
+            <p><strong>El. paštas:</strong> {user.email}</p>
+            <button className="btn" onClick={() => setIsEditing(true)}>Redaguoti</button>
+          </div>
+        )}
       </div>
+
+      {/* Rezervacijos */}
+      <h3>Mano rezervacijos</h3>
+      {reservations.length === 0 ? (
+        <p>Nėra rezervacijų</p>
+      ) : (
+        <table className="reservations-table">
+          <thead>
+            <tr><th>ID</th><th>Langas</th><th>Data</th><th>Statusas</th><th /></tr>
+          </thead>
+          <tbody>
+            {reservations.map(r => (
+              <tr key={r.reservationId}>
+                <td>{r.reservationId}</td>
+                <td>{r.timeSlotId}</td>
+                <td>{new Date(r.reservationDate).toLocaleString()}</td>
+                <td>{r.status}</td>
+                <td><button className="btn btn-delete" onClick={() => delRes(r.reservationId)}>Atšaukti</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 };
 

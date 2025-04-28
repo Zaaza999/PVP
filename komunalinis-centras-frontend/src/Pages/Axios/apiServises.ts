@@ -1,13 +1,13 @@
 import { apiCall } from "./apiCall";
 
 // Naudotojo API funkcijos
-export const getUser = (id: number) => apiCall("get", "Users", id);
+export const getUser = (id: string) => apiCall("get", "Users", id);
 export const addUser = (data: any) => apiCall("add", "Users", "", data);
 export const updateUser = (id: string, data: any) => apiCall("update", "Users", id, data);
 export const deleteUser = (id: number) => apiCall("delete", "Users", id);
 
 // Rezervacijų API funkcijos
-export const getUserReservations = (userId: number) => apiCall("get", `Reservations/ByUser?userId=${userId}`);
+export const getUserReservations = (userId: string) => apiCall("get", `Reservations/ByUser?userId=${userId}`);
 export const getUserReservationsAlt = (userId: number) => apiCall("get", "Reservations/Naudotojas", userId);
 export const addReservation = (data: any) => apiCall("add", "Reservations", "", data);
 export const updateReservation = (id: number, data: any) => apiCall("update", "Reservations", id, data);

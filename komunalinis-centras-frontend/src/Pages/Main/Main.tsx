@@ -1,36 +1,41 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import '../styles.css';
+import "../styles.css";
 import {
   getLocations,
   getWasteTypes,
   getSchedules,
-  getUser              // <- naujas kvietimas
-} from '../Axios/apiServises';
+  getUser, // ⇢ priima STRING id
+} from "../Axios/apiServises";
 
-/* ====== DTO tipai ====== */
-type LocationDto  = { locationId: number; locationName: string };
-type WasteTypeDto = { wasteId: number;   wasteName: string };
-type ScheduleDto  = { scheduleId: number; locationId: number; wasteId: number; collectionDate: string };
-type UserDto      = { userId: number; address: string };
+/* ====== DTO types ====== */
+export type LocationDto = { locationId: number; locationName: string };
+export type WasteTypeDto = { wasteId: number; wasteName: string };
+export type ScheduleDto = {
+  scheduleId: number;
+  locationId: number;
+  wasteId: number;
+  collectionDate: string;
+};
+export type UserDto = { id: string; address: string };
 
-/* ====== Atliekų spalvos & LT pavadinimai ====== */
+/* ====== spalvos & pavadinimai ====== */
 const wasteColor: Record<string, string> = {
-  Household: '#71C568',
-  'Plastic/Metal/Paper': '#F4C542',
-  Glass: '#3AA3E4'
+  Household: "#71C568",
+  "Plastic/Metal/Paper": "#F4C542",
+  Glass: "#3AA3E4",
 };
 const wasteNameLt: Record<string, string> = {
-  Household: 'Buitinės atliekos',
-  'Plastic/Metal/Paper': 'Plastikas/Metalai/Popierius',
-  Glass: 'Stiklas'
+  Household: "Buitinės atliekos",
+  "Plastic/Metal/Paper": "Plastikas/Metalai/Popierius",
+  Glass: "Stiklas",
 };
-const getColor  = (n: string) => wasteColor[n]   ?? '#ccc';
+const getColor = (n: string) => wasteColor[n] ?? "#ccc";
 const getNameLt = (n: string) => wasteNameLt[n] ?? n;
 
 /* ====== Circular progress ====== */
-interface CircularProgressProps { progress: number }
+interface CircularProgressProps { progress: number; }
 const CircularProgress: React.FC<CircularProgressProps> = ({ progress }) => {
   const r = progress <= 50 ? progress * 3.6 : 180;
   const l = progress > 50 ? (progress - 50) * 3.6 : 0;
@@ -43,89 +48,105 @@ const CircularProgress: React.FC<CircularProgressProps> = ({ progress }) => {
   );
 };
 
-/* ====== Norimas naudotojo ID ====== */
-const USER_ID = 8;
+/* ====== extract GUID (string) user id from JWT ====== */
+const getCurrentUserId = (): string | null => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    const decoded: any = jwtDecode(token);
+    const id = decoded.userId ?? decoded.id ?? decoded.sub ?? decoded.nameid;
+    return id ? String(id) : null;
+  } catch (e) {
+    console.error("Invalid token:", e);
+    return null;
+  }
+};
 
-/* ====== Main ====== */
-const App: React.FC = () => {
-  /* --- global state --- */
-  const [locations,  setLocations]  = useState<LocationDto[]>([]);
+/* ====== MAIN COMPONENT ====== */
+const Main: React.FC = () => {
+  /* --- state --- */
+  const [locations, setLocations] = useState<LocationDto[]>([]);
   const [wasteTypes, setWasteTypes] = useState<Map<number, WasteTypeDto>>(new Map());
-  const [schedules,  setSchedules]  = useState<ScheduleDto[]>([]);
+  const [schedules, setSchedules] = useState<ScheduleDto[]>([]);
   const [selectedLoc, setSelectedLoc] = useState<number | null>(null);
-  const [username, setUsername] = useState<string>('Svečias');
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>("Svečias");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-  /* --- mėnesio valdymas (start = dabartinis) --- */
-  const [viewDate, setViewDate] = useState<Date>(() => {
-    const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), 1);
-  });
-  const firstDay     = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
-  const daysInMonth  = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-  const firstWeekday = firstDay.getDay() || 7;
-  const totalCells   = Math.ceil((firstWeekday - 1 + daysInMonth) / 7) * 7;
-  const monthLabel   = viewDate.toLocaleDateString('lt-LT', { year: 'numeric', month: 'long' });
-  const changeMonth  = (d: number) => setViewDate(v => new Date(v.getFullYear(), v.getMonth() + d, 1));
+  /* --- init user id --- */
+  useEffect(() => {
+    setCurrentUserId(getCurrentUserId());
+  }, []);
 
-  /* === INIT: Locations, WasteTypes, User === */
+  /* --- mėnuo --- */
+  const [viewDate, setViewDate] = useState<Date>(() => {
+    const t = new Date();
+    return new Date(t.getFullYear(), t.getMonth(), 1);
+  });
+  const firstDay = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
+  const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+  const firstWeekday = firstDay.getDay() || 7;
+  const totalCells = Math.ceil((firstWeekday - 1 + daysInMonth) / 7) * 7;
+  const monthLabel = viewDate.toLocaleDateString("lt-LT", { year: "numeric", month: "long" });
+  const changeMonth = (d: number) => setViewDate(v => new Date(v.getFullYear(), v.getMonth() + d, 1));
+
+  /* --- INIT: Locations + WasteTypes --- */
   useEffect(() => {
     Promise.all([getLocations(), getWasteTypes()])
-      .then(([locs, wastes]: [LocationDto[], WasteTypeDto[]]) => {
+      .then(([locs, wastes]) => {
         setLocations(locs);
-
-        const map = new Map<number, WasteTypeDto>();
-        wastes.forEach((w: WasteTypeDto) => map.set(w.wasteId, w));   // <-- tipas deklaruotas
-        setWasteTypes(map);
-
-        return Promise.all([getUser(USER_ID), locs]);                 // perduodame locs toliau
-      })
-      .then(([user, locs]: [UserDto, LocationDto[]]) => {
-        if (!user?.address) return;
-
-        const addrWords = user.address.toLowerCase().split(/[\s,]+/);
-        const match = locs.find(l => addrWords.includes(l.locationName.toLowerCase()));
-        if (match) setSelectedLoc(match.locationId);
+        setWasteTypes(new Map<number, WasteTypeDto>(wastes.map((w: WasteTypeDto): [number, WasteTypeDto] => [w.wasteId, w])));
       })
       .catch(console.error);
   }, []);
 
-  /* === Schedules === */
+  /* --- USER & auto-select address --- */
+  useEffect(() => {
+    if (!currentUserId || locations.length === 0) return;
+
+    getUser(currentUserId)
+      .then((user: UserDto) => {
+        if (!user.address) return;
+        const addrWords = user.address.toLowerCase().split(/[,\s]+/);
+        const match = locations.find(l => addrWords.includes(l.locationName.toLowerCase()));
+        if (match) setSelectedLoc(match.locationId);
+      })
+      .catch(console.error);
+  }, [currentUserId, locations]);
+
+  /* --- Schedules by selectedLoc --- */
   useEffect(() => {
     if (selectedLoc == null) { setSchedules([]); return; }
     getSchedules()
-      .then((all: ScheduleDto[]) => setSchedules(all.filter(s => s.locationId === selectedLoc)))
+      .then((all: ScheduleDto[]) => setSchedules(all.filter((s: ScheduleDto) => s.locationId === selectedLoc)))
       .catch(console.error);
   }, [selectedLoc]);
 
+  /* --- Auth display name --- */
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded: any = jwtDecode(token);
-        const fullName = `${decoded.firstName || ""} ${decoded.lastName || ""}`.trim();
-        setUsername(fullName || "Svečias");
-        setIsLoggedIn(true);
-      } catch (e) {
-        console.error("Invalid token:", e);
-        setUsername("Svečias");
-        setIsLoggedIn(false);
-      }
-    } else {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    try {
+      const decoded: any = jwtDecode(token);
+      const fullName = `${decoded.firstName || ""} ${decoded.lastName || ""}`.trim();
+      setUsername(fullName || "Svečias");
+      setIsLoggedIn(true);
+    } catch {
       setUsername("Svečias");
       setIsLoggedIn(false);
     }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     window.location.reload();
   };
 
-  /* === Map date -> WasteType[] (max 3) === */
+  /* --- Date -> WasteType[] helper --- */
   const dateWts = new Map<string, WasteTypeDto[]>();
   schedules.forEach((s: ScheduleDto) => {
-    const key = s.collectionDate.split('T')[0];
-    const [y, m] = key.split('-').map(Number);
+    const key = s.collectionDate.split("T")[0];
+    const [y, m] = key.split("-").map(Number);
     if (y === viewDate.getFullYear() && m === viewDate.getMonth() + 1) {
       const wt = wasteTypes.get(s.wasteId);
       if (!wt) return;
@@ -135,36 +156,33 @@ const App: React.FC = () => {
     }
   });
 
-  /* === JSX === */
+  /* ====== RENDER ====== */
   return (
     <div>
-      {/* ---------- HEADER ---------- */}
+      {/* HEADER */}
       <header>
         <div className="header-left"><h1>KPC</h1></div>
         <div className="header-right">
           <CircularProgress progress={70} />
           <span>{username}</span>
           {isLoggedIn ? (
-              <div className="dropdown">
-                <button className="dropbtn">[ ☰ ]</button>
-                <div className="dropdown-content">
-                  <Link to="/profile">Profilis</Link>
-                  <Link to="/" onClick={(e) => {
-                    e.preventDefault();
-                    handleLogout();
-                  }}>Atsijungti</Link>
-                </div>
+            <div className="dropdown">
+              <button className="dropbtn">[ ☰ ]</button>
+              <div className="dropdown-content">
+                <Link to="/profile">Profilis</Link>
+                <Link to="/" onClick={e => { e.preventDefault(); handleLogout(); }}>Atsijungti</Link>
               </div>
+            </div>
           ) : (
-              <div className="auth-buttons">
-                <Link to="/login" className="auth-link">Prisijungti</Link>
-                <Link to="/register" className="auth-link">Registruotis</Link>
-              </div>
+            <div className="auth-buttons">
+              <Link to="/login" className="auth-link">Prisijungti</Link>
+              <Link to="/register" className="auth-link">Registruotis</Link>
+            </div>
           )}
         </div>
-      </header>
-
-      {/* ---------- MENIU ---------- */}
+      </header> 
+      
+      {/* NAV */}
       <nav>
         <ul>
           <li><a>Forumai</a></li>
@@ -176,7 +194,7 @@ const App: React.FC = () => {
       </nav>
 
       <main>
-        {/* ---------- SKELBIMAI ---------- */}
+        {/* SKELBIMAI */}
         <section className="skelbimai">
           <h2>Skelbimai</h2>
           <ul>
@@ -187,14 +205,12 @@ const App: React.FC = () => {
           </ul>
         </section>
 
-        {/* ---------- ATLIEKŲ GRAFIKAS ---------- */}
+        {/* ATLIEKŲ GRAFIKAS */}
         <section className="atliek-isvezimas">
           <h2>Atliekų išvežimas</h2>
-          <select value={selectedLoc ?? ''} onChange={e => setSelectedLoc(+e.target.value || null)}>
+          <select value={selectedLoc ?? ""} onChange={e => setSelectedLoc(+e.target.value || null)}>
             <option value="">– Pasirinkite gyvenvietę –</option>
-            {locations.map(l =>
-              <option key={l.locationId} value={l.locationId}>{l.locationName}</option>
-            )}
+            {locations.map(l => <option key={l.locationId} value={l.locationId}>{l.locationName}</option>)}
           </select>
 
           {selectedLoc && (
@@ -209,35 +225,28 @@ const App: React.FC = () => {
                 <thead><tr><th>P</th><th>A</th><th>T</th><th>K</th><th>Pn</th><th>Š</th><th>S</th></tr></thead>
                 <tbody>
                   {Array.from({ length: totalCells / 7 }, (_, row) => (
-                    <tr key={row}>
-                      {Array.from({ length: 7 }, (_, col) => {
-                        const cell = row * 7 + col;
-                        const day  = cell - (firstWeekday - 2);
-                        if (day < 1 || day > daysInMonth) return <td key={col}></td>;
-
-                        const key = `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                        const wts = dateWts.get(key);
-                        let style: React.CSSProperties = {};
-
-                        if (wts?.length) {
-                          if (wts.length === 1) {
-                            style.backgroundColor = getColor(wts[0].wasteName);
-                          } else {
-                            const pct = 100 / wts.length;
-                            const stops = wts.map((wt, i) =>
-                              `${getColor(wt.wasteName)} ${i * pct}% ${(i + 1) * pct}%`
-                            ).join(', ');
-                            style.backgroundImage = `linear-gradient(to bottom, ${stops})`;
-                          }
+                    <tr key={row}>{Array.from({ length: 7 }, (_, col) => {
+                      const cell = row * 7 + col;
+                      const day = cell - (firstWeekday - 2);
+                      if (day < 1 || day > daysInMonth) return <td key={col}></td>;
+                      const key = `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                      const wts = dateWts.get(key);
+                      let style: React.CSSProperties = {};
+                      if (wts?.length) {
+                        if (wts.length === 1) {
+                          style.backgroundColor = getColor(wts[0].wasteName);
+                        } else {
+                          const pct = 100 / wts.length;
+                          const stops = wts.map((wt, i) => `${getColor(wt.wasteName)} ${i * pct}% ${(i + 1) * pct}%`).join(", ");
+                          style.backgroundImage = `linear-gradient(to bottom, ${stops})`;
                         }
-                        return <td key={col} style={style}>{day}</td>;
-                      })}
-                    </tr>
+                      }
+                      return <td key={col} style={style}>{day}</td>;
+                    })}</tr>
                   ))}
                 </tbody>
               </table>
 
-              {/* legenda */}
               <div className="legend">
                 {Array.from(wasteTypes.values()).map(w => (
                   <div key={w.wasteId} className="legend-item">
@@ -250,7 +259,7 @@ const App: React.FC = () => {
           )}
         </section>
 
-        {/* ---------- KONTAKTAI ---------- */}
+        {/* KONTAKTAI */}
         <section className="kontaktai">
           <h2>Kontaktai</h2>
           <ul>
@@ -267,4 +276,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default Main;

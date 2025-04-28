@@ -22,8 +22,9 @@ namespace KomunalinisCentras.Backend.Entities
         public string Status { get; set; } = "Confirmed"; 
         
         [Column("topic_id")]
-        public int TopicId { get; set; } 
-        
+        public int TopicId { get; set; }  
+
+        [JsonIgnore]
         public User? User { get; set; } 
 
         [JsonIgnore]
