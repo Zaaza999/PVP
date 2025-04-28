@@ -1,7 +1,7 @@
 import { apiCall } from "./apiCall";
 
 // Naudotojo API funkcijos
-export const getUser = (id: number) => apiCall("get", "Users", id);
+export const getUser = (id: string) => apiCall("get", "Users", id);
 export const addUser = (data: any) => apiCall("add", "Users", "", data);
 export const updateUser = (id: string, data: any) => apiCall("update", "Users", id, data);
 export const deleteUser = (id: number) => apiCall("delete", "Users", id);
