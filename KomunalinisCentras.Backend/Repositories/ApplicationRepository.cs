@@ -44,5 +44,12 @@ namespace KomunalinisCentras.Backend.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<Application?> GetByIdWithUserAsync(int id)
+        {
+            return await _context.Applications
+                .Include(a => a.SubmittedBy)
+                .FirstOrDefaultAsync(a => a.ApplicationId == id);
+        }
+        
     }
 }

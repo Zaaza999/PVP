@@ -27,7 +27,7 @@ namespace KomunalinisCentras.Backend.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var application = await _applicationRepository.GetByIdAsync(id);
+            var application = await _applicationRepository.GetByIdWithUserAsync(id);
             if (application == null)
                 return NotFound();
 
@@ -76,5 +76,19 @@ namespace KomunalinisCentras.Backend.Controllers
             await _applicationRepository.DeleteAsync(id);
             return NoContent();
         }
+
+        [HttpPatch("{id}/approve")]
+        public async Task<IActionResult> SetApprovalStatus(int id, [FromBody] bool approved)
+        {
+            var application = await _applicationRepository.GetByIdAsync(id);
+            if (application == null)
+                return NotFound();
+
+            application.Approved = approved;
+            await _applicationRepository.UpdateAsync(application);
+
+            return NoContent();
+        }
+
     }
 }

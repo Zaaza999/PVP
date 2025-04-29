@@ -1,0 +1,31 @@
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+  }
+  
+  .container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+  }
+  
+  .application-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .application-card p {
+    margin: 6px 0;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .application-card strong {
+    color: #333;
+    font-weight: 600;
+  }
+  

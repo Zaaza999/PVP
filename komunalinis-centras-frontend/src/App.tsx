@@ -11,6 +11,8 @@ import LoginPage from "./Pages/Login/LoginPage";
 import RegisterPage from "./Pages/Register/RegisterPage";
 import RegisterWorker from "./Pages/RegisterWorker/RegisterPage";
 import ApplicationList from "./Pages/ApplicationList/ApplicationList";
+import ApplicationDetail from "./Pages/ApplicationList/ApplicationDetail/ApplicationDetail";
+
 
 function App() {
   return (
@@ -27,6 +29,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/register-worker" element={<RegisterWorker />} />
         <Route path="/application-list" element={<ApplicationList />} />
+        <Route path="/application-list/:id" element={<ApplicationDetail />} />
         {/* This route will show the Reservation component at /reservation */}
         <Route path="/application" element={<Application />} />
       </Routes>

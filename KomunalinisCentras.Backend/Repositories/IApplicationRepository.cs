@@ -9,5 +9,7 @@ namespace KomunalinisCentras.Backend.Repositories
         Task CreateAsync(Application application);
         Task UpdateAsync(Application application);
         Task DeleteAsync(int id);
+        Task<Application?> GetByIdWithUserAsync(int id);
+
     }
 }
