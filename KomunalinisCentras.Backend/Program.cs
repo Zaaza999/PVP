@@ -34,7 +34,7 @@ builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<ILocationRepository, LocationRepository>(); 
 builder.Services.AddScoped<IWasteTypeRepository, WasteTypeRepository>(); 
 builder.Services.AddScoped<IGarbageScheduleRepository, GarbageScheduleRepository>();
-
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
 
 
 builder.Services.AddCors(options =>

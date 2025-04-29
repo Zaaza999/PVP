@@ -19,6 +19,7 @@ namespace KomunalinisCentras.Backend.Data
         public DbSet<Location> Locations { get; set; }
         public DbSet<WasteType> WasteTypes { get; set; }
         public DbSet<GarbageCollectionSchedule> GarbageCollectionSchedules { get; set; } 
+        public DbSet<Application> Applications { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -34,6 +35,7 @@ namespace KomunalinisCentras.Backend.Data
             modelBuilder.Entity<Location>().ToTable("Locations");
             modelBuilder.Entity<WasteType>().ToTable("WasteTypes");
             modelBuilder.Entity<GarbageCollectionSchedule>().ToTable("GarbageCollectionSchedule");
+            modelBuilder.Entity<Application>().ToTable("Applications");
 
             // Example relationships (if you want explicit configuration)
             modelBuilder.Entity<User>()
@@ -72,6 +74,12 @@ namespace KomunalinisCentras.Backend.Data
                 .HasOne(g => g.WasteType)
                 .WithMany()
                 .HasForeignKey(g => g.WasteId);
+            
+            
+            modelBuilder.Entity<Application>()
+                .HasOne(a => a.SubmittedBy)
+                .WithMany()
+                .HasForeignKey(a => a.SubmittedByUserId);
         }
     }
 }
