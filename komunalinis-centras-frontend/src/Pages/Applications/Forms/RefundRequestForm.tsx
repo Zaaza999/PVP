@@ -1,31 +1,9 @@
 import React, { useState } from "react";
+import { useFormSubmit } from "../hooks/useFormSubmit";
 import "../../styles.css";
 
 const RefundRequestForm: React.FC = () => {
-  const [formData, setFormData] = useState({
-    vardas: "",
-    adresas: "",
-    mokejimoKodas: "",
-    data: "",
-    pervedimoData: "",
-    sumaZodziais: "",
-    operacijosNr: "",
-    grazintiKam: "",
-    saskaitosNr: "",
-    pareiskejas: "",
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Pateikta forma:", formData);
-  };
+  const { formData, handleChange, handleSubmit } = useFormSubmit("WasteFeeExemption");  
 
   return (
     <form onSubmit={handleSubmit} className="weekly-schedule-container">

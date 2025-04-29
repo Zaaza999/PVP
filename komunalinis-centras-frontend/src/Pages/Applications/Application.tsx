@@ -15,13 +15,13 @@ import PayerDataChangeRequestForm from "./Forms/PayerDataChangeRequestForm";
 const formsList = [
   { title: "1. Prašymas atleisti nuo kintamos vietinės rinkliavos (fiziniams)", component: <WasteFeeExemptionForm /> },
   { title: "2. Prašymas atleisti nuo kintamos vietinės rinkliavos (juridiniams)", component: <WasteFeeExemptionBusinessForm /> },
-  { title: "3. Prašymas dėl NT objekto įtraukimo į netinkamų/nenaudojamų sąrašą", component: <PropertyUnsuitabilityForm /> },
-  { title: "4. NT ploto / paskirties tikslinimo deklaracija", component: <PropertyUsageDeclarationForm /> },
-  { title: "5. Asmenų skaičiaus deklaracija", component: <ResidentCountDeclarationForm /> },
-  { title: "6. Konteinerio užsakymo prašymas", component: <ContainerRequestForm /> },
-  { title: "7. Konteinerio ištuštinimo dažnio keitimas", component: <ContainerFrequencyChangeForm /> },
-  { title: "8. Konteinerio dydžio keitimas", component: <EmailInvoiceRequestForm /> },
-  { title: "9. Prašymas dėl sąskaitų el. paštu", component: <RefundRequestForm /> },
+  { title: "3. Prašymas dėl sąskaitų el. paštu", component: <RefundRequestForm /> },
+  { title: "4. Prašymas dėl NT objekto įtraukimo į netinkamų/nenaudojamų sąrašą", component: <PropertyUnsuitabilityForm /> },
+  { title: "5. NT ploto / paskirties tikslinimo deklaracija", component: <PropertyUsageDeclarationForm /> },
+  { title: "6. Asmenų skaičiaus deklaracija", component: <ResidentCountDeclarationForm /> },
+  { title: "7. Konteinerio užsakymo prašymas", component: <ContainerRequestForm /> },
+  { title: "8. Konteinerio ištuštinimo dažnio keitimas", component: <ContainerFrequencyChangeForm /> },
+  { title: "9. Konteinerio dydžio keitimas", component: <EmailInvoiceRequestForm /> },
   { title: "10. Permokos grąžinimo prašymas", component: <PayerDataChangeRequestForm /> },
 ];
 

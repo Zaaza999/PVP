@@ -1,51 +1,17 @@
 import React, { useState } from "react";
+import { useFormSubmit } from "../hooks/useFormSubmit";
 import "../../styles.css";
 
 const WasteFeeExemptionForm: React.FC = () => {
-  const [formData, setFormData] = useState({
-    patalpuAdresas: "",
-    savininkoVardas: "",
-    korespondencijosAdresas: "",
-    telefonas: "",
-    elPastas: "",
-    data: "",
-    turtoAdresas: "",
-    bendrasPlotas: "",
-    unikalusNr: "",
-    laikotarpisNuo: "",
-    laikotarpisIki: "",
-    vandensTiekimas: "",
-    elektrosSkaitiklis: "",
-    vandensParodymai: "",
-    elektrosParodymai: "",
-    vardasPavarde: "",
-  });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Submitted Data:", formData);
-  };
-
+  const { formData, handleChange, handleSubmit } = useFormSubmit("WasteFeeExemption");  
+  
   return (
     <form onSubmit={handleSubmit} className="weekly-schedule-container">
       <h2 className="mb-4" style={{ textAlign: "center" }}>
-        Prašymas – Atleisti nuo kintamosios vietinės rinkliavos dedamosios
-        mokėjimo
+        Prašymas – Atleisti nuo kintamosios vietinės rinkliavos dedamosios mokėjimo
       </h2>
-
-      <p>
-        Užpildykite šią formą, jeigu pageidaujate būti atleisti nuo kintamosios
-        vietinės rinkliavos dalies mokėjimo laikotarpiu, kai nekilnojamojo
-        turto objekte nėra gyvenama.
-      </p>
-
+  
       <div className="form-group">
         <label>Patalpų adresas ir savininko vardas, pavardė</label>
         <input
@@ -55,7 +21,7 @@ const WasteFeeExemptionForm: React.FC = () => {
           placeholder="Pvz.: Taikos pr. 1, Kaunas – Jonas Jonaitis"
         />
       </div>
-
+  
       <div className="form-group">
         <label>Adresas korespondencijai, telefono Nr., el. paštas</label>
         <input
@@ -65,7 +31,7 @@ const WasteFeeExemptionForm: React.FC = () => {
           placeholder="Pvz.: korespondencijos@el.paštas.lt, 860000000"
         />
       </div>
-
+  
       <div className="form-group">
         <label>Prašymo pateikimo data</label>
         <input
@@ -75,11 +41,9 @@ const WasteFeeExemptionForm: React.FC = () => {
           onChange={handleChange}
         />
       </div>
-
+  
       <div className="form-group">
-        <label>
-          Nekilnojamojo turto objekto adresas, plotas, unikalus numeris
-        </label>
+        <label>Nekilnojamojo turto objekto adresas, plotas, unikalus numeris</label>
         <input
           name="turtoAdresas"
           placeholder="Adresas"
@@ -99,7 +63,7 @@ const WasteFeeExemptionForm: React.FC = () => {
           onChange={handleChange}
         />
       </div>
-
+  
       <div className="form-group">
         <label>Laikotarpis, kuriam prašoma atleisti</label>
         <div style={{ display: "flex", gap: "10px" }}>
@@ -117,14 +81,9 @@ const WasteFeeExemptionForm: React.FC = () => {
           />
         </div>
       </div>
-
-      <p>
-        Informacija apie vandens ir elektros sunaudojimą nekilnojamojo turto
-        objekte:
-      </p>
-
+  
       <div className="form-group">
-        <label>Vandens tiekimo būsena:</label>
+        <label>Vandens tiekimo būsena</label>
         <select
           name="vandensTiekimas"
           value={formData.vandensTiekimas}
@@ -135,9 +94,9 @@ const WasteFeeExemptionForm: React.FC = () => {
           <option value="nevykdomas">Nevykdomas</option>
         </select>
       </div>
-
+  
       <div className="form-group">
-        <label>Elektros skaitiklio būsena:</label>
+        <label>Elektros skaitiklio būsena</label>
         <select
           name="elektrosSkaitiklis"
           value={formData.elektrosSkaitiklis}
@@ -148,9 +107,9 @@ const WasteFeeExemptionForm: React.FC = () => {
           <option value="neirengtas">Neįrengtas</option>
         </select>
       </div>
-
+  
       <div className="form-group">
-        <label>Vandens parodymai laikotarpio pradžioje (jei yra):</label>
+        <label>Vandens parodymai laikotarpio pradžioje</label>
         <input
           name="vandensParodymai"
           placeholder="m³"
@@ -158,11 +117,9 @@ const WasteFeeExemptionForm: React.FC = () => {
           onChange={handleChange}
         />
       </div>
-
+  
       <div className="form-group">
-        <label>
-          Elektros parodymai laikotarpio pradžioje (jei yra):{" "}
-        </label>
+        <label>Elektros parodymai laikotarpio pradžioje</label>
         <input
           name="elektrosParodymai"
           placeholder="kWh"
@@ -170,7 +127,7 @@ const WasteFeeExemptionForm: React.FC = () => {
           onChange={handleChange}
         />
       </div>
-
+  
       <div className="form-group">
         <label>Atliekų turėtojo vardas, pavardė (parašas)</label>
         <input
@@ -180,27 +137,13 @@ const WasteFeeExemptionForm: React.FC = () => {
           onChange={handleChange}
         />
       </div>
-
-      <hr style={{ margin: "20px 0" }} />
-
-      <p style={{ fontSize: "0.95rem" }}>
-        Patvirtinu, kad prašyme pateikti duomenys yra teisingi. Jei duomenys
-        pasikeistų – informuosiu raštu per 30 kalendorinių dienų. Leidžiu
-        tvarkyti mano asmens duomenis ir įtraukti juos į Administratoriaus
-        tvarkomą registrą.
-      </p>
-
-      <p style={{ fontSize: "0.95rem", marginTop: "10px" }}>
-        Jeigu laikotarpiu sunaudojama daugiau nei 1 m³ vandens arba 45 kWh
-        elektros per 3 mėn., įsipareigoju pateikti papildomą paaiškinimą su
-        įrodymais.
-      </p>
-
+  
       <button type="submit" className="btn" style={{ marginTop: "20px" }}>
         Pateikti prašymą
       </button>
     </form>
   );
+  
 };
 
 export default WasteFeeExemptionForm;
