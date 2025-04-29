@@ -26,6 +26,7 @@ const LoginPage = () => {
 
             const data = await response.json();
             localStorage.setItem("token", data.token);
+            localStorage.setItem("userId", data.userId);
             alert("Login successful!");
             navigate("/");
         } catch (error: any) {
