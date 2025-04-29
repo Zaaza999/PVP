@@ -35,6 +35,9 @@ namespace KomunalinisCentras.Backend.Entities
 
         [JsonIgnore]
         public User? SubmittedBy { get; set; }
+
+        [Column("approved")]
+        public bool Approved { get; set; } = false;
     }
 
 }

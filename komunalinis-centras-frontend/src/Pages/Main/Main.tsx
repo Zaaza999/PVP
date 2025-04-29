@@ -190,6 +190,7 @@ const Main: React.FC = () => {
           <li><Link to="/application">Prašymai</Link></li>
           <li><Link to="/reservation">Rezervacijos</Link></li>
           <li><Link to="/addTime">Pridėti laiką</Link></li>
+          <li><Link to="/application-list">Prašymų sąrašas</Link></li>
         </ul>
       </nav>
 

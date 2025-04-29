@@ -9,6 +9,8 @@ import Application from './Pages/Applications/Application';
 import Profile from './Pages/Profile/Profile'
 import LoginPage from "./Pages/Login/LoginPage";
 import RegisterPage from "./Pages/Register/RegisterPage";
+import RegisterWorker from "./Pages/RegisterWorker/RegisterPage";
+import ApplicationList from "./Pages/ApplicationList/ApplicationList";
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register-worker" element={<RegisterWorker />} />
+        <Route path="/application-list" element={<ApplicationList />} />
         {/* This route will show the Reservation component at /reservation */}
         <Route path="/application" element={<Application />} />
       </Routes>
