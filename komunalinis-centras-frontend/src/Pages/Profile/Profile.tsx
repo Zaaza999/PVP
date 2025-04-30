@@ -13,9 +13,14 @@ import {
 import "../styles.css";
 
 /* ===== DTO ===== */
+interface Role {
+  roleName: string;
+  id: string;
+}
 interface User {
   id: string;
   roleId: number;
+  role?: Role;
   firstName: string | null;
   lastName: string | null;
   username: string;
@@ -140,6 +145,7 @@ const UserProfile: React.FC = () => {
             <p><strong>Adresas:</strong> {user.address}</p>
             <p><strong>Telefonas:</strong> {user.phoneNumber}</p>
             <p><strong>El. paštas:</strong> {user.email}</p>
+            <p><strong>Vartotojo rolė:</strong> {user.role?.roleName ?? "Nenurodyta"}</p>
             <button className="btn" onClick={() => setIsEditing(true)}>Redaguoti</button>
           </div>
         )}

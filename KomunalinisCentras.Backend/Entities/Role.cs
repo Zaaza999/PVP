@@ -7,10 +7,6 @@ namespace KomunalinisCentras.Backend.Entities
 {
     public class Role : IdentityRole
     {
-        [Key] 
-        [Column("role_id")]
-        public int RoleId { get; set; } 
-
         [Column("role_name")]
         public string RoleName { get; set; } = null!;
 

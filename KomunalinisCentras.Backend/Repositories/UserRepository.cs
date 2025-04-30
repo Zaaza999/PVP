@@ -23,6 +23,7 @@ namespace KomunalinisCentras.Backend.Repositories
         public async Task<User?> GetByIdAsync(string id)
         {
             return await _context.Users
+                .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 
