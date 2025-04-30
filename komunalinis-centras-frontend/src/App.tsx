@@ -11,7 +11,7 @@ import LoginPage from "./Pages/Login/LoginPage";
 import RegisterPage from "./Pages/Register/RegisterPage";
 import RegisterWorker from "./Pages/RegisterWorker/RegisterPage";
 import ApplicationList from "./Pages/ApplicationList/ApplicationList";
-import ApplicationDetail from "./Pages/ApplicationList/ApplicationDetail/ApplicationDetail";
+import ApplicationDetail from "./Pages/ApplicationDetail/ApplicationDetail";
 
 
 function App() {
