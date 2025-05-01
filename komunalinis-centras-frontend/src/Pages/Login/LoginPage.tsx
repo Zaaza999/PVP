@@ -29,10 +29,10 @@ const LoginPage = () => {
             localStorage.setItem("userId", data.userId);
             localStorage.setItem("userRole", data.userRole);
             console.log(data)
-            alert("Login successful!");
+            alert("Sėkmingai prisijungėte!");
             navigate("/");
         } catch (error: any) {
-            alert("Login failed: " + error.message);
+            alert("Prisijungimas nepavyko: " + error.message);
         }
     };
 

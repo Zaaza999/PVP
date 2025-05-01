@@ -41,10 +41,10 @@ const RegisterPage = () => {
                 throw new Error(errorText);
             }
 
-            alert("User registered successfully!");
+            alert("Sėkmingai užsiregistravote!");
             navigate("/login");
         } catch (error: any) {
-            alert("Registration failed: " + error.message);
+            alert("Registracija nepavyko: " + error.message);
         }
     };
 
