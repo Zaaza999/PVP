@@ -2,7 +2,7 @@ version: '3.8'
 services:
   db:
     image: mysql:8.0       # Galite pasirinkti norimą versiją
-    container_name: komunalinis_db
+    container_name: my_mysql_db
     environment:
       - MYSQL_ROOT_PASSWORD=supersecret
       - MYSQL_DATABASE=komunalinis_db
@@ -12,32 +12,5 @@ services:
       - "3306:3306"        # Išorinį 3306 prievadą "išmapinti" į konteinerio 3306
     volumes:
       - db_data:/var/lib/mysql
-
-api:
-    build: ./Backend           # naudoja Backend/Dockerfile
-    container_name: komunalinis_api
-    depends_on:
-      - db
-    environment:
-      # --- EF Core connection string (vidinis adresas "db") ---
-      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=komunalinis_db;User=appuser;Password=appsecret
-
-      # --- Gmail SMTP parametrų injekcija ---
-      - Mail__Host=smtp.gmail.com
-      - Mail__Port=587
-      - Mail__User=atliekos.priminimai@gmail.com
-      - Mail__Password=dfticwgezodpgsoi   # << įklijuok App‑Password
-
-      # --- Hangfire job tvarkaraštis (17:00 UTC = 20:00 LT vasarą) ---
-      - Hangfire__Cron=0 17 * * *
-
-      # --- JWT parametrai (sutampa su appsettings.json) ---
-      - JWT__ValidAudience=http://localhost:3000
-      - JWT__ValidIssuer=http://localhost:5000
-      - JWT__Secret=12345678912345678912345678912345
-    ports:
-      - "5000:80"    # swagger + API
-    restart: unless-stopped
-
 volumes:
   db_data:
