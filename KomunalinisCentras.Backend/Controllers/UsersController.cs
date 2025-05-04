@@ -77,6 +77,33 @@ namespace KomunalinisCentras.Backend.Controllers
 
             await _userRepository.DeleteAsync(id);
             return NoContent();
+        } 
+
+        [HttpPut("{id}/subscribe")]
+        public async Task<IActionResult> Subscribe(string id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null) return NotFound();
+
+            if (user.Subscription) return NoContent();     
+
+            user.Subscription = true;
+            await _userRepository.UpdateAsync(user);
+            return NoContent();                             
+        } 
+        // PUT /users/{id}/unsubscribe
+        [HttpPut("{id}/unsubscribe")]
+        public async Task<IActionResult> Unsubscribe(string id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null) return NotFound();
+
+            if (!user.Subscription) return NoContent();     // jau išjungta
+
+            user.Subscription = false;
+            await _userRepository.UpdateAsync(user);
+            return NoContent();
         }
+
     }
 }

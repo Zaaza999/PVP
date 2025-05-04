@@ -644,3 +644,28 @@ body {
 .legend-color { width:14px; height:14px; border:1px solid #444; }
 
 
+/* --- Prenumeratos mygtukas --- */
+.btn-subscribe {
+  background-color: #4caf50;          /* žalia ‑ dera su atliekų tema */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-inline: 18px;
+  transition: background 0.25s, transform 0.15s;
+}
+
+.btn-subscribe:hover {
+  background-color: #43a047;
+  transform: translateY(-2px);
+}
+
+/* varpelio piktograma (CSS pseudo‑elementu, kad nereiktų svg) */
+.btn-subscribe .bell::before {
+  content: \"🔔\";
+  font-size: 1rem;
+} 
+.subscribe-wrapper {
+  margin-top: 1rem;      
+}
+
+

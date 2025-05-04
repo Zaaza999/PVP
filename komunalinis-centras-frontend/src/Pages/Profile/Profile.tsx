@@ -1,6 +1,3 @@
-// src/Pages/Profile/UserProfile.tsx – telefonas → PhoneNumber
-//-------------------------------------------------------------------
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -9,14 +6,12 @@ import {
   updateUser,
   getUserReservations,
   deleteReservation,
+  cancelSubscription, // NEW
 } from "../Axios/apiServises";
 import "../styles.css";
 
 /* ===== DTO ===== */
-interface Role {
-  roleName: string;
-  id: string;
-}
+interface Role { roleName: string; id: string; }
 interface User {
   id: string;
   roleId: number;
@@ -25,8 +20,9 @@ interface User {
   lastName: string | null;
   username: string;
   address: string | null;
-  phoneNumber: string | null; // ← IdentityUser field
+  phoneNumber: string | null;
   email: string | null;
+  subscription: boolean;              // ⇠ pridėta
 }
 interface Reservation {
   reservationId: number;
@@ -57,11 +53,11 @@ const UserProfile: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [firstName, setFirstName]       = useState<string | null>(null);
-  const [lastName, setLastName]         = useState<string | null>(null);
-  const [address, setAddress]           = useState<string | null>(null);
-  const [phoneNumber, setPhoneNumber]   = useState<string | null>(null);
-  const [email, setEmail]               = useState<string | null>(null);
+  const [firstName, setFirstName]     = useState<string | null>(null);
+  const [lastName, setLastName]       = useState<string | null>(null);
+  const [address, setAddress]         = useState<string | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+  const [email, setEmail]             = useState<string | null>(null);
   const [reservations, setReservations] = useState<Reservation[]>([]);
 
   /* --- load user --- */
@@ -86,7 +82,7 @@ const UserProfile: React.FC = () => {
 
   if (!user) return <p>Kraunama...</p>;
 
-  /* --- save */
+  /* --- save edited profile --- */
   const save = () => {
     updateUser(user.id, {
       ...user,
@@ -115,6 +111,13 @@ const UserProfile: React.FC = () => {
     deleteReservation(id)
       .then(() => setReservations(r => r.filter(x => x.reservationId !== id)))
       .catch(console.error);
+
+  /* --- atšaukti prenumeratą --- */
+  const unsubscribe = () => {
+    cancelSubscription(user!.id)
+      .then(() => setUser({ ...user!, subscription: false }))
+      .catch(console.error);
+  };
 
   /* ===== render ===== */
   return (
@@ -146,6 +149,11 @@ const UserProfile: React.FC = () => {
             <p><strong>Telefonas:</strong> {user.phoneNumber}</p>
             <p><strong>El. paštas:</strong> {user.email}</p>
             <p><strong>Vartotojo rolė:</strong> {user.role?.roleName ?? "Nenurodyta"}</p>
+            {/* Prenumeratos statusas */}
+            <p><strong>Atliekų grafiko prenumerata:</strong> {user.subscription ? "Aktyvi" : "Neaktyvi"}</p>
+            {user.subscription && (
+              <button className="btn btn-delete" onClick={unsubscribe}>Atšaukti prenumeratą</button>
+            )}
             <button className="btn" onClick={() => setIsEditing(true)}>Redaguoti</button>
           </div>
         )}

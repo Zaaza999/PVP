@@ -47,6 +47,7 @@ namespace KomunalinisCentras.Backend.Repositories
                 _context.Users.Remove(existing);
                 await _context.SaveChangesAsync();
             }
-        }
+        } 
+        
     }
 }

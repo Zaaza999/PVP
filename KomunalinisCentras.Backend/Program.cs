@@ -1,30 +1,69 @@
+// Program.cs – fully corrected with scoped job registration
+
 using KomunalinisCentras.Backend.Data;
 using KomunalinisCentras.Backend.Repositories;
 using KomunalinisCentras.Backend.Entities;
+using KomunalinisCentras.Backend.Services;   // EmailService
+using KomunalinisCentras.Backend.Jobs;       // ReminderJob
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+
+using Hangfire;
+using Hangfire.MySql;
+using Hangfire.Storage;
+
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Load MySQL connection string from appsettings.json
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Configuration.AddEnvironmentVariables();
 
-// 2. Register DbContext (MySQL via Pomelo)
-builder.Services.AddDbContext<KomunalinisDbContext>(options =>
+// --------------------------------------------------
+// Database (MySQL via Pomelo)
+// --------------------------------------------------
+var conn          = builder.Configuration.GetConnectionString("DefaultConnection")!;
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 32));
+
+builder.Services.AddDbContext<KomunalinisDbContext>(opt =>
+    opt.UseMySql(conn, serverVersion));
+
+// --------------------------------------------------
+// Identity
+// --------------------------------------------------
+builder.Services.AddIdentity<User, Role>()
+    .AddEntityFrameworkStores<KomunalinisDbContext>()
+    .AddDefaultTokenProviders();
+
+// --------------------------------------------------
+// JWT
+// --------------------------------------------------
+var jwt    = builder.Configuration.GetSection("JWT");
+var secret = Encoding.UTF8.GetBytes(jwt["Secret"]!);
+
+builder.Services.AddAuthentication(o =>
 {
-    var serverVersion = new MySqlServerVersion(new Version(8, 0, 32));
-    options.UseMySql(connectionString, serverVersion);
+    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(o =>
+{
+    o.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+    o.SaveToken            = true;
+    o.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer   = true,
+        ValidateAudience = true,
+        ValidIssuer      = jwt["ValidIssuer"],
+        ValidAudience    = jwt["ValidAudience"],
+        IssuerSigningKey = new SymmetricSecurityKey(secret)
+    };
 });
 
-// 3. Add controllers
-builder.Services.AddControllers();
+builder.Services.AddAuthorization();
 
-// 4. (Optional) Add Swagger/OpenAPI
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 // 5. Register repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>(); 
@@ -37,54 +76,82 @@ builder.Services.AddScoped<IGarbageScheduleRepository, GarbageScheduleRepository
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
 
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
-});
+// --------------------------------------------------
+// Custom services & repositories
+// --------------------------------------------------
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+// ... add other repositories here ...
+builder.Services.AddScoped<IEmailService, EmailService>();
 
-builder.Services.AddIdentity<User, Role>()
-    .AddEntityFrameworkStores<KomunalinisDbContext>()
-    .AddDefaultTokenProviders();
-
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.RequireHttpsMetadata = true;
-        options.SaveToken = true;
-        options.TokenValidationParameters = new TokenValidationParameters
+// --------------------------------------------------
+// Hangfire
+// --------------------------------------------------
+builder.Services.AddHangfire(cfg =>
+    cfg.UseStorage(new MySqlStorage(
+        conn,
+        new MySqlStorageOptions
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["JWT:ValidAudience"],
-            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
-        };
-    });
-builder.Services.AddAuthorization();
+            PrepareSchemaIfNecessary = true      // <- svarbiausia eilutė
+        })));
 
-// Build the app
+
+builder.Services.AddHangfireServer();
+
+// --------------------------------------------------
+// MVC, Swagger, CORS
+// --------------------------------------------------
+builder.Services.AddControllers();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(p => p.AddPolicy("AllowAll", policy =>
+    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+
 var app = builder.Build();
 
+// --------------------------------------------------
+// EF Core automatic migrations (optional)
+// --------------------------------------------------
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<KomunalinisDbContext>();
+    db.Database.Migrate();
+}
+
+// --------------------------------------------------
+// Middleware pipeline
+// --------------------------------------------------
 app.UseCors("AllowAll");
-// 6. (Optional) Swagger in Development
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// 7. Additional middlewares
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
-// 8. Map controllers
+// --------------------------------------------------
+// Register recurring job via DI (after Hangfire initialized)
+// --------------------------------------------------
+using (var scope = app.Services.CreateScope())
+{
+    var manager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    manager.AddOrUpdate<ReminderJob>(
+        "waste-reminder",
+        job => job.RunAsync(),
+        builder.Configuration["Hangfire:Cron"] ?? "0 17 * * *"); // 17:00 UTC
+} 
+
+app.UseHangfireDashboard("/hangfire");   // 👈 čia
+
+
+// --------------------------------------------------
+// Endpoints
+// --------------------------------------------------
 app.MapControllers();
 
-// 9. Run application
 app.Run();

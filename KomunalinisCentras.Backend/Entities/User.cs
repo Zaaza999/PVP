@@ -14,8 +14,11 @@ namespace KomunalinisCentras.Backend.Entities
         public string? LastName { get; set; } = null!;
 
         [Column("address")]
-        public string? Address { get; set; }
-        
+        public string? Address { get; set; } 
+
+         [Column("subscription")]
+        public bool Subscription { get; set; } 
+
         public string? RoleId { get; set; } = null!;
 
         [ForeignKey("RoleId")]

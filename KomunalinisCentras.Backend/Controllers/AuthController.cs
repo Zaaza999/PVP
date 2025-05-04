@@ -30,7 +30,7 @@ namespace KomunalinisCentras.Backend.Controllers
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
-        var userRole = await _roleManager.FindByNameAsync("klientas");
+        var userRole = await _roleManager.FindByNameAsync("client");
         if (userRole == null)
             return BadRequest("Kliento rolė neegzistuoja.");
         var user = new User { FirstName = model.FirstName, LastName = model.LastName,
@@ -38,7 +38,7 @@ namespace KomunalinisCentras.Backend.Controllers
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (!result.Succeeded) return BadRequest(result.Errors);
-        await _userManager.AddToRoleAsync(user, "klientas");
+        await _userManager.AddToRoleAsync(user, "client");
         return Ok("User created");
     }
 

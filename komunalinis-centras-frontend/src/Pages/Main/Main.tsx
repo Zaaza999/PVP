@@ -6,10 +6,13 @@ import {
   getLocations,
   getWasteTypes,
   getSchedules,
-  getUser, // ⇢ priima STRING id
+  getUser,
+  subscribeUser,            // ⇠ ADD
 } from "../Axios/apiServises";
 
-/* ====== DTO types ====== */
+/* ============================================================
+ * DTO types
+ * ==========================================================*/
 export type LocationDto = { locationId: number; locationName: string };
 export type WasteTypeDto = { wasteId: number; wasteName: string };
 export type ScheduleDto = {
@@ -18,9 +21,15 @@ export type ScheduleDto = {
   wasteId: number;
   collectionDate: string;
 };
-export type UserDto = { id: string; address: string };
+export type UserDto = {
+  id: string;
+  address: string;
+  subscription: boolean;     // ⇠ ensure backend returns this field
+};
 
-/* ====== spalvos & pavadinimai ====== */
+/* ============================================================
+ * Spalvos & pavadinimai
+ * ==========================================================*/
 const wasteColor: Record<string, string> = {
   Household: "#71C568",
   "Plastic/Metal/Paper": "#F4C542",
@@ -34,21 +43,33 @@ const wasteNameLt: Record<string, string> = {
 const getColor = (n: string) => wasteColor[n] ?? "#ccc";
 const getNameLt = (n: string) => wasteNameLt[n] ?? n;
 
-/* ====== Circular progress ====== */
-interface CircularProgressProps { progress: number; }
+/* ============================================================
+ * Circular progress (palikta iš tavo kodo, jei naudojama kitur)
+ * ==========================================================*/
+interface CircularProgressProps {
+  progress: number;
+}
 const CircularProgress: React.FC<CircularProgressProps> = ({ progress }) => {
   const r = progress <= 50 ? progress * 3.6 : 180;
   const l = progress > 50 ? (progress - 50) * 3.6 : 0;
   return (
     <div className="circular-progress" data-progress={progress}>
-      <div className="circle right"><div className="progress" style={{ transform: `rotate(${r}deg)` }} /></div>
-      <div className="circle left"><div className="progress" style={{ transform: `rotate(${l}deg)` }} /></div>
-      <div className="number"><span>{progress}</span></div>
+      <div className="circle right">
+        <div className="progress" style={{ transform: `rotate(${r}deg)` }} />
+      </div>
+      <div className="circle left">
+        <div className="progress" style={{ transform: `rotate(${l}deg)` }} />
+      </div>
+      <div className="number">
+        <span>{progress}</span>
+      </div>
     </div>
   );
 };
 
-/* ====== extract GUID (string) user id from JWT ====== */
+/* ============================================================
+ * JWT helper: extract GUID (string) user id
+ * ==========================================================*/
 const getCurrentUserId = (): string | null => {
   const token = localStorage.getItem("token");
   if (!token) return null;
@@ -62,23 +83,28 @@ const getCurrentUserId = (): string | null => {
   }
 };
 
-/* ====== MAIN COMPONENT ====== */
+/* ============================================================
+ * MAIN COMPONENT
+ * ==========================================================*/
 const Main: React.FC = () => {
-  /* --- state --- */
+  /* --- state declarations --- */
   const [locations, setLocations] = useState<LocationDto[]>([]);
   const [wasteTypes, setWasteTypes] = useState<Map<number, WasteTypeDto>>(new Map());
   const [schedules, setSchedules] = useState<ScheduleDto[]>([]);
   const [selectedLoc, setSelectedLoc] = useState<number | null>(null);
+
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [user, setUser] = useState<UserDto | null>(null);        // ⇠ SAVE full user
+
   const [username, setUsername] = useState<string>("Svečias");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-  /* --- init user id --- */
+  /* --- read JWT once on mount --- */
   useEffect(() => {
     setCurrentUserId(getCurrentUserId());
   }, []);
 
-  /* --- mėnuo --- */
+  /* --- calendar computations (unchanged) --- */
   const [viewDate, setViewDate] = useState<Date>(() => {
     const t = new Date();
     return new Date(t.getFullYear(), t.getMonth(), 1);
@@ -100,14 +126,15 @@ const Main: React.FC = () => {
       .catch(console.error);
   }, []);
 
-  /* --- USER & auto-select address --- */
+  /* --- USER & auto‑select address --- */
   useEffect(() => {
     if (!currentUserId || locations.length === 0) return;
 
     getUser(currentUserId)
-      .then((user: UserDto) => {
-        if (!user.address) return;
-        const addrWords = user.address.toLowerCase().split(/[,\s]+/);
+      .then((u: UserDto) => {
+        setUser(u);                                        // ⇠ save user
+        if (!u.address) return;
+        const addrWords = u.address.toLowerCase().split(/[,\s]+/);
         const match = locations.find(l => addrWords.includes(l.locationName.toLowerCase()));
         if (match) setSelectedLoc(match.locationId);
       })
@@ -142,7 +169,7 @@ const Main: React.FC = () => {
     window.location.reload();
   };
 
-  /* --- Date -> WasteType[] helper --- */
+  /* --- helper: date -> WasteType[] --- */
   const dateWts = new Map<string, WasteTypeDto[]>();
   schedules.forEach((s: ScheduleDto) => {
     const key = s.collectionDate.split("T")[0];
@@ -156,14 +183,15 @@ const Main: React.FC = () => {
     }
   });
 
-  /* ====== RENDER ====== */
+  /* ============================================================
+   * RENDER
+   * ==========================================================*/
   return (
     <div>
       {/* HEADER */}
       <header>
         <div className="header-left"><h1>KPC</h1></div>
         <div className="header-right">
-          <CircularProgress progress={70} />
           <span>{username}</span>
           {isLoggedIn ? (
             <div className="dropdown">
@@ -180,23 +208,21 @@ const Main: React.FC = () => {
             </div>
           )}
         </div>
-      </header> 
-      
-      {/* NAV */}
+      </header>
+
+      {/* NAV (nekeista) */}
       <nav>
         <ul>
-          <li><a>Forumai</a></li>
           <li><a>Sąskaitos</a></li>
           <li><Link to="/application">Prašymai</Link></li>
           <li><Link to="/reservation">Rezervacijos</Link></li>
           <li><Link to="/addTime">Pridėti laiką</Link></li>
-          {/* Show only if userRole is 'worker' */}
-            {localStorage.getItem("userRole") === "Worker" && (
-              <>
-                <li><Link to="/register-worker">Registruoti darbuotoją</Link></li>
-                <li><Link to="/application-list">Prašymų sąrašas</Link></li>
-              </>
-            )}
+          {localStorage.getItem("userRole") === "Worker" && (
+            <>
+              <li><Link to="/register-worker">Registruoti darbuotoją</Link></li>
+              <li><Link to="/application-list">Prašymų sąrašas</Link></li>
+            </>
+          )}
         </ul>
       </nav>
 
@@ -221,48 +247,78 @@ const Main: React.FC = () => {
           </select>
 
           {selectedLoc && (
-            <div className="calendar">
-              <div className="cal-header">
-                <button onClick={() => changeMonth(-1)}>◀</button>
-                <h3>{monthLabel}</h3>
-                <button onClick={() => changeMonth(1)}>▶</button>
-              </div>
+            <>
+              <div className="calendar">
+                <div className="cal-header">
+                  <button onClick={() => changeMonth(-1)}>◀</button>
+                  <h3>{monthLabel}</h3>
+                  <button onClick={() => changeMonth(1)}>▶</button>
+                </div>
 
-              <table>
-                <thead><tr><th>P</th><th>A</th><th>T</th><th>K</th><th>Pn</th><th>Š</th><th>S</th></tr></thead>
-                <tbody>
-                  {Array.from({ length: totalCells / 7 }, (_, row) => (
-                    <tr key={row}>{Array.from({ length: 7 }, (_, col) => {
-                      const cell = row * 7 + col;
-                      const day = cell - (firstWeekday - 2);
-                      if (day < 1 || day > daysInMonth) return <td key={col}></td>;
-                      const key = `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-                      const wts = dateWts.get(key);
-                      let style: React.CSSProperties = {};
-                      if (wts?.length) {
-                        if (wts.length === 1) {
-                          style.backgroundColor = getColor(wts[0].wasteName);
-                        } else {
-                          const pct = 100 / wts.length;
-                          const stops = wts.map((wt, i) => `${getColor(wt.wasteName)} ${i * pct}% ${(i + 1) * pct}%`).join(", ");
-                          style.backgroundImage = `linear-gradient(to bottom, ${stops})`;
+                <table>
+                  <thead><tr><th>P</th><th>A</th><th>T</th><th>K</th><th>Pn</th><th>Š</th><th>S</th></tr></thead>
+                  <tbody>
+                    {Array.from({ length: totalCells / 7 }, (_, row) => (
+                      <tr key={row}>{Array.from({ length: 7 }, (_, col) => {
+                        const cell = row * 7 + col;
+                        const day = cell - (firstWeekday - 2);
+                        if (day < 1 || day > daysInMonth) return <td key={col}></td>;
+                        const key = `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                        const wts = dateWts.get(key);
+                        let style: React.CSSProperties = {};
+                        if (wts?.length) {
+                          if (wts.length === 1) {
+                            style.backgroundColor = getColor(wts[0].wasteName);
+                          } else {
+                            const pct = 100 / wts.length;
+                            const stops = wts.map((wt, i) => `${getColor(wt.wasteName)} ${i * pct}% ${(i + 1) * pct}%`).join(", ");
+                            style.backgroundImage = `linear-gradient(to bottom, ${stops})`;
+                          }
                         }
-                      }
-                      return <td key={col} style={style}>{day}</td>;
-                    })}</tr>
-                  ))}
-                </tbody>
-              </table>
+                        return <td key={col} style={style}>{day}</td>;
+                      })}</tr>
+                    ))}
+                  </tbody>
+                </table>
 
-              <div className="legend">
-                {Array.from(wasteTypes.values()).map(w => (
-                  <div key={w.wasteId} className="legend-item">
-                    <span className="legend-color" style={{ background: getColor(w.wasteName) }} />
-                    {getNameLt(w.wasteName)}
-                  </div>
-                ))}
+                <div className="legend">
+                  {Array.from(wasteTypes.values()).map(w => (
+                    <div key={w.wasteId} className="legend-item">
+                      <span className="legend-color" style={{ background: getColor(w.wasteName) }} />
+                      {getNameLt(w.wasteName)}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+
+              {/* Prenumeruoti grafikos mygtukas */}
+              {user && !user.subscription && ( 
+                <div className="subscribe-wrapper">
+                  <button
+                    className="btn btn-subscribe"
+                    onClick={async () => {
+                      try {
+                        await subscribeUser(user.id);
+                        setUser({ ...user, subscription: true });
+                        alert("Prenumerata įjungta! Dabar gausite priminimus el. paštu.");
+                      } catch (err) {
+                        console.error(err);
+                        alert("Nepavyko užsiprenumeruoti. Bandykite dar kartą.");
+                      }
+                    }}
+                  >
+                    <span className="bell" />
+                    Prenumeruoti grafiką
+                  </button> 
+                </div>
+              )}
+
+              {user && user.subscription && (
+                <p className="text-green-700 font-medium mt-3">
+                  Prenumerata aktyvuota – priminimai bus siunčiami el. paštu.
+                </p>
+              )}
+            </>
           )}
         </section>
 
