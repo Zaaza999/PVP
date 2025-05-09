@@ -9,9 +9,13 @@ export const apiCall = async (
   id: string | number = "",
   data: any = null
 ) => {
+  const token = localStorage.getItem("token");
   let url = `${BASE_URL}/${endpoint}`;
   let method: "get" | "post" | "put" | "delete" = "get";
-  let config: any = {};
+  let config: any = {
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+    },};
 
   switch (operation) {
     case "get":

@@ -218,16 +218,17 @@ const Main: React.FC = () => {
           <li><Link to="/reservation">Rezervacijos</Link></li>
           <li><Link to="/addTime">Pridėti laiką</Link></li>
           {localStorage.getItem("userRole") === "Worker" && (
-            <>
-              <li><Link to="/register-worker">Registruoti darbuotoją</Link></li>
-              <li><Link to="/application-list">Prašymų sąrašas</Link></li>
-            </>
+              <>
+                <li><Link to="/register-worker">Registruoti darbuotoją</Link></li>
+                <li><Link to="/application-list">Prašymų sąrašas</Link></li>
+                <li><Link to="/residents">Gyventojų sąrašas</Link></li>
+              </>
           )}
         </ul>
       </nav>
 
       <main>
-        {/* SKELBIMAI */}
+      {/* SKELBIMAI */}
         <section className="skelbimai">
           <h2>Skelbimai</h2>
           <ul>

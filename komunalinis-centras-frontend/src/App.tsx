@@ -12,6 +12,7 @@ import RegisterPage from "./Pages/Register/RegisterPage";
 import RegisterWorker from "./Pages/RegisterWorker/RegisterPage";
 import ApplicationList from "./Pages/ApplicationList/ApplicationList";
 import ApplicationDetail from "./Pages/ApplicationDetail/ApplicationDetail";
+import ResidentsPage from "./Pages/Residents/ResidentsPage";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
         <Route path="/register-worker" element={<RegisterWorker />} />
         <Route path="/application-list" element={<ApplicationList />} />
         <Route path="/application-list/:id" element={<ApplicationDetail />} />
+        <Route path="/residents" element={<ResidentsPage />} />
         {/* This route will show the Reservation component at /reservation */}
         <Route path="/application" element={<Application />} />
       </Routes>

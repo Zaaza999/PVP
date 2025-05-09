@@ -30,5 +30,5 @@ export const getSchedules = () => apiCall("get", "GarbageCollectionSchedules");
 
 export const subscribeUser = (userId: string) => apiCall("update", "Users", `${userId}/subscribe`); 
 export const cancelSubscription = (userId: string) => apiCall("update", "Users", `${userId}/unsubscribe`);
-  
+export const getResidents = () => apiCall("get", "Residents/residents");
     

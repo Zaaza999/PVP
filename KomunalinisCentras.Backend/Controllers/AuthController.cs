@@ -85,7 +85,7 @@ namespace KomunalinisCentras.Backend.Controllers
                 new Claim("userId", user.Id.ToString()),
                 new Claim("firstName", user.FirstName),
                 new Claim("lastName", user.LastName),
-                new Claim("userRole", userRole),
+                new Claim(ClaimTypes.Role, userRole),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
