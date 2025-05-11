@@ -217,7 +217,7 @@ const Main: React.FC = () => {
         <ul> 
           {localStorage.getItem("userRole") === "Client" && (
             <>
-            <li><a>Sąskaitos</a></li>
+            <li><Link to="/invoices">Sąskaitos</Link></li>
             <li><Link to="/application">Prašymai</Link></li>
             <li><Link to="/reservation">Rezervacijos</Link></li>
             </> 
