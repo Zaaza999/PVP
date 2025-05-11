@@ -10,6 +10,9 @@ import Profile from './Pages/Profile/Profile'
 import LoginPage from "./Pages/Login/LoginPage";
 import RegisterPage from "./Pages/Register/RegisterPage";
 import RegisterWorker from "./Pages/RegisterWorker/RegisterPage";
+import WorkerList from "./Pages/WorkerList/WorkerList";
+import WorkerDetails from "./Pages/WorkerDetails/WorkerDetails";
+import WorkerEdit from "./Pages/WorkerDetails/WorkerEdit";
 import ApplicationList from "./Pages/ApplicationList/ApplicationList";
 import ApplicationDetail from "./Pages/ApplicationDetail/ApplicationDetail";
 import ResidentsPage from "./Pages/Residents/ResidentsPage";
@@ -29,6 +32,9 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/register-worker" element={<RegisterWorker />} />
+        <Route path="/worker-list" element={<WorkerList />} />
+        <Route path="/worker-list/:id" element={<WorkerDetails />} />
+        <Route path="/worker-list/:id/edit" element={<WorkerEdit />} />
         <Route path="/application-list" element={<ApplicationList />} />
         <Route path="/application-list/:id" element={<ApplicationDetail />} />
         <Route path="/residents" element={<ResidentsPage />} />

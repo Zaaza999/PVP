@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "../styles.css";
+import "./workerDropDown.css"
 import {
   getLocations,
   getWasteTypes,
@@ -217,12 +218,16 @@ const Main: React.FC = () => {
           <li><Link to="/application">Prašymai</Link></li>
           <li><Link to="/reservation">Rezervacijos</Link></li>
           <li><Link to="/addTime">Pridėti laiką</Link></li>
-          {localStorage.getItem("userRole") === "Worker" && (
-              <>
-                <li><Link to="/register-worker">Registruoti darbuotoją</Link></li>
-                <li><Link to="/application-list">Prašymų sąrašas</Link></li>
-                <li><Link to="/residents">Gyventojų sąrašas</Link></li>
-              </>
+          {localStorage.getItem("userRole") === "worker" && (
+            <li className="worker-menu">
+              <div className="worker-menu-button">Darbuotojas ☰</div>
+              <div className="worker-dropdown">
+                <Link to="/register-worker">Registruoti darbuotoją</Link>
+                <Link to="/worker-list">Darbuotojų sąrašas</Link>
+                <Link to="/application-list">Prašymų sąrašas</Link>
+                <Link to="/residents">Gyventojų sąrašas</Link>
+              </div>
+            </li>
           )}
         </ul>
       </nav>

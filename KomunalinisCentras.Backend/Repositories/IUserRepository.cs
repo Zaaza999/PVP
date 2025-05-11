@@ -9,5 +9,6 @@ namespace KomunalinisCentras.Backend.Repositories
         Task CreateAsync(User user);
         Task UpdateAsync(User user);
         Task DeleteAsync(string id);
+        Task<IEnumerable<User>> GetUsersForRoleAsync (string roleId);
     }
 }

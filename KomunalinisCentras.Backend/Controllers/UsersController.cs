@@ -23,6 +23,14 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(users);
         }
 
+        // GET /users/workers
+        [HttpGet("workers")]
+        public async Task<IActionResult> GetAllWorkers()
+        {
+            var workers = await _userRepository.GetUsersForRoleAsync("2");
+            return Ok(workers);
+        }
+
         // GET /users/1
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)

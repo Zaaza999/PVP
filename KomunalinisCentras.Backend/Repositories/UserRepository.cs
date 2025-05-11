@@ -48,6 +48,13 @@ namespace KomunalinisCentras.Backend.Repositories
                 await _context.SaveChangesAsync();
             }
         } 
+        public async Task<IEnumerable<User>> GetUsersForRoleAsync(string roleId)
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .Where(u => u.RoleId == roleId)
+                .ToListAsync();
+        }
         
     }
 }
