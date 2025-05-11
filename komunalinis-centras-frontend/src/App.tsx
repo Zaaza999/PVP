@@ -16,7 +16,7 @@ import WorkerEdit from "./Pages/WorkerDetails/WorkerEdit";
 import ApplicationList from "./Pages/ApplicationList/ApplicationList";
 import ApplicationDetail from "./Pages/ApplicationDetail/ApplicationDetail";
 import ResidentsPage from "./Pages/Residents/ResidentsPage";
-
+import InvoicePage from './Pages/Bills/Bills';  
 
 function App() {
   return (
@@ -39,7 +39,8 @@ function App() {
         <Route path="/application-list/:id" element={<ApplicationDetail />} />
         <Route path="/residents" element={<ResidentsPage />} />
         {/* This route will show the Reservation component at /reservation */}
-        <Route path="/application" element={<Application />} />
+        <Route path="/application" element={<Application />} /> 
+        <Route path="/invoices" element={<InvoicePage />} />
       </Routes>
     </Router>
   );

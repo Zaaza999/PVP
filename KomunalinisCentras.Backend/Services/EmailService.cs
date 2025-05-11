@@ -20,7 +20,7 @@ namespace KomunalinisCentras.Backend.Services
             message.From.Add(MailboxAddress.Parse(_cfg["Mail:User"]));
             message.To.Add(MailboxAddress.Parse(to));
             message.Subject = subject;
-            message.Body = new TextPart("plain") { Text = body };
+            message.Body = new TextPart("html") { Text = body };
 
             using var smtp = new SmtpClient();
             await smtp.ConnectAsync(_cfg["Mail:Host"], int.Parse(_cfg["Mail:Port"]), SecureSocketOptions.StartTls);

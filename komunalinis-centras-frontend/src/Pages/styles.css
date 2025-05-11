@@ -668,5 +668,13 @@ body {
 .subscribe-wrapper {
   margin-top: 1rem;      
 }
-
+.modal-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex;
+  align-items:center; justify-content:center; z-index:1000;
+}
+.modal{
+  background:#fff; padding:30px 40px; border-radius:8px; width:320px;
+  box-shadow:0 4px 12px rgba(0,0,0,.2); text-align:center;
+}
+.modal-actions{ margin-top:25px; display:flex; gap:10px; justify-content:center; }
 
