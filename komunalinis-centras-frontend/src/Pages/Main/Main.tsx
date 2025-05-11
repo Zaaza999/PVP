@@ -156,7 +156,7 @@ const Main: React.FC = () => {
     if (!token) return;
     try {
       const decoded: any = jwtDecode(token);
-      const fullName = `${decoded.firstName || ""} ${decoded.lastName || ""}`.trim();
+      const fullName = `${decoded.firstName || ""} ${decoded.lastName || ""}`.trim(); 
       setUsername(fullName || "Svečias");
       setIsLoggedIn(true);
     } catch {
@@ -166,7 +166,8 @@ const Main: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("token");  
+    localStorage.removeItem("userRole"); 
     window.location.reload();
   };
 
@@ -213,21 +214,33 @@ const Main: React.FC = () => {
 
       {/* NAV (nekeista) */}
       <nav>
-        <ul>
-          <li><a>Sąskaitos</a></li>
-          <li><Link to="/application">Prašymai</Link></li>
-          <li><Link to="/reservation">Rezervacijos</Link></li>
-          <li><Link to="/addTime">Pridėti laiką</Link></li>
-          {localStorage.getItem("userRole") === "worker" && (
+        <ul> 
+          {localStorage.getItem("userRole") === "Client" && (
+            <>
+            <li><a>Sąskaitos</a></li>
+            <li><Link to="/application">Prašymai</Link></li>
+            <li><Link to="/reservation">Rezervacijos</Link></li>
+            </> 
+          )}
+          {localStorage.getItem("userRole") === "Worker" && (   
+            <>
             <li className="worker-menu">
               <div className="worker-menu-button">Darbuotojas ☰</div>
-              <div className="worker-dropdown">
+              <div className="worker-dropdown">  
+                <Link to="/addTime">Pridėti laiką</Link>
                 <Link to="/register-worker">Registruoti darbuotoją</Link>
                 <Link to="/worker-list">Darbuotojų sąrašas</Link>
                 <Link to="/application-list">Prašymų sąrašas</Link>
                 <Link to="/residents">Gyventojų sąrašas</Link>
-              </div>
-            </li>
+              </div> 
+            </li>   
+            <li><Link to="/addTime">Pridėti laiką</Link></li> 
+            <li><Link to="/register-worker">Registruoti darbuotoją</Link></li> 
+            <li><Link to="/worker-list">Darbuotojų sąrašas</Link></li>
+            <li><Link to="/application-list">Prašymų sąrašas</Link></li>
+            <li><Link to="/residents">Gyventojų sąrašas</Link></li>
+            </>
+            
           )}
         </ul>
       </nav>

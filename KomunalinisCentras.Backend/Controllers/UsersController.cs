@@ -27,7 +27,7 @@ namespace KomunalinisCentras.Backend.Controllers
         [HttpGet("workers")]
         public async Task<IActionResult> GetAllWorkers()
         {
-            var workers = await _userRepository.GetUsersForRoleAsync("2");
+            var workers = await _userRepository.GetUsersForRoleAsync("1");
             return Ok(workers);
         }
 
