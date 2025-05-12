@@ -222,7 +222,7 @@ const Main: React.FC = () => {
             <li><Link to="/reservation">Rezervacijos</Link></li>
             </> 
           )}
-          {localStorage.getItem("userRole") === "Worker" && (   
+          {["Worker", "Admin"].includes(localStorage.getItem("userRole") || "") && (
             <>
             <li className="worker-menu">
               <div className="worker-menu-button">Darbuotojas ☰</div>

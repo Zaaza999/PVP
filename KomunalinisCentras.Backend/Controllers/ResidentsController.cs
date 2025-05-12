@@ -8,7 +8,7 @@ using KomunalinisCentras.Backend.Entities;
 
 namespace KomunalinisCentras.Backend.Controllers;
 
-[Authorize(Roles = "Worker")]
+[Authorize(Roles = "Worker,Admin")]
 [ApiController]
 [Route("[controller]")]
 public class ResidentsController : ControllerBase
