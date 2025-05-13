@@ -1,4 +1,8 @@
+using System;
+using System.Text.Json;
+using KomunalinisCentras.Backend.DTOs;
 using KomunalinisCentras.Backend.Entities;
+using KomunalinisCentras.Backend.Factory;
 using KomunalinisCentras.Backend.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,87 +12,137 @@ namespace KomunalinisCentras.Backend.Controllers
     [Route("[controller]")]
     public class ApplicationsController : ControllerBase
     {
-        private readonly IApplicationRepository _applicationRepository;
+        private readonly IServiceProvider _serviceProvider;
 
-        public ApplicationsController(IApplicationRepository applicationRepository)
+        public ApplicationsController(IServiceProvider serviceProvider)
         {
-            _applicationRepository = applicationRepository;
+            _serviceProvider = serviceProvider;
+        }
+
+        // POST /applications
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] ApplicationDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var application = ApplicationFactory.CreateFromDto(dto);
+            if (application == null)
+                return BadRequest("Unknown or unsupported form type.");
+
+            application.Date = DateTime.UtcNow;
+
+            var repoType = typeof(IApplicationRepository<>).MakeGenericType(application.GetType());
+            dynamic repository = _serviceProvider.GetRequiredService(repoType);
+
+            await repository.CreateAsync((dynamic)application);
+
+            return Created(string.Empty, application);
         }
 
         // GET /applications
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var applications = await _applicationRepository.GetAllAsync();
+            var applicationRepository = _serviceProvider.GetRequiredService<IApplicationRepository<Application>>();
+            var all = await applicationRepository.GetAllAsync();
+            return Ok(all);
+        }
+
+        // GET /applications/formType
+        [HttpGet("{formType}")]
+        public async Task<IActionResult> GetAll(string formType)
+        {
+            var applicationType = ApplicationFactory.ResolveType(formType);
+            if (applicationType == null)
+                return BadRequest("Unknown form type.");
+
+            var repoType = typeof(IApplicationRepository<>).MakeGenericType(applicationType);
+            dynamic repository = _serviceProvider.GetRequiredService(repoType);
+
+            var applications = await repository.GetAllAsync();
             return Ok(applications);
         }
 
-        // GET /applications/1
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        // GET /applications/formType/1
+        [HttpGet("{formType}/{id}")]
+        public async Task<IActionResult> GetById(string formType, int id)
         {
-            var application = await _applicationRepository.GetByIdWithUserAsync(id);
+            var applicationType = ApplicationFactory.ResolveType(formType);
+            if (applicationType == null)
+                return BadRequest("Unknown form type.");
+
+            var repoType = typeof(IApplicationRepository<>).MakeGenericType(applicationType);
+            dynamic repository = _serviceProvider.GetRequiredService(repoType);
+
+            var application = await repository.GetByIdAsync(id);
             if (application == null)
                 return NotFound();
 
             return Ok(application);
         }
 
-        // POST /applications
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Application newApplication)
+        // PUT /applications/formType/1
+        [HttpPut("{formType}/{id}")]
+        public async Task<IActionResult> Update(string formType, int id, [FromBody] ApplicationDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var application = ApplicationFactory.CreateFromDto(dto);
+            if (application == null || application.Id != id)
+                return BadRequest("Invalid form type or ID mismatch.");
 
-            newApplication.SubmittedAt = DateTime.UtcNow;
-            await _applicationRepository.CreateAsync(newApplication);
-            return CreatedAtAction(nameof(GetById), new { id = newApplication.ApplicationId }, newApplication);
-        }
+            var repoType = typeof(IApplicationRepository<>).MakeGenericType(application.GetType());
+            dynamic repository = _serviceProvider.GetRequiredService(repoType);
 
-        // PUT /applications/1
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Application updatedApplication)
-        {
-            if (id != updatedApplication.ApplicationId)
-                return BadRequest("ID neatitinka.");
-
-            var existingApp = await _applicationRepository.GetByIdAsync(id);
-            if (existingApp == null)
+            var existing = await repository.GetByIdAsync(id);
+            if (existing == null)
                 return NotFound();
 
-            existingApp.FormType = updatedApplication.FormType;
-            existingApp.Data = updatedApplication.Data;
-            existingApp.SubmittedByUserId = updatedApplication.SubmittedByUserId;
-
-            await _applicationRepository.UpdateAsync(existingApp);
+            await repository.UpdateAsync((dynamic)application);
             return NoContent();
         }
 
-        // DELETE /applications/1
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        // DELETE /applications/formType/1
+        [HttpDelete("{formType}/{id}")]
+        public async Task<IActionResult> Delete(string formType, int id)
         {
-            var existingApp = await _applicationRepository.GetByIdAsync(id);
-            if (existingApp == null)
+            var applicationType = ApplicationFactory.ResolveType(formType);
+            if (applicationType == null)
+                return BadRequest("Unknown form type.");
+
+            var repoType = typeof(IApplicationRepository<>).MakeGenericType(applicationType);
+            dynamic repository = _serviceProvider.GetRequiredService(repoType);
+
+            var existing = await repository.GetByIdAsync(id);
+            if (existing == null)
                 return NotFound();
 
-            await _applicationRepository.DeleteAsync(id);
+            await repository.DeleteAsync(id);
             return NoContent();
         }
 
-        [HttpPatch("{id}/approve")]
-        public async Task<IActionResult> SetApprovalStatus(int id, [FromBody] bool approved)
+        // PUT /applications/{formType}/{id}/status
+        [HttpPut("{formType}/{id}/status")]
+        public async Task<IActionResult> UpdateStatus(string formType, int id, [FromBody] StatusUpdateDto dto)
         {
-            var application = await _applicationRepository.GetByIdAsync(id);
-            if (application == null)
+            if (dto == null)
+                return BadRequest("Missing status data.");
+
+            var applicationType = ApplicationFactory.ResolveType(formType);
+            if (applicationType == null)
+                return BadRequest("Unknown form type.");
+
+            var repoType = typeof(IApplicationRepository<>).MakeGenericType(applicationType);
+            dynamic repository = _serviceProvider.GetRequiredService(repoType);
+
+            var existing = await repository.GetByIdAsync(id);
+            if (existing == null)
                 return NotFound();
 
-            application.Approved = approved;
-            await _applicationRepository.UpdateAsync(application);
+            // Currently supports only boolean "Approved"
+            existing.Approved = dto.Approved;
 
+            await repository.UpdateAsync(existing);
             return NoContent();
         }
-
     }
 }

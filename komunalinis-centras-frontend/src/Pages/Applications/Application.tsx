@@ -8,22 +8,26 @@ import PropertyUsageDeclarationForm from "./Forms/PropertyUsageDeclarationForm";
 import ResidentCountDeclarationForm from "./Forms/ResidentCountDeclarationForm";
 import ContainerRequestForm from "./Forms/ContainerRequestForm";
 import ContainerFrequencyChangeForm from "./Forms/ContainerFrequencyChangeForm";
+import ContainerSizeChangeRequest from "./Forms/ContainerSizeChangeRequest";
 import EmailInvoiceRequestForm from "./Forms/EmailInvoiceRequestForm";
 import RefundRequestForm from "./Forms/RefundRequestForm";
 import PayerDataChangeRequestForm from "./Forms/PayerDataChangeRequestForm";
 
 const formsList = [
-  { title: "1. Prašymas atleisti nuo kintamos vietinės rinkliavos (fiziniams)", component: <WasteFeeExemptionForm /> },
-  { title: "2. Prašymas atleisti nuo kintamos vietinės rinkliavos (juridiniams)", component: <WasteFeeExemptionBusinessForm /> },
-  { title: "3. Prašymas dėl sąskaitų el. paštu", component: <RefundRequestForm /> },
-  { title: "4. Prašymas dėl NT objekto įtraukimo į netinkamų/nenaudojamų sąrašą", component: <PropertyUnsuitabilityForm /> },
-  { title: "5. NT ploto / paskirties tikslinimo deklaracija", component: <PropertyUsageDeclarationForm /> },
-  { title: "6. Asmenų skaičiaus deklaracija", component: <ResidentCountDeclarationForm /> },
-  { title: "7. Konteinerio užsakymo prašymas", component: <ContainerRequestForm /> },
-  { title: "8. Konteinerio ištuštinimo dažnio keitimas", component: <ContainerFrequencyChangeForm /> },
-  { title: "9. Konteinerio dydžio keitimas", component: <EmailInvoiceRequestForm /> },
-  { title: "10. Permokos grąžinimo prašymas", component: <PayerDataChangeRequestForm /> },
+  { title: "1. Prašymas – Atleidimas nuo vietinės rinkliavos (fiziniams asmenims)", component: <WasteFeeExemptionForm /> },
+  { title: "2. Prašymas – Atleidimas nuo vietinės rinkliavos (juridiniams asmenims)", component: <WasteFeeExemptionBusinessForm /> },
+  { title: "3. Prašymas – Sąskaitų gavimas el. paštu", component: <EmailInvoiceRequestForm /> },
+  { title: "4. Prašymas – Pripažinti NT netinkamu naudoti", component: <PropertyUnsuitabilityForm /> },
+  { title: "5. Deklaracija – NT faktinio naudojimo deklaravimas", component: <PropertyUsageDeclarationForm /> },
+  { title: "6. Deklaracija – Gyventojų skaičiaus deklaravimas", component: <ResidentCountDeclarationForm /> },
+  { title: "7. Prašymas – Konteinerio suteikimas", component: <ContainerRequestForm /> },
+  { title: "8. Prašymas – Konteinerio ištuštinimo dažnumo keitimas", component: <ContainerFrequencyChangeForm /> },
+  { title: "9. Prašymas – Konteinerio dydžio keitimas", component: <ContainerSizeChangeRequest /> },
+  { title: "10. Prašymas – Permokėtos vietinės rinkliavos grąžinimas", component: <RefundRequestForm /> },
+  { title: "11. Prašymas – Vietinės rinkliavos mokėtojo duomenų keitimas", component: <PayerDataChangeRequestForm /> },
 ];
+
+
 
 const Application: React.FC = () => {
   const [isListOpen, setIsListOpen] = useState(true);

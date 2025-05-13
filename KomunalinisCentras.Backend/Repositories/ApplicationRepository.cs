@@ -4,52 +4,48 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KomunalinisCentras.Backend.Repositories
 {
-    public class ApplicationRepository : IApplicationRepository
+    public class ApplicationRepository<T> : IApplicationRepository<T> where T : Application
     {
-        private readonly KomunalinisDbContext _context;
+        protected readonly KomunalinisDbContext _context;
+        private readonly DbSet<T> _dbSet;
 
         public ApplicationRepository(KomunalinisDbContext context)
         {
             _context = context;
+            _dbSet = context.Set<T>();
         }
 
-        public async Task<IEnumerable<Application>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
-            return await _context.Set<Application>().ToListAsync();
+            return await _dbSet.ToListAsync();
         }
 
-        public async Task<Application?> GetByIdAsync(int id)
+        public virtual async Task<T?> GetByIdAsync(int id)
         {
-            return await _context.Set<Application>().FindAsync(id);
+            return await _dbSet.FindAsync(id);
         }
 
-        public async Task CreateAsync(Application application)
+        public async Task CreateAsync(T entity)
         {
-            await _context.Set<Application>().AddAsync(application);
+            await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Application application)
+        public async Task UpdateAsync(T entity)
         {
-            _context.Set<Application>().Update(application);
+            _dbSet.Update(entity);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var application = await GetByIdAsync(id);
-            if (application != null)
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
             {
-                _context.Set<Application>().Remove(application);
+                _dbSet.Remove(entity);
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<Application?> GetByIdWithUserAsync(int id)
-        {
-            return await _context.Applications
-                .Include(a => a.SubmittedBy)
-                .FirstOrDefaultAsync(a => a.ApplicationId == id);
-        }
-        
     }
+
 }

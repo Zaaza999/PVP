@@ -1,191 +1,231 @@
-import React, { useState } from "react";
-import "../../styles.css";
+import React from "react";
+import { useFormSubmit } from "../hooks/useFormSubmit";
+
+
+interface PropertyUsageDeclarationEntry {
+  address: string;
+  buildingUniqueNumber: string;
+  registeredPurpose: string;
+  actualPurpose: string;
+  registeredArea: number | string;
+  actualArea: number | string;
+}
+
+const emptyEntry: PropertyUsageDeclarationEntry = {
+  address: "",
+  buildingUniqueNumber: "",
+  registeredPurpose: "",
+  actualPurpose: "",
+  registeredArea: "",
+  actualArea: "",
+};
+
 
 const PropertyUsageDeclarationForm: React.FC = () => {
-  const [formData, setFormData] = useState({
-    patalpuAdresas: "",
-    korespondencijosAdresas: "",
-    data: "",
-    entries: [
-      {
-        adresas: "",
-        unikalusNr: "",
-        paskirtisRegistras: "",
-        paskirtisFaktine: "",
-        plotasRegistras: "",
-        plotasFaktine: "",
-      },
-    ],
-    vardasPavarde: "",
-  });
+  const { formData, setFormData, handleChange, handleSubmit } = useFormSubmit("PropertyUsageDeclaration");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index?: number
-  ) => {
-    const { name, value } = e.target;
-
-    if (typeof index === "number") {
-      const newEntries = [...formData.entries];
-      newEntries[index] = { ...newEntries[index], [name]: value };
-      setFormData({ ...formData, entries: newEntries });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+  const handleEntryChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedEntries = [...(formData.entries || [])];
+    updatedEntries[index] = {
+      ...updatedEntries[index],
+      [e.target.name]: e.target.value,
+    };
+    setFormData({ ...formData, entries: updatedEntries });
   };
 
   const addEntry = () => {
-    setFormData((prev) => ({
-      ...prev,
-      entries: [
-        ...prev.entries,
-        {
-          adresas: "",
-          unikalusNr: "",
-          paskirtisRegistras: "",
-          paskirtisFaktine: "",
-          plotasRegistras: "",
-          plotasFaktine: "",
-        },
-      ],
-    }));
+    const updatedEntries = [...(formData.entries || []), { ...emptyEntry }];
+    setFormData({ ...formData, entries: updatedEntries });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Submitted Data:", formData);
+  const removeEntry = (index: number) => {
+    const updatedEntries = [...(formData.entries || [])];
+    updatedEntries.splice(index, 1);
+    setFormData({ ...formData, entries: updatedEntries });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="weekly-schedule-container">
-      <h2 style={{ textAlign: "center" }}>
-        Nekilnojamojo turto ploto / paskirties tikslinimo deklaracija
+    <form onSubmit={handleSubmit} className="container mt-4">
+      <h2 className="text-center mb-4">
+        Prašymas – Nekilnojamojo turto faktinio naudojimo deklaravimas
       </h2>
 
-      <p>
-        Užpildykite šią deklaraciją, jei turto faktinė paskirtis ar plotas
-        skiriasi nuo Nekilnojamojo turto registro duomenų.
-      </p>
-
-      <div className="form-group">
-        <label>Patalpų adresas, savininko vardas, pavardė</label>
-        <input
-          name="patalpuAdresas"
-          value={formData.patalpuAdresas}
-          onChange={(e) => handleChange(e)}
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Adresas korespondencijai, tel. Nr., el. paštas</label>
-        <input
-          name="korespondencijosAdresas"
-          value={formData.korespondencijosAdresas}
-          onChange={(e) => handleChange(e)}
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Data</label>
-        <input
-          name="data"
-          type="date"
-          value={formData.data}
-          onChange={(e) => handleChange(e)}
-        />
-      </div>
-
-      <hr />
-
-      <p style={{ fontWeight: 600, fontSize: "0.95rem" }}>
-        Nekilnojamojo turto objektų sąrašas:
-      </p>
-
-      {formData.entries.map((entry, index) => (
-        <div key={index} className="form" style={{ gap: "10px" }}>
-          <div className="form-group">
+      <fieldset className="border p-3 mb-4">
+        <legend className="w-auto px-2">Kontaktinė informacija</legend>
+        <div className="row mb-3">
+          <div className="col-md-4">
+            <label className="form-label">Adresas korespondencijai</label>
             <input
-              name="adresas"
-              placeholder="Pastato adresas"
-              value={entry.adresas}
-              onChange={(e) => handleChange(e, index)}
+              type="text"
+              name="correspondenceAddress"
+              className="form-control"
+              value={formData.correspondenceAddress || ""}
+              onChange={handleChange}
             />
           </div>
-          <div className="form-group">
+          <div className="col-md-4">
+            <label className="form-label">Telefono numeris</label>
             <input
-              name="unikalusNr"
-              placeholder="Unikalus Nr."
-              value={entry.unikalusNr}
-              onChange={(e) => handleChange(e, index)}
+              type="text"
+              name="phoneNumber"
+              className="form-control"
+              value={formData.phoneNumber || ""}
+              onChange={handleChange}
             />
           </div>
-          <div className="form-group">
+          <div className="col-md-4">
+            <label className="form-label">El. pašto adresas</label>
             <input
-              name="paskirtisRegistras"
-              placeholder="Paskirtis registruota"
-              value={entry.paskirtisRegistras}
-              onChange={(e) => handleChange(e, index)}
-            />
-          </div>
-          <div className="form-group">
-            <input
-              name="plotasRegistras"
-              placeholder="Plotas registruotas (m²)"
-              value={entry.plotasRegistras}
-              onChange={(e) => handleChange(e, index)}
-            />
-          </div>
-          <div className="form-group">
-            <input
-              name="paskirtisFaktine"
-              placeholder="Paskirtis faktinė"
-              value={entry.paskirtisFaktine}
-              onChange={(e) => handleChange(e, index)}
-            />
-          </div>
-          <div className="form-group">
-            <input
-              name="plotasFaktine"
-              placeholder="Plotas faktinis (m²)"
-              value={entry.plotasFaktine}
-              onChange={(e) => handleChange(e, index)}
+              type="email"
+              name="emailAddress"
+              className="form-control"
+              value={formData.emailAddress || ""}
+              onChange={handleChange}
             />
           </div>
         </div>
-      ))}
+      </fieldset>
 
-      <div className="form-group" style={{ marginTop: "10px" }}>
-        <button type="button" onClick={addEntry} className="btn">
-          Pridėti dar vieną objektą
+      <fieldset className="border p-3 mb-4">
+        <legend className="w-auto px-2">Turto informacija</legend>
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <label className="form-label">Turto adresas</label>
+            <input
+              type="text"
+              name="propertyAddress"
+              className="form-control"
+              value={formData.propertyAddress || ""}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Savininko vardas, pavardė</label>
+            <input
+              type="text"
+              name="propertyOwnerFullName"
+              className="form-control"
+              value={formData.propertyOwnerFullName || ""}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset className="border p-3 mb-4">
+        <legend className="w-auto px-2">Deklaruojami objektai</legend>
+        {(formData.entries || []).map((entry: PropertyUsageDeclarationEntry, index: number) => (
+          <div key={index} className="border p-3 mb-3">
+            <h6>Objektas #{index + 1}</h6>
+            <div className="row mb-2">
+              <div className="col-md-6">
+                <label className="form-label">Adresas</label>
+                <input
+                  type="text"
+                  name="address"
+                  className="form-control"
+                  value={entry.address || ""}
+                  onChange={(e) => handleEntryChange(index, e)}
+                  required
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Unikalus numeris</label>
+                <input
+                  type="text"
+                  name="buildingUniqueNumber"
+                  className="form-control"
+                  value={entry.buildingUniqueNumber || ""}
+                  onChange={(e) => handleEntryChange(index, e)}
+                  required
+                />
+              </div>
+            </div>
+            <div className="row mb-2">
+              <div className="col-md-6">
+                <label className="form-label">Paskirtis (registrų)</label>
+                <input
+                  type="text"
+                  name="registeredPurpose"
+                  className="form-control"
+                  value={entry.registeredPurpose || ""}
+                  onChange={(e) => handleEntryChange(index, e)}
+                  required
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Paskirtis (faktinė)</label>
+                <input
+                  type="text"
+                  name="actualPurpose"
+                  className="form-control"
+                  value={entry.actualPurpose || ""}
+                  onChange={(e) => handleEntryChange(index, e)}
+                  required
+                />
+              </div>
+            </div>
+            <div className="row mb-2">
+              <div className="col-md-6">
+                <label className="form-label">Plotas (registrų, m²)</label>
+                <input
+                  type="number"
+                  name="registeredArea"
+                  step="0.01"
+                  className="form-control"
+                  value={entry.registeredArea || ""}
+                  onChange={(e) => handleEntryChange(index, e)}
+                  required
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Plotas (faktinis, m²)</label>
+                <input
+                  type="number"
+                  name="actualArea"
+                  step="0.01"
+                  className="form-control"
+                  value={entry.actualArea || ""}
+                  onChange={(e) => handleEntryChange(index, e)}
+                  required
+                />
+              </div>
+            </div>
+            <div className="text-end">
+              <button type="button" className="btn btn-danger btn-sm" onClick={() => removeEntry(index)}>
+                Pašalinti
+              </button>
+            </div>
+          </div>
+        ))}
+        <button type="button" className="btn btn-secondary" onClick={addEntry}>
+          Pridėti objektą
+        </button>
+      </fieldset>
+
+      <fieldset className="border p-3 mb-4">
+        <legend className="w-auto px-2">Pareiškėjas</legend>
+        <div className="mb-4">
+          <label className="form-label">Pareiškėjo vardas, pavardė</label>
+          <input
+            type="text"
+            name="applicantFullName"
+            className="form-control"
+            value={formData.applicantFullName || ""}
+            onChange={handleChange}
+            required
+            placeholder="Pvz.: Vardas Pavardė"
+          />
+        </div>
+      </fieldset>
+
+      <div className="text-end">
+        <button type="submit" className="btn btn-primary">
+          Pateikti prašymą
         </button>
       </div>
-
-      <hr />
-
-      <p style={{ fontSize: "0.95rem" }}>
-        Sutinku, kad būtų vykdoma objekto patikra. Įsipareigoju apie bet kokius
-        duomenų pasikeitimus informuoti raštu per 30 kalendorinių dienų.
-      </p>
-
-      <p style={{ fontSize: "0.95rem", fontWeight: 600 }}>Pridedama:</p>
-      <ul style={{ fontSize: "0.95rem", paddingLeft: "20px" }}>
-        <li>Patalpų eksplikacija</li>
-        <li>Nekilnojamojo turto registro išrašas</li>
-      </ul>
-
-      <div className="form-group">
-        <label>Atliekų turėtojo vardas, pavardė (parašas)</label>
-        <input
-          name="vardasPavarde"
-          placeholder="Vardas Pavardė"
-          value={formData.vardasPavarde}
-          onChange={(e) => handleChange(e)}
-        />
-      </div>
-
-      <button type="submit" className="btn" style={{ marginTop: "20px" }}>
-        Pateikti deklaraciją
-      </button>
     </form>
   );
 };

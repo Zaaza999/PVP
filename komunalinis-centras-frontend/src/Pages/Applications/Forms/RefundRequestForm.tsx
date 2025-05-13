@@ -1,117 +1,132 @@
-import React, { useState } from "react";
+import React from "react";
 import { useFormSubmit } from "../hooks/useFormSubmit";
-import "../../styles.css";
 
 const RefundRequestForm: React.FC = () => {
-  const { formData, handleChange, handleSubmit } = useFormSubmit("WasteFeeExemption");  
+  const { formData, handleChange, handleSubmit } = useFormSubmit("RefundRequest");
 
   return (
-    <form onSubmit={handleSubmit} className="weekly-schedule-container">
-      <h2 style={{ textAlign: "center" }}>Prašymas grąžinti permoką</h2>
+    <form onSubmit={handleSubmit} className="container mt-4">
+      <h2 className="text-center mb-4">
+        Prašymas grąžinti sumokėtą vietinę rinkliavą
+      </h2>
 
-      <p>Skirta: Kauno rajono savivaldybei</p>
+      <fieldset className="border p-3 mb-4">
+        <legend className="w-auto px-2">Pareiškėjas</legend>
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <label className="form-label">Vardas, pavardė</label>
+            <input
+              type="text"
+              name="applicantFullName"
+              className="form-control"
+              value={formData.applicantFullName || ""}
+              onChange={handleChange}
+              required
+              placeholder="Pvz.: Vardas Pavardė"
+            />
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Adresas korespondencijai</label>
+            <input
+              type="text"
+              name="correspondenceAddress"
+              className="form-control"
+              value={formData.correspondenceAddress || ""}
+              onChange={handleChange}
+              required
+              placeholder="Pvz.: El. paštas arba adresas"
+            />
+          </div>
+        </div>
+      </fieldset>
 
-      <div className="form-group">
-        <label>Vardas, pavardė</label>
-        <input
-          name="vardas"
-          value={formData.vardas}
-          onChange={handleChange}
-        />
+      <fieldset className="border p-3 mb-4">
+        <legend className="w-auto px-2">Mokėjimo informacija</legend>
+        <div className="row mb-3">
+          <div className="col-md-4">
+            <label className="form-label">Mokėtojo kodas</label>
+            <input
+              type="text"
+              name="payerCode"
+              className="form-control"
+              value={formData.payerCode || ""}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="col-md-4">
+            <label className="form-label">Mokėjimo data</label>
+            <input
+              type="date"
+              name="paymentDate"
+              className="form-control"
+              value={formData.paymentDate || ""}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="col-md-4">
+            <label className="form-label">Mokėta suma (€)</label>
+            <input
+              type="number"
+              name="paymentAmount"
+              step="0.01"
+              className="form-control"
+              value={formData.paymentAmount || ""}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
+
+        <div className="row mb-3">
+          <div className="col-md-4">
+            <label className="form-label">Operacijos numeris</label>
+            <input
+              type="text"
+              name="transactionNumber"
+              className="form-control"
+              value={formData.transactionNumber || ""}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="col-md-8">
+            <label className="form-label">Grąžinimo sąskaita</label>
+            <input
+              type="text"
+              name="refundAccountNumber"
+              className="form-control"
+              value={formData.refundAccountNumber || ""}
+              onChange={handleChange}
+              required
+              placeholder="Pvz.: LTXX123456789012345"
+            />
+          </div>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Mokėjimo priežastis</label>
+          <textarea
+            name="paymentReason"
+            className="form-control"
+            value={formData.paymentReason || ""}
+            onChange={handleChange}
+            required
+            rows={3}
+            placeholder="Nurodykite mokėjimo priežastį..."
+          />
+        </div>
+      </fieldset>
+
+      <div className="text-end">
+        <button
+          type="submit"
+          className="btn btn-primary"
+        >
+          Pateikti prašymą
+        </button>
       </div>
-
-      <div className="form-group">
-        <label>Adresas</label>
-        <input
-          name="adresas"
-          value={formData.adresas}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Mokėtojo kodas</label>
-        <input
-          name="mokejimoKodas"
-          value={formData.mokejimoKodas}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Prašymo data</label>
-        <input
-          name="data"
-          type="date"
-          value={formData.data}
-          onChange={handleChange}
-        />
-      </div>
-
-      <hr />
-
-      <p style={{ fontWeight: 600 }}>Prašymo turinys:</p>
-
-      <div className="form-group">
-        <label>Pervedimo data</label>
-        <input
-          name="pervedimoData"
-          type="date"
-          value={formData.pervedimoData}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-group">
-        <label>
-          Suma žodžiais (pvz.: „vienas euras nulis centų“)
-        </label>
-        <input
-          name="sumaZodziais"
-          value={formData.sumaZodziais}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Operacijos numeris</label>
-        <input
-          name="operacijosNr"
-          value={formData.operacijosNr}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Kam grąžinti (vardas, pavardė)</label>
-        <input
-          name="grazintiKam"
-          value={formData.grazintiKam}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Banko sąskaitos numeris</label>
-        <input
-          name="saskaitosNr"
-          value={formData.saskaitosNr}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Atliekų turėtojo vardas, pavardė (parašas)</label>
-        <input
-          name="pareiskejas"
-          value={formData.pareiskejas}
-          onChange={handleChange}
-        />
-      </div>
-
-      <button type="submit" className="btn" style={{ marginTop: "20px" }}>
-        Pateikti prašymą
-      </button>
     </form>
   );
 };

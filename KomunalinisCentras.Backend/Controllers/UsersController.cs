@@ -27,7 +27,7 @@ namespace KomunalinisCentras.Backend.Controllers
         [HttpGet("workers")]
         public async Task<IActionResult> GetAllWorkers()
         {
-            var workers = await _userRepository.GetUsersForRoleAsync("1");
+            var workers = await _userRepository.GetUsersForRoleAsync("2");
             return Ok(workers);
         }
 
@@ -106,7 +106,7 @@ namespace KomunalinisCentras.Backend.Controllers
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null) return NotFound();
 
-            if (!user.Subscription) return NoContent();     // jau išjungta
+            if (!user.Subscription) return NoContent();
 
             user.Subscription = false;
             await _userRepository.UpdateAsync(user);

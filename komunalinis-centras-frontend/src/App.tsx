@@ -36,7 +36,7 @@ function App() {
         <Route path="/worker-list/:id" element={<WorkerDetails />} />
         <Route path="/worker-list/:id/edit" element={<WorkerEdit />} />
         <Route path="/application-list" element={<ApplicationList />} />
-        <Route path="/application-list/:id" element={<ApplicationDetail />} />
+        <Route path="/application-list/:formType/:formId" element={<ApplicationDetail />} />
         <Route path="/residents" element={<ResidentsPage />} />
         {/* This route will show the Reservation component at /reservation */}
         <Route path="/application" element={<Application />} /> 

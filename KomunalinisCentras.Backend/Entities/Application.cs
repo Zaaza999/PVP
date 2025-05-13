@@ -1,35 +1,20 @@
 using System;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema; 
 
 namespace KomunalinisCentras.Backend.Entities
 {
-    public class Application
+    public abstract class Application
     {
         [Key]
-        [Column("application_id")]
-        public int ApplicationId { get; set; }
+        public int Id { get; set; }
+        [Required]
+        public string FormType  { get; set; } = null!;
 
-        [Column("form_type")]
-        [MaxLength(100)] 
-        public string FormType { get; set; } = string.Empty;
-
-        [Column("data", TypeName = "LONGTEXT")]
-        public string DataJson { get; set; } = "{}";
-
-        [NotMapped]
-        public JsonObject Data
-        {
-            get => JsonNode.Parse(DataJson)?.AsObject() ?? new JsonObject();
-            set => DataJson = value?.ToJsonString() ?? "{}";
-        }
-
-        [Column("submitted_at", TypeName = "datetime")]
-        public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
-
+        [Required]
+        [DataType(DataType.Date)]
+        public DateTime Date { get; set; }
+        
         [Column("user_id")]
         public string SubmittedByUserId { get; set; }
 
@@ -38,5 +23,4 @@ namespace KomunalinisCentras.Backend.Entities
         [Column("approved")]
         public bool Approved { get; set; } = false;
     }
-
 }

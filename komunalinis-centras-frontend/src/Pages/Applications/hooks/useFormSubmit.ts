@@ -1,10 +1,11 @@
-// src/hooks/useFormSubmit.ts
 import { useState } from "react";
 
 export function useFormSubmit<T extends Record<string, any>>(formType: string) {
   const [formData, setFormData] = useState<T>({} as T);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -18,11 +19,40 @@ export function useFormSubmit<T extends Record<string, any>>(formType: string) {
       return;
     }
 
-    const payload = {
-      formType,
-      dataJson: JSON.stringify(formData),
+    // Ensure numeric conversion with fallback to undefined
+    const parseIfNumeric = (value: any) => {
+      if (value === "" || value === undefined) return undefined;
+      const num = parseFloat(value);
+      return isNaN(num) ? undefined : num;
+    };
+
+    const parsedData = {
+      ...formData,
+      area: parseIfNumeric(formData.area),
+      initialWaterReading: parseIfNumeric(formData.initialWaterReading),
+      initialElectricityReading: parseIfNumeric(formData.initialElectricityReading),
+      paymentAmount: parseIfNumeric(formData.paymentAmount),
+      containerVolumeLiters: parseIfNumeric(formData.containerVolumeLiters),
+      emptyingFrequencyPerYear: parseIfNumeric(formData.emptyingFrequencyPerYear),
+      frequencyPerMonth : parseIfNumeric(formData.frequencyPerMonth ),
+      currentCapacityLiters : parseIfNumeric(formData.currentCapacityLiters),
+      newCapacityLiters : parseIfNumeric(formData.newCapacityLiters ),
+      registeredArea : parseIfNumeric(formData.registeredArea ), 
+      entries: (formData.entries || []).map((entry: any) => ({
+        ...entry,
+        registeredArea: parseIfNumeric(entry.registeredArea),
+        actualArea: parseIfNumeric(entry.actualArea),
+      })),
       submittedByUserId: userId,
     };
+
+
+    const payload = {
+      formType,
+      data: parsedData,
+    };
+
+    console.log(payload);
 
     try {
       const response = await fetch("http://localhost:5190/applications", {
@@ -46,6 +76,8 @@ export function useFormSubmit<T extends Record<string, any>>(formType: string) {
       alert("Unexpected error during submission.");
     }
   };
+
+
 
   return { formData, setFormData, handleChange, handleSubmit };
 }

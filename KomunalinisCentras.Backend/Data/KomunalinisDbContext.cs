@@ -20,6 +20,23 @@ namespace KomunalinisCentras.Backend.Data
         public DbSet<WasteType> WasteTypes { get; set; }
         public DbSet<GarbageCollectionSchedule> GarbageCollectionSchedules { get; set; } 
         public DbSet<Application> Applications { get; set; }
+        // START Application forms and their items
+        public DbSet<PropertyUsageDeclaration> PropertyUsageDeclarations { get; set; }
+        public DbSet<PropertyUsageDeclarationEntry> PropertyUsageDeclarationEntries { get; set; }
+        public DbSet<ResidentCountDeclaration> ResidentCountDeclarations { get; set; }
+        public DbSet<Resident> Residents { get; set; }
+        public DbSet<ContainerFrequencyChange> ContainerFrequencyChanges { get; set; }
+        public DbSet<EmailInvoiceRequest> EmailInvoiceRequests { get; set; }
+        public DbSet<RefundRequest> RefundRequests { get; set; }
+        public DbSet<WasteFeeExemption> WasteFeeExemptions { get; set; }
+        public DbSet<WasteFeeExemptionBusiness> WasteFeeExemptionBusinesses { get; set; }
+        public DbSet<PropertyUnsuitability> PropertyUnsuitabilities { get; set; }
+        public DbSet<PayerDataChangeRequest> PayerDataChangeRequests { get; set; }
+        public DbSet<ContainerRequest> ContainerRequests { get; set; }
+        public DbSet<ContainerSizeChangeRequest> ContainerSizeChangeRequests { get; set; }
+
+
+        // END Application forms and their items
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -36,6 +53,19 @@ namespace KomunalinisCentras.Backend.Data
             modelBuilder.Entity<WasteType>().ToTable("WasteTypes");
             modelBuilder.Entity<GarbageCollectionSchedule>().ToTable("GarbageCollectionSchedule");
             modelBuilder.Entity<Application>().ToTable("Applications");
+            modelBuilder.Entity<WasteFeeExemption>().HasBaseType<Application>();
+            modelBuilder.Entity<WasteFeeExemptionBusiness>().HasBaseType<Application>();
+            modelBuilder.Entity<EmailInvoiceRequest>().HasBaseType<Application>();
+            modelBuilder.Entity<PropertyUnsuitability>().HasBaseType<Application>();
+            modelBuilder.Entity<PropertyUsageDeclaration>().HasBaseType<Application>();
+            modelBuilder.Entity<ResidentCountDeclaration>().HasBaseType<Application>();
+            modelBuilder.Entity<ContainerRequest>().HasBaseType<Application>();
+            modelBuilder.Entity<ContainerRequest>().HasBaseType<Application>();
+            modelBuilder.Entity<ContainerFrequencyChange>().HasBaseType<Application>();
+            modelBuilder.Entity<ContainerSizeChangeRequest>().HasBaseType<Application>();
+            modelBuilder.Entity<PayerDataChangeRequest>().HasBaseType<Application>();
+            modelBuilder.Entity<RefundRequest>().HasBaseType<Application>();
+
 
             // Example relationships (if you want explicit configuration)
             modelBuilder.Entity<User>()
@@ -80,6 +110,19 @@ namespace KomunalinisCentras.Backend.Data
                 .HasOne(a => a.SubmittedBy)
                 .WithMany()
                 .HasForeignKey(a => a.SubmittedByUserId);
+            
+            modelBuilder.Entity<PropertyUsageDeclaration>()
+                .HasMany(p => p.Entries)
+                .WithOne(e => e.Declaration)
+                .HasForeignKey(e => e.PropertyUsageDeclarationId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<ResidentCountDeclaration>()
+                .HasMany(d => d.Residents)
+                .WithOne(r => r.Declaration)
+                .HasForeignKey(r => r.ResidentCountDeclarationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

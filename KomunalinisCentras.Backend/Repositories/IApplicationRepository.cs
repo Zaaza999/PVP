@@ -2,14 +2,13 @@ using KomunalinisCentras.Backend.Entities;
 
 namespace KomunalinisCentras.Backend.Repositories
 {
-    public interface IApplicationRepository
+    public interface IApplicationRepository<T> where T : Application
     {
-        Task<IEnumerable<Application>> GetAllAsync();
-        Task<Application?> GetByIdAsync(int id);
-        Task CreateAsync(Application application);
-        Task UpdateAsync(Application application);
+        Task<IEnumerable<T>> GetAllAsync();
+        Task<T?> GetByIdAsync(int id);
+        Task CreateAsync(T entity);
+        Task UpdateAsync(T entity);
         Task DeleteAsync(int id);
-        Task<Application?> GetByIdWithUserAsync(int id);
-
     }
+
 }

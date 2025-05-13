@@ -73,7 +73,18 @@ builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<ILocationRepository, LocationRepository>(); 
 builder.Services.AddScoped<IWasteTypeRepository, WasteTypeRepository>(); 
 builder.Services.AddScoped<IGarbageScheduleRepository, GarbageScheduleRepository>();
-builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+builder.Services.AddScoped(typeof(IApplicationRepository<>), typeof(ApplicationRepository<>));
+builder.Services.AddScoped<IApplicationRepository<ResidentCountDeclaration>, ResidentCountDeclarationRepository>();
+builder.Services.AddScoped<IApplicationRepository<PropertyUsageDeclaration>, PropertyUsageDeclarationRepository>();
+builder.Services.AddScoped<IApplicationRepository<RefundRequest>, RefundRequestRepository>();
+builder.Services.AddScoped<IApplicationRepository<EmailInvoiceRequest>, EmailInvoiceRequestRepository>();
+builder.Services.AddScoped<IApplicationRepository<WasteFeeExemption>, WasteFeeExemptionRepository>();
+builder.Services.AddScoped<IApplicationRepository<WasteFeeExemptionBusiness>, WasteFeeExemptionBusinessRepository>();
+builder.Services.AddScoped<IApplicationRepository<ContainerFrequencyChange>, ContainerFrequencyChangeRepository>();
+builder.Services.AddScoped<IApplicationRepository<ContainerRequest>, ContainerRequestRepository>();
+builder.Services.AddScoped<IApplicationRepository<ContainerSizeChangeRequest>, ContainerSizeChangeRequestRepository>();
+builder.Services.AddScoped<IApplicationRepository<PayerDataChangeRequest>, PayerDataChangeRequestRepository>();
+builder.Services.AddScoped<IApplicationRepository<PropertyUnsuitability>, PropertyUnsuitabilityRepository>();
 
 
 // --------------------------------------------------

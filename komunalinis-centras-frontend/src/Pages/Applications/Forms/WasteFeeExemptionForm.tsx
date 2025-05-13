@@ -1,149 +1,221 @@
-import React, { useState } from "react";
+import React from "react";
 import { useFormSubmit } from "../hooks/useFormSubmit";
-import "../../styles.css";
 
 const WasteFeeExemptionForm: React.FC = () => {
+  const { formData, handleChange, handleSubmit } = useFormSubmit("WasteFeeExemption");
 
-  const { formData, handleChange, handleSubmit } = useFormSubmit("WasteFeeExemption");  
-  
   return (
-    <form onSubmit={handleSubmit} className="weekly-schedule-container">
-      <h2 className="mb-4" style={{ textAlign: "center" }}>
+    <form onSubmit={handleSubmit} className="container mt-4">
+      <h2 className="text-center mb-4">
         Prašymas – Atleisti nuo kintamosios vietinės rinkliavos dedamosios mokėjimo
       </h2>
-  
-      <div className="form-group">
-        <label>Patalpų adresas ir savininko vardas, pavardė</label>
-        <input
-          name="patalpuAdresas"
-          value={formData.patalpuAdresas}
-          onChange={handleChange}
-          placeholder="Pvz.: Taikos pr. 1, Kaunas – Jonas Jonaitis"
-        />
-      </div>
-  
-      <div className="form-group">
-        <label>Adresas korespondencijai, telefono Nr., el. paštas</label>
-        <input
-          name="korespondencijosAdresas"
-          value={formData.korespondencijosAdresas}
-          onChange={handleChange}
-          placeholder="Pvz.: korespondencijos@el.paštas.lt, 860000000"
-        />
-      </div>
-  
-      <div className="form-group">
-        <label>Prašymo pateikimo data</label>
-        <input
-          name="data"
-          type="date"
-          value={formData.data}
-          onChange={handleChange}
-        />
-      </div>
-  
-      <div className="form-group">
-        <label>Nekilnojamojo turto objekto adresas, plotas, unikalus numeris</label>
-        <input
-          name="turtoAdresas"
-          placeholder="Adresas"
-          value={formData.turtoAdresas}
-          onChange={handleChange}
-        />
-        <input
-          name="bendrasPlotas"
-          placeholder="Plotas m²"
-          value={formData.bendrasPlotas}
-          onChange={handleChange}
-        />
-        <input
-          name="unikalusNr"
-          placeholder="Unikalus numeris"
-          value={formData.unikalusNr}
-          onChange={handleChange}
-        />
-      </div>
-  
-      <div className="form-group">
-        <label>Laikotarpis, kuriam prašoma atleisti</label>
-        <div style={{ display: "flex", gap: "10px" }}>
+
+            <fieldset className="border p-3 mb-4">
+        <legend className="w-auto px-2">Kontaktinė informacija</legend>
+        <div className="row mb-3">
+          <div className="col-md-4">
+            <label className="form-label">Adresas korespondencijai</label>
+            <input
+              type="text"
+              name="correspondenceAddress"
+              className="form-control"
+              value={formData.correspondenceAddress || ""}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="col-md-4">
+            <label className="form-label">Telefono numeris</label>
+            <input
+              type="text"
+              name="phoneNumber"
+              className="form-control"
+              value={formData.phoneNumber || ""}
+              onChange={handleChange}
+              placeholder="Pvz.: +37061234567"
+            />
+          </div>
+          <div className="col-md-4">
+            <label className="form-label">El. pašto adresas</label>
+            <input
+              type="email"
+              name="emailAddress"
+              className="form-control"
+              value={formData.emailAddress || ""}
+              onChange={handleChange}
+              placeholder="Pvz.: jonas@pastas.lt"
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset className="border p-3 mb-4">
+        <legend className="w-auto px-2">Turto informacija</legend>
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <label className="form-label">Turto adresas</label>
+            <input
+              type="text"
+              name="propertyAddress"
+              className="form-control"
+              value={formData.propertyAddress || ""}
+              onChange={handleChange}
+              required
+              placeholder="Pvz.: Laisvės al. 10, Kaunas"
+            />
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Savininko vardas, pavardė</label>
+            <input
+              type="text"
+              name="propertyOwnerFullName"
+              className="form-control"
+              value={formData.propertyOwnerFullName || ""}
+              onChange={handleChange}
+              required
+              placeholder="Pvz.: Jonas Jonaitis"
+            />
+          </div>
+        </div>
+        <div className="row mb-3">
+          <div className="col-md-4">
+            <label className="form-label">Plotas (m²)</label>
+            <input
+              type="number"
+              name="area"
+              step="0.01"
+              className="form-control"
+              value={formData.area || ""}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="col-md-8">
+            <label className="form-label">Pastato unikalus numeris</label>
+            <input
+              type="text"
+              name="buildingUniqueNumber"
+              className="form-control"
+              value={formData.buildingUniqueNumber || ""}
+              onChange={handleChange}
+              required
+              placeholder="Pvz.: 1234-5678-9012"
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset className="border p-3 mb-4">
+        <legend className="w-auto px-2">Laikotarpis ir infrastruktūra</legend>
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <label className="form-label">Laikotarpio pradžia</label>
+            <input
+              type="date"
+              name="periodFrom"
+              className="form-control"
+              value={formData.periodFrom || ""}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Laikotarpio pabaiga</label>
+            <input
+              type="date"
+              name="periodTo"
+              className="form-control"
+              value={formData.periodTo || ""}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <label className="form-label d-block">Vandens tiekimo būsena</label>
+            <div>
+              <select
+                name="waterSupplyStatus"
+                className="form-select"
+                value={formData.waterSupplyStatus || ""}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Pasirinkite</option>
+                <option value="vykdomas">Vykdomas</option>
+                <option value="nevykdomas">Nevykdomas</option>
+              </select>
+            </div>
+          </div>
+          <div className="col-md-6">
+            <label className="form-label d-block">Elektros skaitiklio būsena</label>
+            <div>
+              <select
+                name="electricityMeterStatus"
+                className="form-select"
+                value={formData.electricityMeterStatus || ""}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Pasirinkite</option>
+                <option value="irengtas">Įrengtas</option>
+                <option value="neirengtas">Neįrengtas</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <label className="form-label">Pradiniai vandens parodymai (m³)</label>
+            <input
+              type="number"
+              name="initialWaterReading"
+              step="1"
+              className="form-control"
+              value={formData.initialWaterReading || ""}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Pradiniai elektros parodymai (kWh)</label>
+            <input
+              type="number"
+              name="initialElectricityReading"
+              step="1"
+              className="form-control"
+              value={formData.initialElectricityReading || ""}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset className="border p-3 mb-4">
+        <legend className="w-auto px-2">Pareiškėjas</legend>
+        <div className="mb-4">
+          <label className="form-label">Pareiškėjo vardas, pavardė</label>
           <input
-            name="laikotarpisNuo"
-            type="date"
-            value={formData.laikotarpisNuo}
+            type="text"
+            name="applicantFullName"
+            className="form-control"
+            value={formData.applicantFullName || ""}
             onChange={handleChange}
-          />
-          <input
-            name="laikotarpisIki"
-            type="date"
-            value={formData.laikotarpisIki}
-            onChange={handleChange}
+            required
+            placeholder="Pvz.: Vardas Pavardė"
           />
         </div>
-      </div>
-  
-      <div className="form-group">
-        <label>Vandens tiekimo būsena</label>
-        <select
-          name="vandensTiekimas"
-          value={formData.vandensTiekimas}
-          onChange={handleChange}
+      </fieldset>
+
+      <div className="text-end">
+        <button
+          type="submit"
+          className="btn btn-primary"
         >
-          <option value="">Pasirinkite</option>
-          <option value="vykdomas">Vykdomas</option>
-          <option value="nevykdomas">Nevykdomas</option>
-        </select>
+          Pateikti prašymą
+        </button>
       </div>
-  
-      <div className="form-group">
-        <label>Elektros skaitiklio būsena</label>
-        <select
-          name="elektrosSkaitiklis"
-          value={formData.elektrosSkaitiklis}
-          onChange={handleChange}
-        >
-          <option value="">Pasirinkite</option>
-          <option value="irengtas">Įrengtas</option>
-          <option value="neirengtas">Neįrengtas</option>
-        </select>
-      </div>
-  
-      <div className="form-group">
-        <label>Vandens parodymai laikotarpio pradžioje</label>
-        <input
-          name="vandensParodymai"
-          placeholder="m³"
-          value={formData.vandensParodymai}
-          onChange={handleChange}
-        />
-      </div>
-  
-      <div className="form-group">
-        <label>Elektros parodymai laikotarpio pradžioje</label>
-        <input
-          name="elektrosParodymai"
-          placeholder="kWh"
-          value={formData.elektrosParodymai}
-          onChange={handleChange}
-        />
-      </div>
-  
-      <div className="form-group">
-        <label>Atliekų turėtojo vardas, pavardė (parašas)</label>
-        <input
-          name="vardasPavarde"
-          placeholder="Vardas Pavardė"
-          value={formData.vardasPavarde}
-          onChange={handleChange}
-        />
-      </div>
-  
-      <button type="submit" className="btn" style={{ marginTop: "20px" }}>
-        Pateikti prašymą
-      </button>
     </form>
   );
-  
 };
 
 export default WasteFeeExemptionForm;

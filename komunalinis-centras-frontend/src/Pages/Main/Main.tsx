@@ -242,6 +242,32 @@ const Main: React.FC = () => {
             </>
             
           )}
+
+            <>
+            <li><Link to="/invoices">Sąskaitos</Link></li>
+            <li><Link to="/application">Prašymai</Link></li>
+            <li><Link to="/reservation">Rezervacijos</Link></li>
+            </> 
+
+            <>
+            <li className="worker-menu">
+              <div className="worker-menu-button">Darbuotojas ☰</div>
+              <div className="worker-dropdown">  
+                <Link to="/addTime">Pridėti laiką</Link>
+                <Link to="/register-worker">Registruoti darbuotoją</Link>
+                <Link to="/worker-list">Darbuotojų sąrašas</Link>
+                <Link to="/application-list">Prašymų sąrašas</Link>
+                <Link to="/residents">Gyventojų sąrašas</Link>
+              </div> 
+            </li>   
+            {/* <li><Link to="/addTime">Pridėti laiką</Link></li> 
+            <li><Link to="/register-worker">Registruoti darbuotoją</Link></li> 
+            <li><Link to="/worker-list">Darbuotojų sąrašas</Link></li>
+            <li><Link to="/application-list">Prašymų sąrašas</Link></li>
+            <li><Link to="/residents">Gyventojų sąrašas</Link></li> */}
+            </>
+            
+          
         </ul>
       </nav>
 
