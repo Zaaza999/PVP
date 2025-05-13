@@ -13,11 +13,14 @@ namespace KomunalinisCentras.Backend.Controllers
     public class ApplicationsController : ControllerBase
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly IApplicationStatusRepository _statusRepository;
 
-        public ApplicationsController(IServiceProvider serviceProvider)
+        public ApplicationsController(IServiceProvider serviceProvider, IApplicationStatusRepository statusRepository)
         {
             _serviceProvider = serviceProvider;
+            _statusRepository = statusRepository;
         }
+
 
         // POST /applications
         [HttpPost]
@@ -124,8 +127,12 @@ namespace KomunalinisCentras.Backend.Controllers
         [HttpPut("{formType}/{id}/status")]
         public async Task<IActionResult> UpdateStatus(string formType, int id, [FromBody] StatusUpdateDto dto)
         {
-            if (dto == null)
-                return BadRequest("Missing status data.");
+            if (dto == null || dto.StatusId <= 0)
+                return BadRequest("Invalid or missing status data.");
+
+            var statusExists = await _statusRepository.ExistsAsync(dto.StatusId);
+            if (!statusExists)
+                return BadRequest("Provided status ID does not exist.");
 
             var applicationType = ApplicationFactory.ResolveType(formType);
             if (applicationType == null)
@@ -138,11 +145,18 @@ namespace KomunalinisCentras.Backend.Controllers
             if (existing == null)
                 return NotFound();
 
-            // Currently supports only boolean "Approved"
-            existing.Approved = dto.Approved;
+            existing.StatusId = dto.StatusId;
 
             await repository.UpdateAsync(existing);
             return NoContent();
         }
+
+        [HttpGet("/applicationstatuses")]
+        public async Task<IActionResult> GetStatuses()
+        {
+            var statuses = await _statusRepository.GetAllAsync();
+            return Ok(statuses);
+        }
+
     }
 }

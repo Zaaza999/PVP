@@ -17,12 +17,16 @@ namespace KomunalinisCentras.Backend.Repositories
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet
+                .Include(a => a.Status)
+                .ToListAsync();
         }
 
         public virtual async Task<T?> GetByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _dbSet
+                .Include(a => a.Status)
+                .FirstOrDefaultAsync(a => a.Id == id);
         }
 
         public async Task CreateAsync(T entity)

@@ -34,7 +34,6 @@ namespace KomunalinisCentras.Backend.Factory
 
             if (app == null) return null;
 
-            // 👇 Set base Application properties from JSON explicitly
             var dataObj = JsonDocument.Parse(dataJson).RootElement;
 
             app.SubmittedByUserId = dataObj.GetProperty("submittedByUserId").GetString() ?? "";
@@ -43,6 +42,8 @@ namespace KomunalinisCentras.Backend.Factory
                 : DateTime.UtcNow;
 
             app.FormType = dto.FormType;
+
+            app.StatusId = 2;
 
             return app;
         }

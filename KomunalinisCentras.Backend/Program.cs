@@ -85,6 +85,7 @@ builder.Services.AddScoped<IApplicationRepository<ContainerRequest>, ContainerRe
 builder.Services.AddScoped<IApplicationRepository<ContainerSizeChangeRequest>, ContainerSizeChangeRequestRepository>();
 builder.Services.AddScoped<IApplicationRepository<PayerDataChangeRequest>, PayerDataChangeRequestRepository>();
 builder.Services.AddScoped<IApplicationRepository<PropertyUnsuitability>, PropertyUnsuitabilityRepository>();
+builder.Services.AddScoped<IApplicationStatusRepository, ApplicationStatusRepository>();
 
 
 // --------------------------------------------------

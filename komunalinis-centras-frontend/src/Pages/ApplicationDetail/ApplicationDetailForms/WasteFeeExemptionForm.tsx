@@ -16,7 +16,7 @@ interface WasteFeeExemptionData {
   initialWaterReading?: number;
   initialElectricityReading?: number;
   applicantFullName: string;
-  approved: boolean;
+  statusId: number;
   id: number;
   formType: string;
 }
@@ -60,12 +60,12 @@ const WasteFeeExemptionForm: React.FC<{ data: WasteFeeExemptionData }> = ({ data
         </fieldset>
       </div>
 
-      {/* Reusable status management block */}
       <ApplicationStatusManager
-        approved={data.approved}
+        statusId={data.statusId}
         formType={data.formType}
         formId={data.id}
       />
+
     </div>
   );
 };

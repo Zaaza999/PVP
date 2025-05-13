@@ -18,7 +18,7 @@ interface PropertyUsageDeclarationData {
   propertyOwnerFullName: string;
   applicantFullName: string;
   entries: PropertyUsageDeclarationEntry[];
-  approved: boolean;
+  statusId: number;
   id: number;
   formType: string;
 }
@@ -70,7 +70,7 @@ const PropertyUsageDeclarationForm: React.FC<{ data: PropertyUsageDeclarationDat
       </div>
 
       <ApplicationStatusManager
-        approved={data.approved}
+        statusId={data.statusId}
         formType={data.formType}
         formId={data.id}
       />

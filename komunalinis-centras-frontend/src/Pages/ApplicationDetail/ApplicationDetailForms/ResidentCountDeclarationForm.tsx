@@ -20,7 +20,7 @@ interface ResidentCountDeclarationData {
   residents: Resident[];
   id: number;
   formType: string;
-  approved: boolean;
+  statusId: number;
 }
 
 const ResidentCountDeclarationForm: React.FC<{ data: ResidentCountDeclarationData }> = ({ data }) => {
@@ -68,7 +68,7 @@ const ResidentCountDeclarationForm: React.FC<{ data: ResidentCountDeclarationDat
       </div>
 
       <ApplicationStatusManager
-        approved={data.approved}
+        statusId={data.statusId}
         formType={data.formType}
         formId={data.id}
       />

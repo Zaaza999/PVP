@@ -10,7 +10,7 @@ interface ContainerSizeChangeRequestData {
   currentCapacityLiters: number;
   newCapacityLiters: number;
   applicantFullName: string;
-  approved: boolean;
+  statusId: number;
   id: number;
   formType: string;
 }
@@ -47,10 +47,11 @@ const ContainerSizeChangeRequestForm: React.FC<{ data: ContainerSizeChangeReques
       </div>
 
       <ApplicationStatusManager
-        approved={data.approved}
+        statusId={data.statusId}
         formType={data.formType}
         formId={data.id}
       />
+
     </div>
   );
 };

@@ -7,6 +7,7 @@ namespace KomunalinisCentras.Backend.DTOs
 {
     public class StatusUpdateDto
     {
-        public bool Approved { get; set; }
+        public int StatusId { get; set; }
     }
+
 }

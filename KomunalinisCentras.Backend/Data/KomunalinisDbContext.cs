@@ -35,8 +35,8 @@ namespace KomunalinisCentras.Backend.Data
         public DbSet<ContainerRequest> ContainerRequests { get; set; }
         public DbSet<ContainerSizeChangeRequest> ContainerSizeChangeRequests { get; set; }
 
-
         // END Application forms and their items
+        public DbSet<ApplicationStatus> ApplicationStatuses { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -122,6 +122,12 @@ namespace KomunalinisCentras.Backend.Data
                 .WithOne(r => r.Declaration)
                 .HasForeignKey(r => r.ResidentCountDeclarationId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Application>()
+                .HasOne(a => a.Status)
+                .WithMany(s => s.Applications)
+                .HasForeignKey(a => a.StatusId)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
     }

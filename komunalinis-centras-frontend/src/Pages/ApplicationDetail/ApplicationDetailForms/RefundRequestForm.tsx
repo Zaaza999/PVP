@@ -12,7 +12,7 @@ interface RefundRequestData {
   paymentReason: string;
   id: number;
   formType: string;
-  approved: boolean;
+  statusId: number;
 }
 
 const RefundRequestForm: React.FC<{ data: RefundRequestData }> = ({ data }) => {
@@ -41,7 +41,7 @@ const RefundRequestForm: React.FC<{ data: RefundRequestData }> = ({ data }) => {
       </div>
 
       <ApplicationStatusManager
-        approved={data.approved}
+        statusId={data.statusId}
         formType={data.formType}
         formId={data.id}
       />

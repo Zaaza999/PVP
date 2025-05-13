@@ -1,33 +1,56 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+interface ApplicationStatus {
+  id: number;
+  name: string;
+}
 
 interface ApplicationStatusManagerProps {
-  approved: boolean;
+  statusId: number;
   formType: string;
   formId: number;
 }
 
 const ApplicationStatusManager: React.FC<ApplicationStatusManagerProps> = ({
-  approved,
+  statusId,
   formType,
   formId,
 }) => {
-  const [status, setStatus] = useState(approved ? "Patvirtinta" : "Nepatvirtinta");
+  const [statuses, setStatuses] = useState<ApplicationStatus[]>([]);
+  const [selectedStatusId, setSelectedStatusId] = useState<number>(statusId);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchStatuses = async () => {
+      try {
+        const response = await fetch("http://localhost:5190/applicationstatuses");
+        const data = await response.json();
+        setStatuses(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Klaida gaunant būsenas:", error);
+      }
+    };
+
+    fetchStatuses();
+  }, []);
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatus(e.target.value);
+    setSelectedStatusId(Number(e.target.value));
   };
 
   const handleStatusSubmit = async () => {
-    const approvedValue = status === "Patvirtinta";
-
     try {
-      const response = await fetch(`http://localhost:5190/applications/${formType}/${formId}/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ approved: approvedValue }),
-      });
+      const response = await fetch(
+        `http://localhost:5190/applications/${formType}/${formId}/status`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ statusId: selectedStatusId }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Nepavyko atnaujinti būsenos");
@@ -40,6 +63,8 @@ const ApplicationStatusManager: React.FC<ApplicationStatusManagerProps> = ({
     }
   };
 
+  const currentStatus = statuses.find((s) => s.id === selectedStatusId);
+
   return (
     <div className="container rounded bg-light">
       <div className="row align-items-end mb-4 border p-3">
@@ -47,8 +72,8 @@ const ApplicationStatusManager: React.FC<ApplicationStatusManagerProps> = ({
         <div className="col-md-4">
           <label className="form-label fw-bold">Dabartinė būsena</label>
           <div>
-            <span className={`badge fs-5 ${status === "Patvirtinta" ? "bg-success" : "bg-warning text-dark"}`}>
-              {status}
+            <span>
+              {currentStatus?.name || "Nėra"}
             </span>
           </div>
         </div>
@@ -56,15 +81,27 @@ const ApplicationStatusManager: React.FC<ApplicationStatusManagerProps> = ({
         {/* Middle: Status dropdown */}
         <div className="col-md-4">
           <label className="form-label fw-bold">Keičiama būsena</label>
-          <select className="form-select" value={status} onChange={handleStatusChange}>
-            <option value="Patvirtinta">Patvirtinta</option>
-            <option value="Nepatvirtinta">Nepatvirtinta</option>
+          <select
+            className="form-select"
+            value={selectedStatusId}
+            onChange={handleStatusChange}
+            disabled={loading}
+          >
+            {statuses.map((status) => (
+              <option key={status.id} value={status.id}>
+                {status.name}
+              </option>
+            ))}
           </select>
         </div>
 
         {/* Right: Submit button */}
         <div className="col-md-4 text-end">
-          <button className="btn btn-primary mt-2" onClick={handleStatusSubmit}>
+          <button
+            className="btn btn-primary mt-2"
+            onClick={handleStatusSubmit}
+            disabled={loading}
+          >
             Atnaujinti būseną
           </button>
         </div>

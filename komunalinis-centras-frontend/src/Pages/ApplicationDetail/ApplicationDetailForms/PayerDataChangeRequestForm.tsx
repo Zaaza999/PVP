@@ -20,7 +20,7 @@ interface PayerDataChangeRequestData {
   paymentNoticeEmail: string;
   representativePosition: string;
 
-  approved: boolean;
+  statusId: number;
   id: number;
   formType: string;
 }
@@ -62,7 +62,7 @@ const PayerDataChangeRequestForm: React.FC<{ data: PayerDataChangeRequestData }>
       </div>
 
       <ApplicationStatusManager
-        approved={data.approved}
+        statusId={data.statusId}
         formType={data.formType}
         formId={data.id}
       />

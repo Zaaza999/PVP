@@ -17,6 +17,7 @@ namespace KomunalinisCentras.Backend.Repositories
         {
             return await _context.Set<ResidentCountDeclaration>()
                 .Include(r => r.Residents)
+                .Include(r => r.Status)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
     }

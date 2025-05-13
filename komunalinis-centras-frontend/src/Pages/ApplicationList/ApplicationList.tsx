@@ -13,9 +13,8 @@ const formatDate = (isoDate: string) => {
 };
 
 
-
 const ApplicationList: React.FC = () => {
-  const [applications, setApplications] = useState([]);
+  const [applications, setApplications] = useState<any[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,8 +23,8 @@ const ApplicationList: React.FC = () => {
         const response = await fetch("http://localhost:5190/applications");
         if (!response.ok) throw new Error("Nepavyko gauti duomenų");
         const data = await response.json();
-        setApplications(data);
         console.log(data);
+        setApplications(data);
       } catch (err) {
         console.error("Klaida:", err);
       }
@@ -40,7 +39,7 @@ const ApplicationList: React.FC = () => {
 
       <div className="d-flex flex-column gap-3">
         {applications.map((application: any) => (
-          <div key={application.applicationId} className="w-100">
+          <div key={application.id} className="w-100">
             <div className="card shadow-sm">
               <div className="card-body">
                 <h5 className="card-title">Forma: {getFormTitle(application.formType)}</h5>
@@ -49,10 +48,8 @@ const ApplicationList: React.FC = () => {
                 </p>
                 <p className="card-text">
                   <strong>Būsena:</strong>{" "}
-                  <span
-                    className={`badge ${application.approved ? "bg-success" : "bg-warning text-dark"}`}
-                  >
-                    {application.approved ? "Patvirtinta" : "Nepatvirtinta"}
+                  <span>
+                    {application.status?.name || "Nežinoma būsena"}
                   </span>
                 </p>
                 <div className="text-end">
