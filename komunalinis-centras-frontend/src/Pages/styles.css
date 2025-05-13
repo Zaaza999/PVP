@@ -676,5 +676,14 @@ body {
   background:#fff; padding:30px 40px; border-radius:8px; width:320px;
   box-shadow:0 4px 12px rgba(0,0,0,.2); text-align:center;
 }
-.modal-actions{ margin-top:25px; display:flex; gap:10px; justify-content:center; }
+.modal-actions{ margin-top:25px; display:flex; gap:10px; justify-content:center; } 
+
+.btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.busy { color:#d32f2f; font-weight:600; }
+.free { color:#2e7d32; font-weight:600; }
+
+
 
