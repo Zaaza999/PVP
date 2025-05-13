@@ -44,29 +44,6 @@ const wasteNameLt: Record<string, string> = {
 const getColor = (n: string) => wasteColor[n] ?? "#ccc";
 const getNameLt = (n: string) => wasteNameLt[n] ?? n;
 
-/* ============================================================
- * Circular progress (palikta iš tavo kodo, jei naudojama kitur)
- * ==========================================================*/
-interface CircularProgressProps {
-  progress: number;
-}
-const CircularProgress: React.FC<CircularProgressProps> = ({ progress }) => {
-  const r = progress <= 50 ? progress * 3.6 : 180;
-  const l = progress > 50 ? (progress - 50) * 3.6 : 0;
-  return (
-    <div className="circular-progress" data-progress={progress}>
-      <div className="circle right">
-        <div className="progress" style={{ transform: `rotate(${r}deg)` }} />
-      </div>
-      <div className="circle left">
-        <div className="progress" style={{ transform: `rotate(${l}deg)` }} />
-      </div>
-      <div className="number">
-        <span>{progress}</span>
-      </div>
-    </div>
-  );
-};
 
 /* ============================================================
  * JWT helper: extract GUID (string) user id
@@ -223,17 +200,7 @@ const Main: React.FC = () => {
             </> 
           )}
           {["Worker", "Admin"].includes(localStorage.getItem("userRole") || "") && (
-            <>
-            <li className="worker-menu">
-              <div className="worker-menu-button">Darbuotojas ☰</div>
-              <div className="worker-dropdown">  
-                <Link to="/addTime">Pridėti laiką</Link>
-                <Link to="/register-worker">Registruoti darbuotoją</Link>
-                <Link to="/worker-list">Darbuotojų sąrašas</Link>
-                <Link to="/application-list">Prašymų sąrašas</Link>
-                <Link to="/residents">Gyventojų sąrašas</Link>
-              </div> 
-            </li>   
+            <>  
             <li><Link to="/addTime">Pridėti laiką</Link></li> 
             <li><Link to="/register-worker">Registruoti darbuotoją</Link></li> 
             <li><Link to="/worker-list">Darbuotojų sąrašas</Link></li>
@@ -250,7 +217,7 @@ const Main: React.FC = () => {
         <section className="skelbimai">
           <h2>Skelbimai</h2>
           <ul>
-            <li>Dievagojasi kad nenurauta</li>
+            <li>Ieškomas santechnikas</li>
             <li>Parduodamas garažas</li>
             <li>Nuomojamas 2 kambarių butas</li>
             <li>Automobilio dalys už gerą kainą</li>
@@ -347,7 +314,7 @@ const Main: React.FC = () => {
           <ul>
             <li>El. paštas: info@fake-mail.lt</li>
             <li>Tel.: +370 600 00000</li>
-            <li>Adresas: Vilniaus g. 10, Vilnius</li>
+            <li>Adresas: Liepų g. 34, Garliava</li>
             <li>Darbo laikas: I–V 8:00–17:00</li>
           </ul>
         </section>
