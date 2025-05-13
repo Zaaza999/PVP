@@ -42,7 +42,7 @@ const RegisterPage = () => {
             }
 
             alert("User registered successfully!");
-            navigate("/login");
+            navigate("/");
         } catch (error: any) {
             alert("Registration failed: " + error.message);
         }
@@ -106,8 +106,13 @@ const RegisterPage = () => {
                     <button type="submit" className="register-button">
                         Atlikti registraciją
                     </button>
-                </form>
-            </div>
+                </form>   
+                <div className="button-wrapper">
+                    <button className="back-button" onClick={() => navigate("/")}>
+                        Grįžti į pagrindinį puslapį
+                    </button>
+                </div>
+            </div> 
         </div>
     );
 };

@@ -668,14 +668,44 @@ body {
 .subscribe-wrapper {
   margin-top: 1rem;      
 }
-.modal-backdrop{
-  position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex;
-  align-items:center; justify-content:center; z-index:1000;
+
+/* ---------- FONAS ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex !important;          /* svarbu – kad nebūtų perrašyta .show */
+  align-items: center;               /* vertikalus centras */
+  justify-content: center;           /* horizontalus */
+  z-index: 1050;
 }
-.modal{
-  background:#fff; padding:30px 40px; border-radius:8px; width:320px;
-  box-shadow:0 4px 12px rgba(0,0,0,.2); text-align:center;
+
+/* ---------- DIALOGAS ---------- */
+.modal-backdrop .modal {
+  /* numušame Bootstrap pozicionavimą */
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  margin: 0 !important;
+
+  /* mūsų dydžiai */
+  display: block !important;
+  height: auto !important;
+  width: 360px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  /* estetika */
+  background: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  text-align: center;
 }
+
+
+
 .modal-actions{ margin-top:25px; display:flex; gap:10px; justify-content:center; } 
 
 .btn-delete:disabled {

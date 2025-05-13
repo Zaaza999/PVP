@@ -12,7 +12,9 @@ import PropertyUsageDeclaration from "./ApplicationDetailForms/PropertyUsageDecl
 import RefundRequest from "./ApplicationDetailForms/RefundRequestForm";
 import ResidentCountDeclaration from "./ApplicationDetailForms/ResidentCountDeclarationForm";
 import WasteFeeExemptionBusiness from "./ApplicationDetailForms/WasteFeeExemptionBusinessForm";
-import WasteFeeExemption from "./ApplicationDetailForms/WasteFeeExemptionForm";
+import WasteFeeExemption from "./ApplicationDetailForms/WasteFeeExemptionForm"; 
+import { Link } from "react-router-dom";
+
 
 // Map formType to component
 const formComponentMap: Record<string, React.FC<{ data: any }>> = {
@@ -64,8 +66,13 @@ const ApplicationDetail: React.FC = () => {
   return (
     <div className="container mt-4">
       <h2 className="mb-4">Formos detalės</h2>
-      <FormComponent data={formData} />
-    </div>
+      <FormComponent data={formData} /> 
+      <div className="button-wrapper">
+        <Link to="/application-list" className="back-button">
+          Grįžti
+        </Link>
+      </div>
+    </div> 
   );
 };
 

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { createPortal } from "react-dom";
+import { createPortal } from "react-dom"; 
+import { useNavigate } from "react-router-dom";  
+
 import "../styles.css";            // jau turi – kortelių & lentelių išvaizdai
 
 /* ====== Tipai ====== */
@@ -46,7 +48,8 @@ const PayModal: React.FC<PayModalProps> = ({ invoice, onClose, onConfirm }) =>
   );
 
 /* ====== Pagrindinis puslapis ====== */
-const InvoicePage: React.FC = () => {
+const InvoicePage: React.FC = () => { 
+  const navigate = useNavigate(); 
   const [invoices, setInvoices] = useState<Invoice[]>(initialInvoices);
   const [selected, setSelected] = useState<Invoice | null>(null);
 
@@ -111,7 +114,12 @@ const InvoicePage: React.FC = () => {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table>  
+        <div className="button-wrapper">
+          <button className="back-button" onClick={() => navigate("/")}>
+            Grįžti į pagrindinį puslapį
+          </button>
+        </div>
       </div>
 
       {/* Modalas */}

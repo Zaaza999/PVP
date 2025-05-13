@@ -64,6 +64,11 @@ const ApplicationList: React.FC = () => {
             </div>
           </div>
         ))}
+      </div> 
+      <div className="button-wrapper">
+          <button className="back-button" onClick={() => navigate("/")}>
+              Grįžti į pagrindinį puslapį
+          </button>
       </div>
     </div>
   );

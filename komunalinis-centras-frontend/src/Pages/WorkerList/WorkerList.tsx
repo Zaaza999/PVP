@@ -29,9 +29,14 @@ const WorkersList: React.FC = () => {
           <p><strong>Vardas:</strong> {worker.firstName} {worker.lastName}</p>
           <p><strong>El. paštas:</strong> {worker.email}</p>
           {/* Optional button */}
-          <button className="view-worker-button" onClick={() => navigate(`/worker-list/${worker.id}`)}>Peržiūrėti</button>
+          <button className="view-worker-button" onClick={() => navigate(`/worker-list/${worker.id}`)}>Peržiūrėti</button> 
         </div>
-      ))}
+      ))} 
+        <div className="button-wrapper">
+            <button className="view-worker-button" onClick={() => navigate("/")}>
+                Grįžti į pagrindinį puslapį
+            </button>
+        </div>
     </div>
   );
 };

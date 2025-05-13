@@ -18,7 +18,7 @@ import "../../App.css";
    =============================================================== */
 const WORK_DAY_START_HOUR = 8;
 const WORK_DAY_END_HOUR   = 17;
-const STEP_MINUTES        = 15;
+const STEP_MINUTES        = 30;
 
 /* ===== JWT helper ============================================ */
 const getCurrentUserId = (): string | null => {
@@ -294,6 +294,11 @@ const EmployeeTimeSlotsPage: React.FC = () => {
             )}
           </tbody>
         </table>
+      </div> 
+      <div className="button-wrapper">
+          <button className="back-button" onClick={() => navigate("/")}>
+              Grįžti į pagrindinį puslapį
+          </button>
       </div>
     </div>
   );

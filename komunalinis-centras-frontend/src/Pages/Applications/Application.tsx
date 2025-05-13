@@ -11,7 +11,9 @@ import ContainerFrequencyChangeForm from "./Forms/ContainerFrequencyChangeForm";
 import ContainerSizeChangeRequest from "./Forms/ContainerSizeChangeRequest";
 import EmailInvoiceRequestForm from "./Forms/EmailInvoiceRequestForm";
 import RefundRequestForm from "./Forms/RefundRequestForm";
-import PayerDataChangeRequestForm from "./Forms/PayerDataChangeRequestForm";
+import PayerDataChangeRequestForm from "./Forms/PayerDataChangeRequestForm";  
+import { Link } from "react-router-dom";
+
 
 const formsList = [
   { title: "1. Prašymas – Atleidimas nuo vietinės rinkliavos (fiziniams asmenims)", component: <WasteFeeExemptionForm /> },
@@ -109,8 +111,13 @@ const Application: React.FC = () => {
           </div>
           {formsList[selectedFormIndex].component}
         </div>
-      )}
+      )} 
 
+      <div className="button-wrapper">
+        <Link to="/" className="back-button">
+          Grįžti į pagrindinį puslapį
+        </Link>
+      </div>
     </div>
   );
 };
