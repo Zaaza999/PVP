@@ -57,11 +57,10 @@ const ResidentsList: React.FC = () => {
 
         getUser(userId)
             .then(user => {
-                if (user.role?.roleName !== "worker") {
+                if (!["worker", "admin"].includes(user.role?.roleName?.toLowerCase() || "")) {
                     setError("Neturite prieigos prie šio puslapio.");
                     return;
                 }
-                console.log(jwtDecode(token));
                 getResidents()
                     .then((res: Resident[]) => setResidents(res))
                     .catch(() => setError("Nepavyko gauti gyventojų sąrašo."));

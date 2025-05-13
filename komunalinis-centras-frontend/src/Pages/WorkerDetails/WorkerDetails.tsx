@@ -1,11 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { getUser } from "../Axios/apiServises";
+import {jwtDecode} from "jwt-decode";
 import "./WorkerDetails.css";
+
+interface JwtPayload {
+  userId: string;
+  [key: string]: any;
+}
 
 const WorkerDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [worker, setWorker] = useState<any>(null);
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const decoded: JwtPayload = jwtDecode(token);
+    const userId = decoded.userId ?? decoded.sub;
+    if (!userId) return;
+
+    getUser(userId)
+        .then((user) => {
+          setUserRole(user.role?.roleName);
+        })
+        .catch((err) => {
+          console.error("Nepavyko gauti naudotojo duomenų:", err);
+        });
+  }, []);
 
   useEffect(() => {
     const fetchWorker = async () => {
@@ -82,8 +107,12 @@ const handleDelete = async () => {
 
         <div className="button-group">
           <button className="worker-back-button" onClick={() => navigate(-1)}>Grįžti atgal</button>
-          <button className="worker-edit-button" onClick={() => navigate(`/worker-list/${id}/edit`)}>Redaguoti</button>
-          <button className="worker-delete-button" onClick={handleDelete}>Ištrinti</button>
+          {userRole === "admin" && (
+              <>
+                <button className="worker-edit-button" onClick={() => navigate(`/worker-list/${id}/edit`)}>Redaguoti</button>
+                <button className="worker-delete-button" onClick={handleDelete}>Ištrinti</button>
+              </>
+          )}
         </div>
       </div>
     </div>

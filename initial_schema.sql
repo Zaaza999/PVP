@@ -212,7 +212,8 @@ CREATE TABLE `__EFMigrationsHistory` (
 /* -- Roles (Worker + Client) -------------------------------- */
 INSERT INTO `Roles` (`Id`, `role_name`, `Name`, `NormalizedName`, `ConcurrencyStamp`) VALUES
 ('1', 'worker', 'Worker', 'WORKER', NULL),
-('2', 'client', 'Client', 'CLIENT', NULL); 
+('2', 'client', 'Client', 'CLIENT', NULL), 
+('3', 'admin', 'Admin', 'ADMIN', NULL);
 
 LOCK TABLES `WasteTypes` WRITE;
 /*!40000 ALTER TABLE `WasteTypes` DISABLE KEYS */;
