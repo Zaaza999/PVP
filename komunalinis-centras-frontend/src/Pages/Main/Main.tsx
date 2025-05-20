@@ -199,18 +199,16 @@ const Main: React.FC = () => {
             <li><Link to="/reservation">Rezervacijos</Link></li>
             </> 
           )}
-          {["worker", "admin"].includes(localStorage.getItem("userRole") || "") && (
+          {(localStorage.getItem("userRole")?.toLowerCase().includes("worker") || 
+            localStorage.getItem("userRole") === "admin") && (
             <>  
-            <li><Link to="/addTime">Pridėti laiką</Link></li> 
-            <li><Link to="/register-worker">Registruoti darbuotoją</Link></li> 
-            <li><Link to="/worker-list">Darbuotojų sąrašas</Link></li>
-            <li><Link to="/application-list">Prašymų sąrašas</Link></li>
-            <li><Link to="/residents">Gyventojų sąrašas</Link></li>
+              <li><Link to="/addTime">Pridėti laiką</Link></li> 
+              <li><Link to="/register-worker">Registruoti darbuotoją</Link></li> 
+              <li><Link to="/worker-list">Darbuotojų sąrašas</Link></li>
+              <li><Link to="/application-list">Prašymų sąrašas</Link></li>
+              <li><Link to="/residents">Gyventojų sąrašas</Link></li>
             </>
-            
-          )}
-
-            
+          )}            
           
         </ul>
       </nav>

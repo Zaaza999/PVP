@@ -27,7 +27,7 @@ namespace KomunalinisCentras.Backend.Controllers
         [HttpGet("workers")]
         public async Task<IActionResult> GetAllWorkers()
         {
-            var workers = await _userRepository.GetUsersForRoleAsync("2");
+            var workers = await _userRepository.GetAllWorkers();
             return Ok(workers);
         }
 
@@ -85,7 +85,7 @@ namespace KomunalinisCentras.Backend.Controllers
 
             await _userRepository.DeleteAsync(id);
             return NoContent();
-        } 
+        }
 
         [HttpPut("{id}/subscribe")]
         public async Task<IActionResult> Subscribe(string id)
@@ -93,12 +93,12 @@ namespace KomunalinisCentras.Backend.Controllers
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null) return NotFound();
 
-            if (user.Subscription) return NoContent();     
+            if (user.Subscription) return NoContent();
 
             user.Subscription = true;
             await _userRepository.UpdateAsync(user);
-            return NoContent();                             
-        } 
+            return NoContent();
+        }
         // PUT /users/{id}/unsubscribe
         [HttpPut("{id}/unsubscribe")]
         public async Task<IActionResult> Unsubscribe(string id)
@@ -112,6 +112,15 @@ namespace KomunalinisCentras.Backend.Controllers
             await _userRepository.UpdateAsync(user);
             return NoContent();
         }
+        
+        // GET /users/roles
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetAllRoles()
+        {
+            var roles = await _userRepository.GetAllRoles();
+            return Ok(roles);
+        }
+
 
     }
 }

@@ -13,5 +13,9 @@ namespace KomunalinisCentras.Backend.Entities
         // Navigation (one Role -> many Users) 
         [JsonIgnore]
         public ICollection<User> Users { get; set; } = new List<User>();
+    
+        [JsonIgnore]
+        public ICollection<ApplicationGroup> ApplicationGroups { get; set; } = new List<ApplicationGroup>();
+
     }
 }

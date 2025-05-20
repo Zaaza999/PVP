@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getUser } from "../Axios/apiServises";
 import {jwtDecode} from "jwt-decode";
+import { formatWorkerRoleName } from "../../utils/formatWorkerRoleName";
 import "./WorkerDetails.css";
 
 interface JwtPayload {
@@ -78,7 +79,7 @@ const handleDelete = async () => {
           <div className="avatar-placeholder">👤</div>
           <div>
             <h2>{worker.firstName || "---------"} {worker.lastName || "---------"}</h2>
-            <p className="role-text">{worker.role?.name || "---------"}</p>
+            <p className="role-text">{formatWorkerRoleName(worker.role?.name) || "---------"}</p>
           </div>
         </div>
 

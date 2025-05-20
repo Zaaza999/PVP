@@ -37,12 +37,14 @@ namespace KomunalinisCentras.Backend.Data
 
         // END Application forms and their items
         public DbSet<ApplicationStatus> ApplicationStatuses { get; set; }
+        public DbSet<ApplicationGroup> ApplicationGroups { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             // Map to the new table names from the SQL script
             modelBuilder.Entity<Role>().ToTable("Roles");
             modelBuilder.Entity<User>().ToTable("Users");
@@ -65,6 +67,7 @@ namespace KomunalinisCentras.Backend.Data
             modelBuilder.Entity<ContainerSizeChangeRequest>().HasBaseType<Application>();
             modelBuilder.Entity<PayerDataChangeRequest>().HasBaseType<Application>();
             modelBuilder.Entity<RefundRequest>().HasBaseType<Application>();
+            modelBuilder.Entity<ApplicationGroup>().ToTable("ApplicationGroups");
 
 
             // Example relationships (if you want explicit configuration)
@@ -104,19 +107,19 @@ namespace KomunalinisCentras.Backend.Data
                 .HasOne(g => g.WasteType)
                 .WithMany()
                 .HasForeignKey(g => g.WasteId);
-            
-            
+
+
             modelBuilder.Entity<Application>()
                 .HasOne(a => a.SubmittedBy)
                 .WithMany()
                 .HasForeignKey(a => a.SubmittedByUserId);
-            
+
             modelBuilder.Entity<PropertyUsageDeclaration>()
                 .HasMany(p => p.Entries)
                 .WithOne(e => e.Declaration)
                 .HasForeignKey(e => e.PropertyUsageDeclarationId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
             modelBuilder.Entity<ResidentCountDeclaration>()
                 .HasMany(d => d.Residents)
                 .WithOne(r => r.Declaration)
@@ -128,6 +131,26 @@ namespace KomunalinisCentras.Backend.Data
                 .WithMany(s => s.Applications)
                 .HasForeignKey(a => a.StatusId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Application>()
+                .HasOne(a => a.ApplicationGroup)
+                .WithMany(g => g.Applications)
+                .HasForeignKey(a => a.ApplicationGroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Role>()
+                .HasMany(r => r.ApplicationGroups)
+                .WithMany(g => g.Roles)
+                .UsingEntity<Dictionary<string, object>>(
+                    "RoleApplicationGroup",
+                    r => r.HasOne<ApplicationGroup>().WithMany().HasForeignKey("ApplicationGroupId"),
+                    g => g.HasOne<Role>().WithMany().HasForeignKey("RoleId"),
+                    je =>
+                    {
+                        je.ToTable("RoleApplicationGroups");
+                        je.HasKey("RoleId", "ApplicationGroupId");
+                    }
+                );
 
         }
     }

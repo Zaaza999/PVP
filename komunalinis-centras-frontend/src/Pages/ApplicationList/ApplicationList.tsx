@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getFormTitle } from "../../utils/formTitleHelper";
+import { formatApplicationGroupName } from "../../utils/formatApplicationGroupName";
 
 const formatDate = (isoDate: string) => {
   const date = new Date(isoDate);
@@ -12,19 +13,37 @@ const formatDate = (isoDate: string) => {
   return `${year}/${month}/${day} ${hours}:${minutes}`;
 };
 
+const groupByApplicationGroup = (apps: any[]) => {
+  return apps.reduce((groups: Record<string, any[]>, app) => {
+    const groupName = app.applicationGroup?.groupName || "Kita";
+    if (!groups[groupName]) {
+      groups[groupName] = [];
+    }
+    groups[groupName].push(app);
+    return groups;
+  }, {});
+};
 
 const ApplicationList: React.FC = () => {
-  const [applications, setApplications] = useState<any[]>([]);
+  const [groupedApplications, setGroupedApplications] = useState<Record<string, any[]>>({});
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await fetch("http://localhost:5190/applications");
+        const userRole = localStorage.getItem("userRole");
+        console.log("User current role is: ", userRole);
+        if (!userRole) {
+          console.warn("No role found in localStorage.");
+          return;
+        }
+
+        const response = await fetch(`http://localhost:5190/applications/by-role/${userRole}`);
         if (!response.ok) throw new Error("Nepavyko gauti duomenų");
+
         const data = await response.json();
-        console.log(data);
-        setApplications(data);
+        const grouped = groupByApplicationGroup(data);
+        setGroupedApplications(grouped);
       } catch (err) {
         console.error("Klaida:", err);
       }
@@ -34,43 +53,62 @@ const ApplicationList: React.FC = () => {
   }, []);
 
   return (
-    <div className="container mt-4">
-      <h2 className="text-center mb-4">Pateiktų prašymų sąrašas</h2>
+    <div className="container py-4">
+      <h2 className="text-center mb-5 fw-bold border-bottom pb-2">
+        Pateiktų prašymų sąrašas
+      </h2>
 
-      <div className="d-flex flex-column gap-3">
-        {applications.map((application: any) => (
-          <div key={application.id} className="w-100">
-            <div className="card shadow-sm">
-              <div className="card-body">
-                <h5 className="card-title">Forma: {getFormTitle(application.formType)}</h5>
-                <p className="card-text mb-1">
-                  <strong>Pateikta:</strong> {formatDate(application.date)}
-                </p>
-                <p className="card-text">
-                  <strong>Būsena:</strong>{" "}
-                  <span>
-                    {application.status?.name || "Nežinoma būsena"}
-                  </span>
-                </p>
-                <div className="text-end">
-                  <button
-                    className="btn btn-outline-primary btn-sm"
-                    onClick={() => navigate(`/application-list/${application.formType}/${application.id}`)}
-                  >
-                    Peržiūrėti
-                  </button>
-                </div>
-              </div>
-            </div>
+      {Object.entries(groupedApplications).map(([groupName, apps]) => (
+        <div key={groupName} className="mb-5">
+          <h4 className="text-secondary border-bottom pb-2 mb-3">{formatApplicationGroupName(groupName)}</h4>
+
+          <div className="table-responsive">
+            <table className="table table-hover align-middle shadow-sm border rounded">
+              <thead className="table-light">
+                <tr>
+                  <th scope="col">Forma</th>
+                  <th scope="col">Pateikta</th>
+                  <th scope="col">Būsena</th>
+                  <th scope="col" className="text-end">Veiksmas</th>
+                </tr>
+              </thead>
+              <tbody>
+                {apps.map((application: any) => (
+                  <tr key={application.id}>
+                    <td>{getFormTitle(application.formType)}</td>
+                    <td>{formatDate(application.date)}</td>
+                    <td>
+                      <span>
+                        {application.status?.name}
+                      </span>
+                    </td>
+                    <td className="text-end">
+                      <button
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={() =>
+                          navigate(
+                            `/application-list/${application.formType}/${application.id}`
+                          )
+                        }
+                      >
+                        Peržiūrėti
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ))}
-      </div> 
-      <div className="button-wrapper">
-          <button className="back-button" onClick={() => navigate("/")}>
-              Grįžti į pagrindinį puslapį
-          </button>
+        </div>
+      ))}
+
+      <div className="text-center mt-5">
+        <button className="btn btn-secondary" onClick={() => navigate("/")}>
+          Grįžti į pagrindinį puslapį
+        </button>
       </div>
     </div>
+
   );
 };
 

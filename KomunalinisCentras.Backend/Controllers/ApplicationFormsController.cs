@@ -5,6 +5,9 @@ using KomunalinisCentras.Backend.Entities;
 using KomunalinisCentras.Backend.Factory;
 using KomunalinisCentras.Backend.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace KomunalinisCentras.Backend.Controllers
 {
@@ -14,11 +17,13 @@ namespace KomunalinisCentras.Backend.Controllers
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IApplicationStatusRepository _statusRepository;
+        private readonly RoleManager<Role> _roleManager;
 
-        public ApplicationsController(IServiceProvider serviceProvider, IApplicationStatusRepository statusRepository)
+        public ApplicationsController(IServiceProvider serviceProvider, IApplicationStatusRepository statusRepository, RoleManager<Role> roleManager)
         {
             _serviceProvider = serviceProvider;
             _statusRepository = statusRepository;
+            _roleManager = roleManager;
         }
 
 
@@ -50,6 +55,28 @@ namespace KomunalinisCentras.Backend.Controllers
             var applicationRepository = _serviceProvider.GetRequiredService<IApplicationRepository<Application>>();
             var all = await applicationRepository.GetAllAsync();
             return Ok(all);
+        }
+
+        [HttpGet("by-role/{roleName}")]
+        public async Task<IActionResult> GetApplicationsByWorkerRole(string roleName)
+        {
+            // var normalizedRoleName = roleName.ToUpperInvariant(); 
+            var role = await _roleManager.Roles
+                .Include(r => r.ApplicationGroups)
+                .FirstOrDefaultAsync(r => r.Name == roleName);
+
+            if (role == null)
+                return NotFound("Role not found.");
+
+            var allowedGroupIds = role.ApplicationGroups.Select(g => g.Id).ToList();
+
+            if (!allowedGroupIds.Any())
+                return Ok(new List<Application>());
+
+            var repo = _serviceProvider.GetRequiredService<IApplicationRepository<Application>>();
+            var apps = await repo.GetByApplicationGroupIdsAsync(allowedGroupIds);
+
+            return Ok(apps);
         }
 
         // GET /applications/formType

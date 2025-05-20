@@ -10,7 +10,7 @@ namespace KomunalinisCentras.Backend.Entities
         public int Id { get; set; }
 
         [Required]
-        public string FormType  { get; set; } = null!;
+        public string FormType { get; set; } = null!;
 
         [Required]
         [DataType(DataType.Date)]
@@ -26,6 +26,12 @@ namespace KomunalinisCentras.Backend.Entities
         public int StatusId { get; set; }
 
         public ApplicationStatus Status { get; set; } = null!;
+
+        [ForeignKey("ApplicationGroup")]
+        public int ApplicationGroupId { get; set; }
+
+        public ApplicationGroup ApplicationGroup { get; set; } = null!;
+
     }
 
 }

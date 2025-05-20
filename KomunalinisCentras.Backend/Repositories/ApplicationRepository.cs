@@ -50,6 +50,15 @@ namespace KomunalinisCentras.Backend.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<IEnumerable<T>> GetByApplicationGroupIdsAsync(IEnumerable<int> groupIds)
+        {
+            return await _dbSet
+                .Include(a => a.Status)
+                .Where(a => groupIds.Contains(a.ApplicationGroupId))
+                .ToListAsync();
+        }
+
     }
 
 }

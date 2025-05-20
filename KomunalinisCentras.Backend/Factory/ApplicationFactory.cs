@@ -27,7 +27,7 @@ namespace KomunalinisCentras.Backend.Factory
                 "containerfrequencychange" => JsonSerializer.Deserialize<ContainerFrequencyChange>(dataJson, jsonOptions),
                 "containersizechangerequest" => JsonSerializer.Deserialize<ContainerSizeChangeRequest>(dataJson, jsonOptions),
                 "payerdatachangerequest" => JsonSerializer.Deserialize<PayerDataChangeRequest>(dataJson, jsonOptions),
-                "refundrequest" => JsonSerializer.Deserialize<RefundRequest>(dataJson, jsonOptions),    
+                "refundrequest" => JsonSerializer.Deserialize<RefundRequest>(dataJson, jsonOptions),
                 // Add other types here
                 _ => null
             };
@@ -44,6 +44,8 @@ namespace KomunalinisCentras.Backend.Factory
             app.FormType = dto.FormType;
 
             app.StatusId = 2;
+
+            app.ApplicationGroupId = GetApplicationGroupId(dto.FormType);
 
             return app;
         }
@@ -66,7 +68,35 @@ namespace KomunalinisCentras.Backend.Factory
                 _ => null
             };
         }
-    }
 
+        private static int GetApplicationGroupId(string formType)
+        {
+            formType = formType.Trim().ToLower(); // Normalize
+
+            return formType switch
+            {
+                // Billing & Finance - GroupId = 1
+                "wastefeeexemption" => 1,
+                "wastefeeexemptionbusiness" => 1,
+                "emailinvoicerequest" => 1,
+                "refundrequest" => 1,
+
+                // Property & Residency - GroupId = 2
+                "propertyunsuitability" => 2,
+                "propertyusagedeclaration" => 2,
+                "residentcountdeclaration" => 2,
+
+                // Container Management - GroupId = 3
+                "containerrequest" => 3,
+                "containerfrequencychange" => 3,
+                "containersizechangerequest" => 3,
+
+                // Personal Data / Account Updates - GroupId = 4
+                "payerdatachangerequest" => 4,
+
+                _ => 5 // Not recognized
+            };
+        }
+    }
 
 }

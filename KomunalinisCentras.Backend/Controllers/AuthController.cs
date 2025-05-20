@@ -30,7 +30,7 @@ namespace KomunalinisCentras.Backend.Controllers
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
-        var userRole = await _roleManager.FindByNameAsync("client");
+        var userRole = await _roleManager.FindByIdAsync(model.RoleId);
         if (userRole == null)
             return BadRequest("Kliento rolė neegzistuoja.");
         var user = new User { FirstName = model.FirstName, LastName = model.LastName,
@@ -38,16 +38,16 @@ namespace KomunalinisCentras.Backend.Controllers
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (!result.Succeeded) return BadRequest(result.Errors);
-        await _userManager.AddToRoleAsync(user, "client");
+        await _userManager.AddToRoleAsync(user, userRole.NormalizedName);
         return Ok("User created");
     }
 
     [HttpPost("register-worker")]
     public async Task<IActionResult> RegisterWorker([FromBody] RegisterModel model)
     {
-        var workerRole = await _roleManager.FindByNameAsync("worker");
-        if (workerRole == null)
-            return BadRequest("Worker role does not exist.");
+        var role = await _roleManager.FindByIdAsync(model.RoleId);
+        if (role == null)
+            return BadRequest("Specified role does not exist.");
 
         var user = new User
         {
@@ -55,16 +55,16 @@ namespace KomunalinisCentras.Backend.Controllers
             LastName = model.LastName,
             UserName = model.Email,
             Email = model.Email,
-            RoleId = workerRole.Id // Set FK
+            RoleId = role.Id
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
         if (!result.Succeeded)
             return BadRequest(result.Errors);
 
-        await _userManager.AddToRoleAsync(user, "worker");
+        await _userManager.AddToRoleAsync(user, role.NormalizedName);
 
-        return Ok("User created with worker role");
+        return Ok("User created");
     }
 
 

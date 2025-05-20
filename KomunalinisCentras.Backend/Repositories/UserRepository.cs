@@ -47,7 +47,7 @@ namespace KomunalinisCentras.Backend.Repositories
                 _context.Users.Remove(existing);
                 await _context.SaveChangesAsync();
             }
-        } 
+        }
         public async Task<IEnumerable<User>> GetUsersForRoleAsync(string roleId)
         {
             return await _context.Users
@@ -55,6 +55,18 @@ namespace KomunalinisCentras.Backend.Repositories
                 .Where(u => u.RoleId == roleId)
                 .ToListAsync();
         }
-        
+        public async Task<IEnumerable<User>> GetAllWorkers()
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .Where(u => u.Role != null && u.Role.Name.ToLower().Contains("worker"))
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Role>> GetAllRoles()
+        {
+            return await _context.Roles.ToListAsync();
+        }
+
     }
 }

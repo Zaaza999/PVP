@@ -33,6 +33,7 @@ const RegisterPage = () => {
                     lastname: form.LastName,
                     email: form.email,
                     password: form.password,
+                    RoleId: "1",
                 }),
             });
 

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./RegisterPage.css";
 import { useNavigate } from "react-router-dom";
+import { formatWorkerRoleName } from "../../utils/formatWorkerRoleName";
 
 const RegisterPage = () => {
     const [form, setForm] = useState({
@@ -9,10 +10,25 @@ const RegisterPage = () => {
         email: "",
         password: "",
         confirmPassword: "",
+        roleId: "",
     });
+    const [roles, setRoles] = useState([]);
     const navigate = useNavigate();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    useEffect(() => {
+        const fetchRoles = async () => {
+            try {
+                const res = await fetch("http://localhost:5190/users/roles");
+                const data = await res.json();
+                setRoles(data);
+            } catch (err) {
+                console.error("Failed to fetch roles:", err);
+            }
+        };
+        fetchRoles();
+    }, []);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
@@ -30,9 +46,10 @@ const RegisterPage = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     FirstName: form.FirstName,
-                    lastname: form.LastName,
-                    email: form.email,
-                    password: form.password,
+                    LastName: form.LastName,
+                    Email: form.email,
+                    Password: form.password,
+                    RoleId: form.roleId,
                 }),
             });
 
@@ -103,16 +120,32 @@ const RegisterPage = () => {
                             required
                         />
                     </div>
+                    <div className="form-group">
+                        <label>Darbuotojo rolė</label>
+                        <select
+                            name="roleId"
+                            value={form.roleId}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">-- Pasirinkite rolę --</option>
+                            {roles.map((role: any) => (
+                                <option key={role.id} value={role.id}>
+                                    {formatWorkerRoleName(role.roleName)}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                     <button type="submit" className="register-button">
                         Atlikti registraciją
                     </button>
-                </form>   
+                </form>
                 <div className="button-wrapper">
                     <button className="back-button" onClick={() => navigate("/")}>
                         Grįžti į pagrindinį puslapį
                     </button>
                 </div>
-            </div> 
+            </div>
         </div>
     );
 };
