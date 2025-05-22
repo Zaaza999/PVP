@@ -72,6 +72,15 @@ namespace KomunalinisCentras.Backend.Controllers
 
             await _employeeTimeSlotRepository.DeleteAsync(id);
             return NoContent();
+        } 
+
+        // EmployeeTimeSlotsController.cs
+        [HttpGet("by-topic/{topicId:int}")]
+        public async Task<IActionResult> GetByTopic(int topicId)
+        {
+            var slots = await _employeeTimeSlotRepository.GetAvailableByTopicAsync(topicId);
+            return Ok(slots);
         }
+
     }
 }

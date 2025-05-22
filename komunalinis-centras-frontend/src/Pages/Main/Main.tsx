@@ -216,7 +216,7 @@ const Main: React.FC = () => {
       <main>
       {/* SKELBIMAI */}
         <section className="skelbimai">
-          <h2>Skelbimai</h2>
+          <h2>Naujienos</h2>
           <ul>
             <li>Ieškomas santechnikas</li>
             <li>Parduodamas garažas</li>

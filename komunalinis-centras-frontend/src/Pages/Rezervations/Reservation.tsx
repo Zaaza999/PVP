@@ -3,9 +3,10 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import {
-  addReservation,
-  getTimeSlots,
   getVisitTopics,
+  getTimeSlotsByTopic,  //  <-- naujas endpointas
+  addReservation, 
+  getUser,
 } from "../Axios/apiServises";
 import "../styles.css";
 
@@ -14,33 +15,41 @@ const getCurrentUserId = (): string | null => {
   const token = localStorage.getItem("token");
   if (!token) return null;
   try {
-    const decoded: any = jwtDecode(token);
-    const id = decoded.userId ?? decoded.id ?? decoded.sub ?? decoded.nameid;
-    return id ? String(id) : null;
+    // token payload { "nameid": "<Guid>" , … }
+    const decoded: { nameid?: string } = jwtDecode(token);
+    return decoded?.nameid ?? null;
   } catch {
     return null;
   }
 };
 
-/* ====== DTO types ====== */
-type EmployeeTimeSlot = {
+/* ===== DTO types ===== */
+export type EmployeeTimeSlot = {
   timeSlotId: number;
   employeeId: number;
-  slotDate: string;
-  timeFrom: string;
-  timeTo: string;
+  slotDate: string;      // ISO-8601 2024-05-22T00:00:00
+  timeFrom: string;      // 09:00
+  timeTo: string;        // 09:30
   isTaken: boolean;
 };
-type VisitTopic = { topicId: number; topicName: string; description?: string };
 
-/* ====== date helpers ====== */
-const setToMidnight = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+export type VisitTopic = {
+  topicId: number;
+  topicName: string;
+  description?: string;
+};
+
+/* ===== date helpers ===== */
+const setToMidnight = (d: Date) =>
+  new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
 const getMonday = (date: Date): Date => {
   const temp = setToMidnight(new Date(date));
   const day = temp.getDay();
-  const diff = temp.getDate() - day + (day === 0 ? -6 : 1);
+  const diff = temp.getDate() - day + (day === 0 ? -6 : 1); // Pradedam savaitę nuo pirmadienio
   return new Date(temp.setDate(diff));
 };
+
 const addDays = (date: Date, days: number): Date => {
   const d = setToMidnight(date);
   d.setDate(d.getDate() + days);
@@ -50,52 +59,68 @@ const addDays = (date: Date, days: number): Date => {
 /* ====== COMPONENT ====== */
 const WeeklyScheduleReservation: React.FC = () => {
   const navigate = useNavigate();
+
+  /* --- state --- */
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() =>
     getMonday(new Date())
   );
+
   const [employeeTimeSlots, setEmployeeTimeSlots] = useState<EmployeeTimeSlot[]>(
     []
   );
   const [topics, setTopics] = useState<VisitTopic[]>([]);
+
   const [selectedTimeSlotId, setSelectedTimeSlotId] = useState<number | null>(
     null
   );
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTimeRange, setSelectedTimeRange] = useState<string>("");
   const [selectedTopicId, setSelectedTopicId] = useState<number | null>(null);
+
   const [submitted, setSubmitted] = useState(false);
 
-  /* --- INIT: fetch JWT id + API data --- */
+  /* --- INIT: fetch user + topics --- */
   useEffect(() => {
     setCurrentUserId(getCurrentUserId());
-
-    getTimeSlots()
-      .then((data: EmployeeTimeSlot[]) =>
-      setEmployeeTimeSlots(data.filter((s: EmployeeTimeSlot) => !s.isTaken))
-    )
-      .catch((err) => console.error("Klaida gaunant laiko langus:", err));
 
     getVisitTopics()
       .then(setTopics)
       .catch((err) => console.error("Klaida gaunant temų sąrašą:", err));
   }, []);
 
+  /* --- kai pasirenkama tema, atsiunčiam atitinkamus laiko tarpus --- */
+  useEffect(() => {
+    if (selectedTopicId == null) {
+      setEmployeeTimeSlots([]);
+      return;
+    }
+
+    getTimeSlotsByTopic(selectedTopicId)
+      .then((data) =>
+        setEmployeeTimeSlots(
+          data.filter((s: EmployeeTimeSlot) => !s.isTaken) // saugiklis
+        )
+      )
+      .catch((err) => console.error("Klaida gaunant laiko langus:", err));
+  }, [selectedTopicId]); 
+
   /* --- navigacija per savaites --- */
   const handlePreviousWeek = () => {
     setCurrentWeekStart(addDays(currentWeekStart, -7));
     resetSelection();
   };
+
   const handleNextWeek = () => {
     setCurrentWeekStart(addDays(currentWeekStart, 7));
     resetSelection();
   };
+
   const resetSelection = () => {
     setSelectedTimeSlotId(null);
     setSelectedDate(null);
     setSelectedTimeRange("");
-    setSelectedTopicId(null);
     setSubmitted(false);
   };
 
@@ -103,16 +128,26 @@ const WeeklyScheduleReservation: React.FC = () => {
   const handleTopicChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = parseInt(e.target.value, 10);
     setSelectedTopicId(isNaN(val) ? null : val);
+    // išvalom ankstesnio pasirinkimo duomenis
+    resetSelection();
   };
+
   const handleTimeSlotClick = (slot: EmployeeTimeSlot) => {
-    const rawDate = slot.slotDate.split("T")[0];
+    const rawDate = slot.slotDate.split("T")[0]; // YYYY-MM-DD
     setSelectedTimeSlotId(slot.timeSlotId);
     setSelectedDate(rawDate);
     setSelectedTimeRange(`${slot.timeFrom} - ${slot.timeTo}`);
   };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!currentUserId || !selectedTimeSlotId || !selectedTopicId || !selectedDate) return;
+    if (
+      !currentUserId ||
+      !selectedTimeSlotId ||
+      !selectedTopicId ||
+      !selectedDate
+    )
+      return;
 
     const isoDateTime = new Date(
       `${selectedDate}T${selectedTimeRange.split(" - ")[0]}`
@@ -134,18 +169,10 @@ const WeeklyScheduleReservation: React.FC = () => {
     const slotDate = new Date(slot.slotDate.split("T")[0]);
     const weekEnd = addDays(currentWeekStart, 6);
     return slotDate >= currentWeekStart && slotDate <= weekEnd;
-  });
+  }); 
 
   /* ====== RENDER ====== */
-  if (currentUserId === null)
-    return (
-      <div className="weekly-schedule-container">
-        <h2>Prisijunkite, kad galėtumėte rezervuoti vizitą</h2>
-        <button className="btn" onClick={() => navigate("/login")}>
-          Prisijungti
-        </button>
-      </div>
-    );
+
 
   return (
     <div className="weekly-schedule-container">
@@ -154,7 +181,9 @@ const WeeklyScheduleReservation: React.FC = () => {
       {submitted ? (
         <div className="success-message">
           <p>Dėkojame už rezervaciją! Jūsų vizitas patvirtintas.</p>
-          <Link to="/" className="btn">Atgal</Link>
+          <Link to="/" className="btn">
+            Atgal
+          </Link>
         </div>
       ) : (
         <>
@@ -170,6 +199,7 @@ const WeeklyScheduleReservation: React.FC = () => {
 
           {/* Forma */}
           <form onSubmit={handleSubmit}>
+            {/* Tema */}
             <div className="form-group">
               <label htmlFor="topic">Pasirinkite vizito temą:</label>
               <select
@@ -200,7 +230,11 @@ const WeeklyScheduleReservation: React.FC = () => {
               <tbody>
                 {visibleSlots.length === 0 ? (
                   <tr>
-                    <td colSpan={4}>Nėra laisvų laiko langų šiai savaitei</td>
+                    <td colSpan={4}>
+                      {selectedTopicId
+                        ? "Šiai savaitei nėra laisvų laikų"
+                        : "Pirmiausia pasirinkite temą"}
+                    </td>
                   </tr>
                 ) : (
                   visibleSlots.map((slot) => {
@@ -208,15 +242,20 @@ const WeeklyScheduleReservation: React.FC = () => {
                       .split("T")[0]
                       .split("-")
                       .map(Number);
-                    const displayDate = new Date(y, m - 1, d).toLocaleDateString(
-                      "lt-LT"
-                    );
+                    const displayDate = new Date(
+                      y,
+                      m - 1,
+                      d
+                    ).toLocaleDateString("lt-LT");
                     const timeRange = `${slot.timeFrom} - ${slot.timeTo}`;
+
                     return (
                       <tr
                         key={slot.timeSlotId}
                         className={
-                          slot.timeSlotId === selectedTimeSlotId ? "selected" : ""
+                          slot.timeSlotId === selectedTimeSlotId
+                            ? "selected"
+                            : ""
                         }
                       >
                         <td>{displayDate}</td>
@@ -243,28 +282,28 @@ const WeeklyScheduleReservation: React.FC = () => {
               <div className="selected-info">
                 <p>Laiko lango ID: {selectedTimeSlotId}</p>
                 <p>
-                  Data: {new Date(selectedDate).toLocaleDateString("lt-LT")},
+                  Data: {new Date(selectedDate).toLocaleDateString("lt-LT")},{" "}
                   Laikas: {selectedTimeRange}
                 </p>
               </div>
             )}
 
-            <button
-              type="submit"
-              className="btn"
-              disabled={!selectedTimeSlotId || !selectedTopicId}
-            >
-              Rezervuoti
-            </button> 
+            {/* Veiksmo mygtukai */}
             <div className="button-wrapper">
-                <button className="back-button" onClick={() => navigate("/")}>
-                   Grįžti į pagrindinį puslapį
-                </button>
+              <button type="submit" className="btn primary" disabled={!selectedTimeSlotId}>
+                Patvirtinti
+              </button>
+              <button
+                type="button"
+                className="back-button"
+                onClick={() => navigate("/")}
+              >
+                Grįžti į pagrindinį puslapį
+              </button>
             </div>
           </form>
         </>
-      )} 
-  
+      )}
     </div>
   );
 };

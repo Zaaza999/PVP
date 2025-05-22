@@ -14,7 +14,9 @@ export const updateReservation = (id: number, data: any) => apiCall("update", "R
 export const deleteReservation = (id: number) => apiCall("delete", "Reservations", id);
 
 // Laiko intervalų (EmployeeTimeSlots) API funkcijos
-export const getTimeSlots = () => apiCall("get", "EmployeeTimeSlots");
+export const getTimeSlots = () => apiCall("get", "EmployeeTimeSlots"); 
+export const getTimeSlotsByTopic = (topicId: number)        =>
+  apiCall("get", `EmployeeTimeSlots/by-topic/${topicId}`);
 export const addTimeSlot = (data: any) => apiCall("add", "EmployeeTimeSlots", "", data);
 export const updateTimeSlot = (id: number, data: any) => apiCall("update", "EmployeeTimeSlots", id, data);
 export const deleteTimeSlot = (id: number) => apiCall("delete", "EmployeeTimeSlots", id); 
