@@ -3,19 +3,19 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 13, 2025 at 08:07 PM
+-- Generation Time: May 20, 2025 at 08:40 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
-Set SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-Set time_zone = "+00:00";
+SET time_zone = "+00:00";
 
 
-/*!40101 Set @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 Set @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 Set @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 Set NAMES utf8mb4 */;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `komunalinis_db`
@@ -32,16 +32,29 @@ CREATE TABLE `AggregatedCounter` (
   `Key` varchar(100) NOT NULL,
   `Value` int(11) NOT NULL,
   `ExpireAt` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `applicationgroups`
+--
+
+CREATE TABLE `applicationgroups` (
+  `Id` int(11) NOT NULL,
+  `GroupName` longtext NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `AggregatedCounter`
+-- Dumping data for table `applicationgroups`
 --
 
-INSERT INTO `AggregatedCounter` (`Id`, `Key`, `Value`, `ExpireAt`) VALUES
-(1, 'stats:succeeded', 1, NULL),
-(2, 'stats:succeeded:2025-05-13', 1, '2025-06-13 18:00:03'),
-(3, 'stats:succeeded:2025-05-13-18', 1, '2025-05-14 18:00:03');
+INSERT INTO `applicationgroups` (`Id`, `GroupName`) VALUES
+(1, 'Billing and finance'),
+(2, 'Property and residency'),
+(3, 'Container management'),
+(4, 'Personal Data / Account Updates'),
+(5, 'Unknown');
 
 -- --------------------------------------------------------
 
@@ -55,6 +68,7 @@ CREATE TABLE `Applications` (
   `Date` datetime(6) NOT NULL,
   `user_id` varchar(255) NOT NULL,
   `StatusId` int(11) NOT NULL,
+  `ApplicationGroupId` int(11) NOT NULL,
   `Discriminator` varchar(34) NOT NULL,
   `PropertyAddress` longtext DEFAULT NULL,
   `PropertyOwnerFullName` longtext DEFAULT NULL,
@@ -161,8 +175,14 @@ CREATE TABLE `Applications` (
 -- Dumping data for table `Applications`
 --
 
-INSERT INTO `Applications` (`Id`, `FormType`, `Date`, `user_id`, `StatusId`, `Discriminator`, `PropertyAddress`, `PropertyOwnerFullName`, `CorrespondenceAddress`, `PhoneNumber`, `EmailAddress`, `EffectiveFrom`, `FrequencyPerMonth`, `ApplicantFullName`, `ContainerRequest_PropertyAddress`, `ContainerRequest_PropertyOwnerFullName`, `ContainerRequest_CorrespondenceAddress`, `ContainerRequest_PhoneNumber`, `ContainerRequest_EmailAddress`, `EmailForInvoices`, `ContainerVolumeLiters`, `EmptyingFrequencyPerYear`, `ContainerRequest_ApplicantFullName`, `ContainerSizeChangeRequest_PropertyAddress`, `ContainerSizeChangeRequest_PropertyOwnerFullName`, `ContainerSizeChangeRequest_CorrespondenceAddress`, `ContainerSizeChangeRequest_PhoneNumber`, `ContainerSizeChangeRequest_EmailAddress`, `CurrentCapacityLiters`, `NewCapacityLiters`, `ContainerSizeChangeRequest_ApplicantFullName`, `EmailInvoiceRequest_PropertyAddress`, `EmailInvoiceRequest_PropertyOwnerFullName`, `EmailInvoiceRequest_CorrespondenceAddress`, `EmailInvoiceRequest_PhoneNumber`, `EmailInvoiceRequest_EmailAddress`, `EmailInvoiceRequest_ApplicantFullName`, `PayerDataChangeRequest_PropertyOwnerFullName`, `PayerDataChangeRequest_CorrespondenceAddress`, `PayerDataChangeRequest_PhoneNumber`, `PayerDataChangeRequest_EmailAddress`, `CompanyCode`, `TenantFullName`, `TenantCompanyCode`, `PayerDataChangeRequest_PropertyAddress`, `BuildingUniqueNumber`, `RegisteredArea`, `RegisteredPurpose`, `LeaseStartDateOrUsageStartDate`, `PaymentNoticeMailingAddress`, `PaymentNoticeEmail`, `RepresentativePosition`, `PropertyUnsuitability_PropertyAddress`, `PropertyUnsuitability_PropertyOwnerFullName`, `PropertyUnsuitability_CorrespondenceAddress`, `PropertyUnsuitability_PhoneNumber`, `PropertyUnsuitability_EmailAddress`, `Area`, `PropertyUnsuitability_BuildingUniqueNumber`, `PropertyUnsuitability_ApplicantFullName`, `PropertyUsageDeclaration_PropertyAddress`, `PropertyUsageDeclaration_PropertyOwnerFullName`, `PropertyUsageDeclaration_CorrespondenceAddress`, `PropertyUsageDeclaration_PhoneNumber`, `PropertyUsageDeclaration_EmailAddress`, `PropertyUsageDeclaration_ApplicantFullName`, `RefundRequest_ApplicantFullName`, `RefundRequest_CorrespondenceAddress`, `PayerCode`, `PaymentReason`, `PaymentDate`, `PaymentAmount`, `TransactionNumber`, `RefundAccountNumber`, `ResidentCountDeclaration_PropertyAddress`, `ResidentCountDeclaration_PropertyOwnerFullName`, `ResidentCountDeclaration_CorrespondenceAddress`, `ResidentCountDeclaration_PhoneNumber`, `ResidentCountDeclaration_EmailAddress`, `ResidentCountDeclaration_ApplicantFullName`, `ResidentCountDeclaration_Area`, `WasteFeeExemption_PropertyAddress`, `WasteFeeExemption_PropertyOwnerFullName`, `WasteFeeExemption_CorrespondenceAddress`, `WasteFeeExemption_PhoneNumber`, `WasteFeeExemption_EmailAddress`, `WasteFeeExemption_Area`, `WasteFeeExemption_BuildingUniqueNumber`, `PeriodFrom`, `PeriodTo`, `WaterSupplyStatus`, `ElectricityMeterStatus`, `InitialWaterReading`, `InitialElectricityReading`, `WasteFeeExemption_ApplicantFullName`, `WasteFeeExemptionBusiness_PropertyAddress`, `WasteFeeExemptionBusiness_PropertyOwnerFullName`, `WasteFeeExemptionBusiness_CorrespondenceAddress`, `WasteFeeExemptionBusiness_PhoneNumber`, `WasteFeeExemptionBusiness_EmailAddress`, `WasteFeeExemptionBusiness_Area`, `WasteFeeExemptionBusiness_BuildingUniqueNumber`, `WasteFeeExemptionBusiness_PeriodFrom`, `WasteFeeExemptionBusiness_PeriodTo`, `WasteFeeExemptionBusiness_ApplicantFullName`) VALUES
-(2, 'EmailInvoiceRequest', '2025-05-13 17:42:00.468420', '4bfeedf6-053a-4aa0-a48b-424b472311e1', 11, 'EmailInvoiceRequest', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'teastas', 'Mantvydas Bira', 'testas', '+37060288266', 'manbir@ktu.lt', 'Mantvydas Bira', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `Applications` (`Id`, `FormType`, `Date`, `user_id`, `StatusId`, `ApplicationGroupId`, `Discriminator`, `PropertyAddress`, `PropertyOwnerFullName`, `CorrespondenceAddress`, `PhoneNumber`, `EmailAddress`, `EffectiveFrom`, `FrequencyPerMonth`, `ApplicantFullName`, `ContainerRequest_PropertyAddress`, `ContainerRequest_PropertyOwnerFullName`, `ContainerRequest_CorrespondenceAddress`, `ContainerRequest_PhoneNumber`, `ContainerRequest_EmailAddress`, `EmailForInvoices`, `ContainerVolumeLiters`, `EmptyingFrequencyPerYear`, `ContainerRequest_ApplicantFullName`, `ContainerSizeChangeRequest_PropertyAddress`, `ContainerSizeChangeRequest_PropertyOwnerFullName`, `ContainerSizeChangeRequest_CorrespondenceAddress`, `ContainerSizeChangeRequest_PhoneNumber`, `ContainerSizeChangeRequest_EmailAddress`, `CurrentCapacityLiters`, `NewCapacityLiters`, `ContainerSizeChangeRequest_ApplicantFullName`, `EmailInvoiceRequest_PropertyAddress`, `EmailInvoiceRequest_PropertyOwnerFullName`, `EmailInvoiceRequest_CorrespondenceAddress`, `EmailInvoiceRequest_PhoneNumber`, `EmailInvoiceRequest_EmailAddress`, `EmailInvoiceRequest_ApplicantFullName`, `PayerDataChangeRequest_PropertyOwnerFullName`, `PayerDataChangeRequest_CorrespondenceAddress`, `PayerDataChangeRequest_PhoneNumber`, `PayerDataChangeRequest_EmailAddress`, `CompanyCode`, `TenantFullName`, `TenantCompanyCode`, `PayerDataChangeRequest_PropertyAddress`, `BuildingUniqueNumber`, `RegisteredArea`, `RegisteredPurpose`, `LeaseStartDateOrUsageStartDate`, `PaymentNoticeMailingAddress`, `PaymentNoticeEmail`, `RepresentativePosition`, `PropertyUnsuitability_PropertyAddress`, `PropertyUnsuitability_PropertyOwnerFullName`, `PropertyUnsuitability_CorrespondenceAddress`, `PropertyUnsuitability_PhoneNumber`, `PropertyUnsuitability_EmailAddress`, `Area`, `PropertyUnsuitability_BuildingUniqueNumber`, `PropertyUnsuitability_ApplicantFullName`, `PropertyUsageDeclaration_PropertyAddress`, `PropertyUsageDeclaration_PropertyOwnerFullName`, `PropertyUsageDeclaration_CorrespondenceAddress`, `PropertyUsageDeclaration_PhoneNumber`, `PropertyUsageDeclaration_EmailAddress`, `PropertyUsageDeclaration_ApplicantFullName`, `RefundRequest_ApplicantFullName`, `RefundRequest_CorrespondenceAddress`, `PayerCode`, `PaymentReason`, `PaymentDate`, `PaymentAmount`, `TransactionNumber`, `RefundAccountNumber`, `ResidentCountDeclaration_PropertyAddress`, `ResidentCountDeclaration_PropertyOwnerFullName`, `ResidentCountDeclaration_CorrespondenceAddress`, `ResidentCountDeclaration_PhoneNumber`, `ResidentCountDeclaration_EmailAddress`, `ResidentCountDeclaration_ApplicantFullName`, `ResidentCountDeclaration_Area`, `WasteFeeExemption_PropertyAddress`, `WasteFeeExemption_PropertyOwnerFullName`, `WasteFeeExemption_CorrespondenceAddress`, `WasteFeeExemption_PhoneNumber`, `WasteFeeExemption_EmailAddress`, `WasteFeeExemption_Area`, `WasteFeeExemption_BuildingUniqueNumber`, `PeriodFrom`, `PeriodTo`, `WaterSupplyStatus`, `ElectricityMeterStatus`, `InitialWaterReading`, `InitialElectricityReading`, `WasteFeeExemption_ApplicantFullName`, `WasteFeeExemptionBusiness_PropertyAddress`, `WasteFeeExemptionBusiness_PropertyOwnerFullName`, `WasteFeeExemptionBusiness_CorrespondenceAddress`, `WasteFeeExemptionBusiness_PhoneNumber`, `WasteFeeExemptionBusiness_EmailAddress`, `WasteFeeExemptionBusiness_Area`, `WasteFeeExemptionBusiness_BuildingUniqueNumber`, `WasteFeeExemptionBusiness_PeriodFrom`, `WasteFeeExemptionBusiness_PeriodTo`, `WasteFeeExemptionBusiness_ApplicantFullName`) VALUES
+(1, 'WasteFeeExemption', '2025-05-20 15:55:49.459156', '6526519c-4c1b-4a67-8d28-0879a4b97313', 10, 1, 'WasteFeeExemption', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Partizanų g. 13 17', 'Mantvydas Bira', 'Partizanų g. 13 17', '+37060288266', 'manbir@ktu.lt', 222, '123', '2025-05-09 00:00:00.000000', '2025-05-29 00:00:00.000000', 'nevykdomas', 'neirengtas', 111, 222, 'Mantvydas Bira', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 'WasteFeeExemptionBusiness', '2025-05-20 18:10:52.847943', '6526519c-4c1b-4a67-8d28-0879a4b97313', 2, 1, 'WasteFeeExemptionBusiness', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Partizanų g. 13 17', 'Mantvydas Bira', 'Partizanų g. 13 17', '+37060288266', 'manbir@ktu.lt', 222, '13 17', '2025-05-21 00:00:00.000000', '2025-05-21 00:00:00.000000', 'Mantvydas Bira'),
+(3, 'EmailInvoiceRequest', '2025-05-20 18:11:03.375300', '6526519c-4c1b-4a67-8d28-0879a4b97313', 2, 1, 'EmailInvoiceRequest', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Partizanų g. 13 17', 'Mantvydas Bira', 'Partizanų g. 13 17', '+37060288266', 'manbir@ktu.lt', 'Mantvydas Bira', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(4, 'PropertyUnsuitability', '2025-05-20 18:11:21.256499', '6526519c-4c1b-4a67-8d28-0879a4b97313', 2, 2, 'PropertyUnsuitability', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Partizanų g. 13 17', 'Mantvydas Bira', 'Partizanų g. 13 17', '+37060288233', 'manbir@ktu.lt', 333, 'tes', 'Mantvydas Bira', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(5, 'PropertyUsageDeclaration', '2025-05-20 18:11:42.235955', '6526519c-4c1b-4a67-8d28-0879a4b97313', 2, 2, 'PropertyUsageDeclaration', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'test', 'Mantvydas Bira', 'Partizanų g. 13 17', '060288266', 'manbir@ktu.lt', 'Mantvydas Bira', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(6, 'ContainerSizeChangeRequest', '2025-05-20 18:12:09.136331', '6526519c-4c1b-4a67-8d28-0879a4b97313', 2, 3, 'ContainerSizeChangeRequest', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Partizanų g. 13 17', 'Mantvydas Bira', 'Partizanų g. 13 17', '060288266', 'manbir@ktu.lt', 333, 333, 'Mantvydas Bira', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(7, 'RefundRequest', '2025-05-20 18:12:23.379061', '6526519c-4c1b-4a67-8d28-0879a4b97313', 2, 1, 'RefundRequest', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Mantvydas Bira', 'Partizanų g. 13 17', 'assd', '343434', '2025-05-22 00:00:00.000000', 33, '333', '343', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -251,7 +271,12 @@ CREATE TABLE `AspNetUserRoles` (
 --
 
 INSERT INTO `AspNetUserRoles` (`UserId`, `RoleId`) VALUES
-('4bfeedf6-053a-4aa0-a48b-424b472311e1', '1');
+('3befd432-9d7f-4534-ba98-7df3ac93f8cd', '2'),
+('5945e7d1-2b04-456b-b2f3-68026a979aed', '1'),
+('6526519c-4c1b-4a67-8d28-0879a4b97313', '1'),
+('6967c6aa-7b7f-4b2a-8aef-7f87953b1d36', '3'),
+('7a9681e4-fa94-4133-b516-c2ba91af1ad4', '3'),
+('dff14033-dbe7-4053-a699-efb38c6f04a1', '6');
 
 -- --------------------------------------------------------
 
@@ -277,7 +302,7 @@ CREATE TABLE `Counter` (
   `Key` varchar(100) NOT NULL,
   `Value` int(11) NOT NULL,
   `ExpireAt` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -288,7 +313,7 @@ CREATE TABLE `Counter` (
 CREATE TABLE `DistributedLock` (
   `Resource` varchar(100) NOT NULL,
   `CreatedAt` datetime(6) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -331,22 +356,20 @@ CREATE TABLE `Hash` (
   `Field` varchar(40) NOT NULL,
   `Value` longtext DEFAULT NULL,
   `ExpireAt` datetime(6) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `Hash`
 --
 
 INSERT INTO `Hash` (`Id`, `Key`, `Field`, `Value`, `ExpireAt`) VALUES
-(1, 'recurring-Job:waste-reminder', 'Queue', 'default', NULL),
-(2, 'recurring-Job:waste-reminder', 'Cron', '0 18 * * *', NULL),
-(3, 'recurring-Job:waste-reminder', 'TimeZoneId', 'UTC', NULL),
-(4, 'recurring-Job:waste-reminder', 'Job', '{\"Type\":\"KomunalinisCentras.Backend.Jobs.ReminderJob, KomunalinisCentras.Backend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Method\":\"RunAsync\",\"ParameterTypes\":\"[]\",\"Arguments\":\"[]\"}', NULL),
-(5, 'recurring-Job:waste-reminder', 'CreatedAt', '2025-05-13T17:19:23.2036583Z', NULL),
-(6, 'recurring-Job:waste-reminder', 'NextExecution', '2025-05-14T18:00:00.0000000Z', NULL),
-(7, 'recurring-Job:waste-reminder', 'V', '2', NULL),
-(8, 'recurring-Job:waste-reminder', 'LastExecution', '2025-05-13T18:00:01.5769323Z', NULL),
-(10, 'recurring-Job:waste-reminder', 'LastJobId', '1', NULL);
+(1, 'recurring-job:waste-reminder', 'Queue', 'default', NULL),
+(2, 'recurring-job:waste-reminder', 'Cron', '47 21 * * *', NULL),
+(3, 'recurring-job:waste-reminder', 'TimeZoneId', 'UTC', NULL),
+(4, 'recurring-job:waste-reminder', 'Job', '{\"Type\":\"KomunalinisCentras.Backend.Jobs.ReminderJob, KomunalinisCentras.Backend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Method\":\"RunAsync\",\"ParameterTypes\":\"[]\",\"Arguments\":\"[]\"}', NULL),
+(5, 'recurring-job:waste-reminder', 'CreatedAt', '2025-05-20T15:53:41.2426328Z', NULL),
+(6, 'recurring-job:waste-reminder', 'NextExecution', '2025-05-20T21:47:00.0000000Z', NULL),
+(7, 'recurring-job:waste-reminder', 'V', '2', NULL);
 
 -- --------------------------------------------------------
 
@@ -362,14 +385,7 @@ CREATE TABLE `Job` (
   `Arguments` longtext NOT NULL,
   `CreatedAt` datetime(6) NOT NULL,
   `ExpireAt` datetime(6) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `Job`
---
-
-INSERT INTO `Job` (`Id`, `StateId`, `StateName`, `InvocationData`, `Arguments`, `CreatedAt`, `ExpireAt`) VALUES
-(1, 3, 'Succeeded', '{\"Type\":\"KomunalinisCentras.Backend.Jobs.ReminderJob, KomunalinisCentras.Backend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Method\":\"RunAsync\",\"ParameterTypes\":\"[]\",\"Arguments\":\"[]\"}', '[]', '2025-05-13 18:00:01.601796', '2025-05-14 18:00:03.627684');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -382,17 +398,7 @@ CREATE TABLE `JobParameter` (
   `JobId` int(11) NOT NULL,
   `Name` varchar(40) NOT NULL,
   `Value` longtext DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `JobParameter`
---
-
-INSERT INTO `JobParameter` (`Id`, `JobId`, `Name`, `Value`) VALUES
-(1, 1, 'RecurringJobId', '\"waste-reminder\"'),
-(2, 1, 'Time', '1747159201'),
-(3, 1, 'CurrentCulture', '\"en-US\"'),
-(4, 1, 'CurrentUICulture', '\"en-US\"');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -406,7 +412,7 @@ CREATE TABLE `JobQueue` (
   `FetchedAt` datetime(6) DEFAULT NULL,
   `Queue` varchar(50) NOT NULL,
   `FetchToken` varchar(36) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -421,7 +427,7 @@ CREATE TABLE `JobState` (
   `Name` varchar(20) NOT NULL,
   `Reason` varchar(100) DEFAULT NULL,
   `Data` longtext DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -434,7 +440,7 @@ CREATE TABLE `List` (
   `Key` varchar(100) NOT NULL,
   `Value` longtext DEFAULT NULL,
   `ExpireAt` datetime(6) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -464,6 +470,13 @@ CREATE TABLE `PropertyUsageDeclarationEntries` (
   `ActualArea` double NOT NULL,
   `PropertyUsageDeclarationId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `PropertyUsageDeclarationEntries`
+--
+
+INSERT INTO `PropertyUsageDeclarationEntries` (`Id`, `Address`, `BuildingUniqueNumber`, `RegisteredPurpose`, `ActualPurpose`, `RegisteredArea`, `ActualArea`, `PropertyUsageDeclarationId`) VALUES
+(1, 'Partizanu g. 28 14', 'test', '323', '123', 333, 333, 5);
 
 -- --------------------------------------------------------
 
@@ -497,6 +510,33 @@ CREATE TABLE `Residents` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `roleapplicationgroups`
+--
+
+CREATE TABLE `roleapplicationgroups` (
+  `RoleId` varchar(255) NOT NULL,
+  `ApplicationGroupId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `roleapplicationgroups`
+--
+
+INSERT INTO `roleapplicationgroups` (`RoleId`, `ApplicationGroupId`) VALUES
+('2', 1),
+('2', 2),
+('2', 3),
+('2', 4),
+('2', 5),
+('3', 1),
+('3', 4),
+('4', 2),
+('5', 2),
+('6', 3);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `Roles`
 --
 
@@ -514,7 +554,11 @@ CREATE TABLE `Roles` (
 
 INSERT INTO `Roles` (`Id`, `role_name`, `Name`, `NormalizedName`, `ConcurrencyStamp`) VALUES
 ('1', 'client', 'client', 'CLIENT', NULL),
-('2', 'worker', 'worker', 'WORKER', NULL);
+('2', 'worker_admin', 'worker_admin', 'WORKERK_ADMIN', NULL),
+('3', 'worker_BillingSpecialist', 'worker_BillingSpecialist', 'WORKER_BILLINGSPECIALIST', NULL),
+('4', 'worker_PropertyInspector', 'worker_PropertyInspector', 'WORKER_PROPERTYINSPECTOR', NULL),
+('5', 'worker_ResidencyVerifier', 'worker_ResidencyVerifier', 'WORKER_RESIDENCYVERIFIER', NULL),
+('6', 'worker_ContainerCoordinator', 'worker_ContainerCoordinator', 'WORKER_CONTAINERCOORDINATOR', NULL);
 
 -- --------------------------------------------------------
 
@@ -526,7 +570,7 @@ CREATE TABLE `Server` (
   `Id` varchar(100) NOT NULL,
   `Data` longtext NOT NULL,
   `LastHeartbeat` datetime(6) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -540,14 +584,14 @@ CREATE TABLE `Set` (
   `Value` varchar(256) NOT NULL,
   `Score` float NOT NULL,
   `ExpireAt` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `Set`
 --
 
 INSERT INTO `Set` (`Id`, `Key`, `Value`, `Score`, `ExpireAt`) VALUES
-(1, 'recurring-jobs', 'waste-reminder', 1747250000, NULL);
+(1, 'recurring-jobs', 'waste-reminder', 1747780000, NULL);
 
 -- --------------------------------------------------------
 
@@ -562,16 +606,7 @@ CREATE TABLE `State` (
   `Reason` varchar(100) DEFAULT NULL,
   `CreatedAt` datetime(6) NOT NULL,
   `Data` longtext DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `State`
---
-
-INSERT INTO `State` (`Id`, `JobId`, `Name`, `Reason`, `CreatedAt`, `Data`) VALUES
-(1, 1, 'Enqueued', 'Triggered by recurring Job scheduler', '2025-05-13 18:00:01.617849', '{\"EnqueuedAt\":\"2025-05-13T18:00:01.6140660Z\",\"Queue\":\"default\"}'),
-(2, 1, 'Processing', NULL, '2025-05-13 18:00:03.597047', '{\"StartedAt\":\"2025-05-13T18:00:03.5921463Z\",\"ServerId\":\"desktop-as2bpu7:6000:f5c06db3-7972-469f-b8b9-d210f5bd4cec\",\"WorkerId\":\"05267599-ed33-464a-a2ff-e18da0cb18b6\"}'),
-(3, 1, 'Succeeded', NULL, '2025-05-13 18:00:03.623736', '{\"SucceededAt\":\"2025-05-13T18:00:03.6184420Z\",\"PerformanceDuration\":\"12\",\"Latency\":\"2003\"}');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -607,7 +642,16 @@ CREATE TABLE `Users` (
 --
 
 INSERT INTO `Users` (`Id`, `first_name`, `last_name`, `address`, `subscription`, `RoleId`, `UserName`, `NormalizedUserName`, `Email`, `NormalizedEmail`, `EmailConfirmed`, `PasswordHash`, `SecurityStamp`, `ConcurrencyStamp`, `PhoneNumber`, `PhoneNumberConfirmed`, `TwoFactorEnabled`, `LockoutEnd`, `LockoutEnabled`, `AccessFailedCount`) VALUES
-('4bfeedf6-053a-4aa0-a48b-424b472311e1', 'Mantvydas', 'Bira', NULL, 0, '1', 'manbir@ktu.lt123A', 'MANBIR@KTU.LT123A', 'manbir@ktu.lt123A', 'MANBIR@KTU.LT123A', 0, 'AQAAAAIAAYagAAAAEC5AESoNeg28ISfF3xi3CqrxPG8m/Zz40Fxf4deL/CoKHcayBVV7Nod28/2o4f1F+g==', 'M7YYNOXB52EDGJN6POZVSRTOYAF2XZF5', '9f3f3cbd-fc83-41d6-bfbd-795588905260', NULL, 0, 0, NULL, 1, 0);
+('3befd432-9d7f-4534-ba98-7df3ac93f8cd', 'Mantvydas', 'Bira', NULL, 0, '2', 'manbir@ktu.lt123Q', 'MANBIR@KTU.LT123Q', 'manbir@ktu.lt123Q', 'MANBIR@KTU.LT123Q', 0, 'AQAAAAIAAYagAAAAEM/mxAYMkXo4qBOo+kn/eJdZWaNPeM6bBgXxzCwjvJrj3Qv6RlDIKStWu5Arzw0+CQ==', 'B2TZDQ5NQPQQ2YC7K5FXBGKKIFK4Q7AW', 'e4395bbe-ac65-44b2-9f8c-0183bd0eee8e', NULL, 0, 0, NULL, 1, 0),
+('5945e7d1-2b04-456b-b2f3-68026a979aed', 'Mantvydas', 'Bira', NULL, 0, '1', 'manbir@ktu.lt123AQ', 'MANBIR@KTU.LT123AQ', 'manbir@ktu.lt123AQ', 'MANBIR@KTU.LT123AQ', 0, 'AQAAAAIAAYagAAAAEBm636R9MXyNaZgoDQmF9uORbf79q5YB/hmZVamgxC7WIroO/deit2FISppxFOz/Iw==', 'EC647HPDUQLGKF5AXXHOYK6VG3WBC7OT', '0409b557-a424-4507-9a99-9ea26931a71b', NULL, 0, 0, NULL, 1, 0),
+('6526519c-4c1b-4a67-8d28-0879a4b97313', 'manbir@ktu.lt123A', 'manbir@ktu.lt123A', NULL, 0, '1', 'manbir@ktu.lt123A', 'MANBIR@KTU.LT123A', 'manbir@ktu.lt123A', 'MANBIR@KTU.LT123A', 0, 'AQAAAAIAAYagAAAAEDZt1dkXqz+l1HILpORJkxQGs/5PGgRJ5/VdRLRs4upNecF7D8l82XYct+X/Gb0bjw==', '4B2ZP2ERPHY4QBZQR53NI5BRNI3E4725', 'e1c0d741-b6d7-4553-81c1-c80ebff7fda4', NULL, 0, 0, NULL, 1, 0),
+('6967c6aa-7b7f-4b2a-8aef-7f87953b1d36', 'Mantvydas', 'Bira', NULL, 0, '3', 'manbir@ktu.lt123AEA', 'MANBIR@KTU.LT123AEA', 'manbir@ktu.lt123AEA', 'MANBIR@KTU.LT123AEA', 0, 'AQAAAAIAAYagAAAAEAj4GIIYIVt00pA5f9tkWvh5nHIxUjbhccPv+RuqHcAYQ7KxobpRAr5m3scgPfhQMQ==', 'NU6ULBKCOGW3AFXKNYFB3CAN6DBJ45RW', 'cb415514-d1d2-4e70-8f7b-d8cab5f6948c', NULL, 0, 0, NULL, 1, 0),
+('7a9681e4-fa94-4133-b516-c2ba91af1ad4', 'Mantvydas', 'Bira', NULL, 0, '3', 'manbir@finance5A', 'MANBIR@FINANCE5A', 'manbir@finance5A', 'MANBIR@FINANCE5A', 0, 'AQAAAAIAAYagAAAAEGl63jUURYLmXjf/76aKYU5h8jdEtOSj/jW5mvq4A5syXNakEGCv0umMYMVaCtuNfA==', 'YVKWTFXEU5JKLH5EP2W3XQCXFNZA6I7N', '1d03bfa6-1bd7-44b1-9b6a-53563bd70a22', NULL, 0, 0, NULL, 1, 0),
+('af08f101-eb45-447c-b0e4-a4ba7e1d1881', 'Mantvydas', 'Bira', NULL, 0, '2', 'manbir@ktu.lt123AE', 'MANBIR@KTU.LT123AE', 'manbir@ktu.lt123AE', 'MANBIR@KTU.LT123AE', 0, 'AQAAAAIAAYagAAAAEPo/vYaDyHNTtnupB5vpWCCLBtpPSqAkkH8ADd1hJPIZpfggRa1AYRUakROsaHfGWQ==', 'LCJ6J7OCS6ORRBULDJ5C76IZ3TCSIIOS', '7148a44e-0ea5-472e-aadc-90e44f940e19', NULL, 0, 0, NULL, 1, 0),
+('cf787cd7-41aa-44cd-8593-4353683d2ca9', 'manbir@ktu.lt123AWA', 'manbir@ktu.lt123AWA', NULL, 0, '2', 'manbir@ktu.lt123AWA', 'MANBIR@KTU.LT123AWA', 'manbir@ktu.lt123AWA', 'MANBIR@KTU.LT123AWA', 0, 'AQAAAAIAAYagAAAAEKE/+SxWxkLlOfZhwrDJBYYs3lFlybI8NGqCcnVkvKTSFGHkHFusSQ1ugRyB/Tcotw==', 'BDHG6KT75RW7NKUKPSAGUHVZZMQRROLX', 'bea05aa4-2701-4468-9f0f-4f3c26d646bb', NULL, 0, 0, NULL, 1, 0),
+('dc572c07-cdbb-410a-9fe3-9bae6a584679', 'Mantvydas', 'Bira', NULL, 0, '6', 'manbir@ktu.lt123AAA', 'MANBIR@KTU.LT123AAA', 'manbir@ktu.lt123AAA', 'MANBIR@KTU.LT123AAA', 0, 'AQAAAAIAAYagAAAAECNCHFRZW097uOxR+cN1B0/EbbYZCT37Q2B30U8iruVTqgtDcurBQEZor86iq7qOlQ==', 'UMDWVXL7ULJ3LQETAR7EDARXKJX2GF3O', 'c811d451-95a4-46e1-85ea-d9b406f8e2ff', NULL, 0, 0, NULL, 1, 0),
+('dff14033-dbe7-4053-a699-efb38c6f04a1', 'Mantvydas', 'Bira', NULL, 0, '6', 'manbir@ktu.lt123AEE', 'MANBIR@KTU.LT123AEE', 'manbir@ktu.lt123AEE', 'MANBIR@KTU.LT123AEE', 0, 'AQAAAAIAAYagAAAAEAl+eiFh1UI1V9uWOI3wovsfzXLtWoxDx2pNM7GYFdQh/m0Gd3VuzKAxELXusim9Pw==', 'NFIM75WHY5RKI5XT4PUSJCU3YCPMEORO', '9cce1c1b-6da0-47cc-9757-fc5c58660f6c', NULL, 0, 0, NULL, 1, 0),
+('ec559218-82a7-496b-856f-9529b52d332a', 'manbir@ktu.lt123AW', 'manbir@ktu.lt123AW', NULL, 0, '4', 'manbir@ktu.lt123AW', 'MANBIR@KTU.LT123AW', 'manbir@ktu.lt123AW', 'MANBIR@KTU.LT123AW', 0, 'AQAAAAIAAYagAAAAELChixJpyb8KfZscWGoPcET9a6xXQUbwbSS3gyEmhZkcOsacInvd3rEDtMlKuSFPSg==', '4UZN5M6HR7T2O67OIG43TPZ6TJODOH7U', 'd75e28dd-584d-45a9-8da8-cce45e9e9155', NULL, 0, 0, NULL, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -648,7 +692,7 @@ CREATE TABLE `__EFMigrationsHistory` (
 --
 
 INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`) VALUES
-('20250513171903_refundRequestFormaaa', '8.0.4');
+('20250520155328_updateDatabase', '8.0.4');
 
 --
 -- Indexes for dumped tables
@@ -662,10 +706,17 @@ ALTER TABLE `AggregatedCounter`
   ADD UNIQUE KEY `IX_CounterAggregated_Key` (`Key`);
 
 --
+-- Indexes for table `applicationgroups`
+--
+ALTER TABLE `applicationgroups`
+  ADD PRIMARY KEY (`Id`);
+
+--
 -- Indexes for table `Applications`
 --
 ALTER TABLE `Applications`
   ADD PRIMARY KEY (`Id`),
+  ADD KEY `IX_Applications_ApplicationGroupId` (`ApplicationGroupId`),
   ADD KEY `IX_Applications_StatusId` (`StatusId`),
   ADD KEY `IX_Applications_user_id` (`user_id`);
 
@@ -803,6 +854,13 @@ ALTER TABLE `Residents`
   ADD KEY `IX_Residents_ResidentCountDeclarationId` (`ResidentCountDeclarationId`);
 
 --
+-- Indexes for table `roleapplicationgroups`
+--
+ALTER TABLE `roleapplicationgroups`
+  ADD PRIMARY KEY (`RoleId`,`ApplicationGroupId`),
+  ADD KEY `IX_RoleApplicationGroups_ApplicationGroupId` (`ApplicationGroupId`);
+
+--
 -- Indexes for table `Roles`
 --
 ALTER TABLE `Roles`
@@ -864,13 +922,19 @@ ALTER TABLE `__EFMigrationsHistory`
 -- AUTO_INCREMENT for table `AggregatedCounter`
 --
 ALTER TABLE `AggregatedCounter`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `applicationgroups`
+--
+ALTER TABLE `applicationgroups`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `Applications`
 --
 ALTER TABLE `Applications`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `ApplicationStatuses`
@@ -894,7 +958,7 @@ ALTER TABLE `AspNetUserClaims`
 -- AUTO_INCREMENT for table `Counter`
 --
 ALTER TABLE `Counter`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `EmployeeTimeSlots`
@@ -912,25 +976,25 @@ ALTER TABLE `GarbageCollectionSchedule`
 -- AUTO_INCREMENT for table `Hash`
 --
 ALTER TABLE `Hash`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `Job`
 --
 ALTER TABLE `Job`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `JobParameter`
 --
 ALTER TABLE `JobParameter`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `JobQueue`
 --
 ALTER TABLE `JobQueue`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `JobState`
@@ -954,7 +1018,7 @@ ALTER TABLE `Locations`
 -- AUTO_INCREMENT for table `PropertyUsageDeclarationEntries`
 --
 ALTER TABLE `PropertyUsageDeclarationEntries`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `Reservations`
@@ -972,13 +1036,13 @@ ALTER TABLE `Residents`
 -- AUTO_INCREMENT for table `Set`
 --
 ALTER TABLE `Set`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4003;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `State`
 --
 ALTER TABLE `State`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `VisitTopics`
@@ -1000,6 +1064,7 @@ ALTER TABLE `WasteTypes`
 -- Constraints for table `Applications`
 --
 ALTER TABLE `Applications`
+  ADD CONSTRAINT `FK_Applications_ApplicationGroups_ApplicationGroupId` FOREIGN KEY (`ApplicationGroupId`) REFERENCES `applicationgroups` (`Id`) ON DELETE CASCADE,
   ADD CONSTRAINT `FK_Applications_ApplicationStatuses_StatusId` FOREIGN KEY (`StatusId`) REFERENCES `ApplicationStatuses` (`Id`),
   ADD CONSTRAINT `FK_Applications_Users_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`Id`) ON DELETE CASCADE;
 
@@ -1080,6 +1145,13 @@ ALTER TABLE `Residents`
   ADD CONSTRAINT `FK_Residents_Applications_ResidentCountDeclarationId` FOREIGN KEY (`ResidentCountDeclarationId`) REFERENCES `Applications` (`Id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `roleapplicationgroups`
+--
+ALTER TABLE `roleapplicationgroups`
+  ADD CONSTRAINT `FK_RoleApplicationGroups_ApplicationGroups_ApplicationGroupId` FOREIGN KEY (`ApplicationGroupId`) REFERENCES `applicationgroups` (`Id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_RoleApplicationGroups_Roles_RoleId` FOREIGN KEY (`RoleId`) REFERENCES `Roles` (`Id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `State`
 --
 ALTER TABLE `State`
@@ -1092,13 +1164,38 @@ ALTER TABLE `Users`
   ADD CONSTRAINT `FK_Users_Roles_RoleId` FOREIGN KEY (`RoleId`) REFERENCES `Roles` (`Id`);
 COMMIT;
 
-/*!40101 Set CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 Set CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 Set COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+LOCK TABLES `WasteTypes` WRITE;
+/*!40000 ALTER TABLE `WasteTypes` DISABLE KEYS */;
+INSERT INTO `WasteTypes` VALUES (1,'Household');
+INSERT INTO `WasteTypes` VALUES (2,'Plastic/Metal/Paper');
+INSERT INTO `WasteTypes` VALUES (3,'Glass');
+/*!40000 ALTER TABLE `WasteTypes` ENABLE KEYS */;
+UNLOCK TABLES;
 
-/* -----------------------------------------------------------
-   Pabaiga
-   ----------------------------------------------------------- */
-SET FOREIGN_KEY_CHECKS = 1;
-SET UNIQUE_CHECKS      = 1;
-COMMIT;
+
+ALTER TABLE `applicationgroups`
+RENAME TO `ApplicationGroups`; 
+
+ALTER TABLE `roleapplicationgroups`
+RENAME TO `RoleApplicationGroups`; 
+
+/* 1. Pridedam naują stulpelį RoleId */
+ALTER TABLE `VisitTopics`
+    ADD COLUMN `RoleId` VARCHAR(255) NULL    -- NULL, jei rolė neprivaloma
+    AFTER `description`;
+
+/* 2. Užsienio raktas į Roles.Id */
+ALTER TABLE `VisitTopics`
+    ADD CONSTRAINT `FK_VisitTopics_Roles_RoleId`
+        FOREIGN KEY (`RoleId`)
+        REFERENCES `Roles` (`Id`)
+        ON DELETE SET NULL      -- arba CASCADE / RESTRICT pagal poreikį
+        ON UPDATE CASCADE;
+
+/* 3. Indeksas greitesnėms paieškoms */
+CREATE INDEX `IX_VisitTopics_RoleId`
+    ON `VisitTopics` (`RoleId`);
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
