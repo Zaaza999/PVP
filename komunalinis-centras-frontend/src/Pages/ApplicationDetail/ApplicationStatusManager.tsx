@@ -65,8 +65,10 @@ const ApplicationStatusManager: React.FC<ApplicationStatusManagerProps> = ({
 
   const currentStatus = statuses.find((s) => s.id === selectedStatusId);
 
-  return (
-    <div className="container rounded bg-light">
+  return ( 
+    <div className="container rounded bg-light"> 
+      {localStorage.getItem("userRole") !== "client" && (
+        <>
       <div className="row align-items-end mb-4 border p-3">
         {/* Left: Current status */}
         <div className="col-md-4">
@@ -105,7 +107,9 @@ const ApplicationStatusManager: React.FC<ApplicationStatusManagerProps> = ({
             Atnaujinti būseną
           </button>
         </div>
-      </div>
+      </div>  
+      </>
+      )}
     </div>
   );
 };

@@ -47,6 +47,24 @@ namespace KomunalinisCentras.Backend.Repositories
                 _context.EmployeeTimeSlots.Remove(slot);
                 await _context.SaveChangesAsync();
             }
+        } 
+
+        // EmployeeTimeSlotRepository.cs
+        public async Task<IEnumerable<EmployeeTimeSlot>> GetAvailableByTopicAsync(int topicId)
+        {
+            // 1. randam temą ir jos RoleId
+            var topic = await _context.VisitTopics
+                                    .AsNoTracking()
+                                    .FirstOrDefaultAsync(t => t.TopicId == topicId);
+            if (topic == null) return Enumerable.Empty<EmployeeTimeSlot>();
+
+            var roleId = topic.roleID;   // "roleID" jeigu toks stulpelis
+
+            // 2. filtruojam tarpus pagal laisvumą ir rolę
+            return await _context.EmployeeTimeSlots
+                                .Where(s => !s.IsTaken &&
+                                            s.Employee.RoleId == roleId)
+                                .ToListAsync();
         }
     }
 }

@@ -8,6 +8,8 @@ namespace KomunalinisCentras.Backend.Repositories
         Task<EmployeeTimeSlot?> GetByIdAsync(int id);
         Task CreateAsync(EmployeeTimeSlot employeeTimeSlot);
         Task UpdateAsync(EmployeeTimeSlot employeeTimeSlot);
-        Task DeleteAsync(int id);
+        Task DeleteAsync(int id); 
+        Task<IEnumerable<EmployeeTimeSlot>> GetAvailableByTopicAsync(int topicId);
+
     }
 }
