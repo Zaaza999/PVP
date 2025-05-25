@@ -147,10 +147,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        /* ========================================================
-           Būsenos keitimas + laiškas pareiškėjui
-        ======================================================== */
-
         // PUT /applications/{formType}/{id}/status
         [HttpPut("{formType}/{id}/status")]
         public async Task<IActionResult> UpdateStatus(string formType, int id, [FromBody] StatusUpdateDto dto)
@@ -198,7 +194,7 @@ namespace KomunalinisCentras.Backend.Controllers
 
                 if (!string.IsNullOrWhiteSpace(targetEmail))
                 {
-                    var bodyHtml = $"<p>Sveiki!</p><p>Informuojame, kad Jūsų prašymo (<strong>{formType} #{existing.Id}</strong>) būsena pakeista į:</p><p style='font-size:1.2em;font-weight:600'>{statusEntity.Name}</p><p>Dėkojame, kad naudojatės mūsų paslaugomis!</p>";
+                    var bodyHtml = $"<p>Sveiki!</p><p>Informuojame, kad Jūsų prašymo būsena pakeista į:</p><p style='font-size:1.2em;font-weight:600'>{statusEntity.Name}</p><p>Dėkojame, kad naudojatės mūsų paslaugomis!</p>";
                     await _mail.SendAsync(targetEmail, "Atnaujinta prašymo būsena", bodyHtml);
                 }
             }
