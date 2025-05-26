@@ -1194,7 +1194,23 @@ ALTER TABLE `VisitTopics`
 
 /* 3. Indeksas greitesnėms paieškoms */
 CREATE INDEX `IX_VisitTopics_RoleId`
-    ON `VisitTopics` (`RoleId`);
+    ON `VisitTopics` (`RoleId`); 
+
+
+ALTER TABLE EmployeeTimeSlots
+    ADD COLUMN topic       VARCHAR(100)  NOT NULL DEFAULT ''  AFTER is_taken,
+    ADD COLUMN description VARCHAR(500) NULL       AFTER topic;
+
+
+ALTER TABLE EmployeeTimeSlots
+    MODIFY COLUMN topic VARCHAR(100) NULL; 
+
+ALTER TABLE EmployeeTimeSlots
+    ADD COLUMN for_rezervation       int  NOT NULL DEFAULT '1'  AFTER description
+
+ALTER TABLE EmployeeTimeSlots
+    MODIFY COLUMN for_rezervation TINYINT(1) NOT NULL DEFAULT 1;
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -32,5 +32,21 @@ export const getSchedules = () => apiCall("get", "GarbageCollectionSchedules");
 
 export const subscribeUser = (userId: string) => apiCall("update", "Users", `${userId}/subscribe`); 
 export const cancelSubscription = (userId: string) => apiCall("update", "Users", `${userId}/unsubscribe`);
-export const getResidents = () => apiCall("get", "Residents/residents");
+export const getResidents = () => apiCall("get", "Residents/residents"); 
+
+
+export const getEmployeeDaySchedule = (employeeId: string, dateISO: string) => apiCall("get", `EmployeeTimeSlots/employee/${employeeId}/by-date?date=${dateISO}`);
+
+export const addEmployeeTask = (employeeId: string, data: {
+    date: string;          // "YYYY-MM-DD"
+    from: string;          // "HH:mm"
+    to: string;            // "HH:mm"
+    topic: string;
+    description?: string;
+  }
+) => apiCall( "add", `EmployeeTimeSlots/employee/${employeeId}/add-task`, "", data ); 
+// export const addEmployeeTask = (employeeId: string, data: AddTaskReq) =>
+//   apiCall("post", `EmployeeTimeSlots/employee/${employeeId}/add-task`, "", data);
+
+
     

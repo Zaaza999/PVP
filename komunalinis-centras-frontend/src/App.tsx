@@ -17,6 +17,7 @@ import ApplicationList from "./Pages/ApplicationList/ApplicationList";
 import ApplicationDetail from "./Pages/ApplicationDetail/ApplicationDetail";
 import ResidentsPage from "./Pages/Residents/ResidentsPage";
 import InvoicePage from './Pages/Bills/Bills';  
+import WorkerSchedule from "./Pages/WorkerSchedule/DaySchedule" 
 
 function App() {
   return (
@@ -28,7 +29,6 @@ function App() {
         {/* This route will show the Reservation component at /reservation */}
         <Route path="/reservation" element={<Reservation />} /> 
         <Route path="/addTime" element={<AddTime />} /> 
-        <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/register-worker" element={<RegisterWorker />} />
@@ -38,9 +38,9 @@ function App() {
         <Route path="/application-list" element={<ApplicationList />} />
         <Route path="/application-list/:formType/:formId" element={<ApplicationDetail />} />
         <Route path="/residents" element={<ResidentsPage />} />
-        {/* This route will show the Reservation component at /reservation */}
         <Route path="/application" element={<Application />} /> 
-        <Route path="/invoices" element={<InvoicePage />} />
+        <Route path="/invoices" element={<InvoicePage />} />  
+        <Route path="/workschedule/:employeeId" element={<WorkerSchedule />} />
       </Routes>
     </Router>
   );

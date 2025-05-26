@@ -72,7 +72,7 @@ namespace KomunalinisCentras.Backend.Controllers
 
             await _employeeTimeSlotRepository.DeleteAsync(id);
             return NoContent();
-        } 
+        }
 
         // EmployeeTimeSlotsController.cs
         [HttpGet("by-topic/{topicId:int}")]
@@ -81,6 +81,50 @@ namespace KomunalinisCentras.Backend.Controllers
             var slots = await _employeeTimeSlotRepository.GetAvailableByTopicAsync(topicId);
             return Ok(slots);
         }
+
+        // EmployeeTimeSlotsController.cs
+        [HttpGet("employee/{employeeId}/by-date")]
+        public async Task<IActionResult> GetDaySchedule(string employeeId, [FromQuery] DateOnly date)
+        {
+            var data = await _employeeTimeSlotRepository.GetByEmployeeAndDateAsync(employeeId, date);
+            return Ok(data);
+        } 
+        
+        public record AddTaskDto(
+            DateOnly Date,
+            string   From,
+            string   To,
+            string   Topic,
+            string?  Description);
+
+        [HttpPost("employee/{employeeId}/add-task")]
+        public async Task<IActionResult> AddTask(string employeeId, [FromBody] AddTaskDto dto)
+        {
+            // leidžiame tiek „HH:mm“, tiek „HH:mm:ss“
+            var parseFormats = new[] { "HH:mm", "HH:mm:ss" };
+
+            if (!TimeOnly.TryParseExact(dto.From, parseFormats, null, System.Globalization.DateTimeStyles.None, out var from))
+                return BadRequest("Neteisingas lauko 'from' formatas. Naudokite HH:mm arba HH:mm:ss.");
+
+            if (!TimeOnly.TryParseExact(dto.To, parseFormats, null, System.Globalization.DateTimeStyles.None, out var to))
+                return BadRequest("Neteisingas lauko 'to' formatas. Naudokite HH:mm arba HH:mm:ss.");
+
+            var slot = new EmployeeTimeSlot
+            {
+                EmployeeId     = employeeId,
+                SlotDate       = dto.Date.ToDateTime(TimeOnly.MinValue),
+                TimeFrom       = from.ToTimeSpan(),   // DB stulpelis TimeSpan
+                TimeTo         = to.ToTimeSpan(),
+                Topic          = dto.Topic,
+                Description    = dto.Description,
+                ForRezervation = false,
+                IsTaken        = true
+            };
+
+            await _employeeTimeSlotRepository.CreateAsync(slot);
+            return Ok(slot);
+        }
+
 
     }
 }
