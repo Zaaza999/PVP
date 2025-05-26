@@ -18,7 +18,10 @@ namespace KomunalinisCentras.Backend.Entities
 
          [Column("subscription")]
         public bool Subscription { get; set; } 
-
+        
+        [Column("is_online")]
+        public bool IsOnline { get; set; }
+        
         public string? RoleId { get; set; } = null!;
 
         [ForeignKey("RoleId")]
