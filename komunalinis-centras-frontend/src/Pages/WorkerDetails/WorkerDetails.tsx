@@ -111,7 +111,8 @@ const handleDelete = async () => {
           {userRole === "worker_admin" && (
               <>
                 <button className="worker-edit-button" onClick={() => navigate(`/worker-list/${id}/edit`)}>Redaguoti</button>
-                <button className="worker-delete-button" onClick={handleDelete}>Ištrinti</button>
+                <button className="worker-delete-button" onClick={handleDelete}>Ištrinti</button> 
+                <button className="worker-delete-button" onClick={() =>navigate(`/workschedule/${worker.id}`)}>Tvarkaraštis</button>
               </>
           )}
         </div>

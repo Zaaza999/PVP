@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react"; 
+import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import dayjs, { Dayjs } from "dayjs";
 import {
@@ -221,7 +222,21 @@ export default function DaySchedule() {
 
       <Button variant="contained" sx={{ mt: 2 }} onClick={() => setOpenAdd(true)}>
         + Pridėti darbą
-      </Button>
+      </Button> 
+      {localStorage.getItem("userRole") !== "worker_admin" && (
+       <div className="button-wrapper">
+        <Link to="/" className="back-button">
+          Grįžti į pagrindinį puslapį
+        </Link>
+      </div>  
+      )} 
+      {localStorage.getItem("userRole") === "worker_admin" && (
+      <div className="button-wrapper">
+        <Link to={"/worker-list"} className="back-button">
+          Atgal
+        </Link>
+      </div> 
+      )}
 
       {/* dialog */}
       <Dialog open={openAdd} onClose={() => setOpenAdd(false)}>
