@@ -1,6 +1,8 @@
 using KomunalinisCentras.Backend.Entities;
 using KomunalinisCentras.Backend.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace KomunalinisCentras.Backend.Controllers
 {
@@ -9,11 +11,19 @@ namespace KomunalinisCentras.Backend.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
 
-        public UsersController(IUserRepository userRepository)
+        public UsersController(
+            IUserRepository userRepository,
+            UserManager<User> userManager,
+            RoleManager<Role> roleManager)
         {
             _userRepository = userRepository;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
+
 
         // GET /users
         [HttpGet]
@@ -61,7 +71,6 @@ namespace KomunalinisCentras.Backend.Controllers
             var existing = await _userRepository.GetByIdAsync(id);
             if (existing == null) return NotFound();
 
-            // Example of updating fields:
             existing.FirstName = updatedUser.FirstName;
             existing.LastName = updatedUser.LastName;
             existing.UserName = updatedUser.UserName;
@@ -72,7 +81,24 @@ namespace KomunalinisCentras.Backend.Controllers
 
             await _userRepository.UpdateAsync(existing);
 
-            // Grąžiname 200 OK ir atnaujinto vartotojo duomenis
+            // Synchronize Identity Role
+            var identityUser = await _userManager.FindByIdAsync(existing.Id);
+            if (identityUser != null)
+            {
+                var currentRoles = (await _userManager.GetRolesAsync(identityUser))
+                    .Select(r => r.ToUpperInvariant())
+                    .ToList();
+
+
+                await _userManager.RemoveFromRolesAsync(identityUser, currentRoles);
+
+                var role = await _roleManager.FindByIdAsync(updatedUser.RoleId);
+                if (role != null)
+                {
+                    await _userManager.AddToRoleAsync(identityUser, role.Name);
+                }
+            }
+
             return Ok(existing);
         }
 
@@ -112,7 +138,7 @@ namespace KomunalinisCentras.Backend.Controllers
             await _userRepository.UpdateAsync(user);
             return NoContent();
         }
-        
+
         // GET /users/roles
         [HttpGet("roles")]
         public async Task<IActionResult> GetAllRoles()
