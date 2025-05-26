@@ -57,7 +57,7 @@ const ResidentsList: React.FC = () => {
 
         getUser(userId)
             .then(user => {
-                if (!["worker", "admin"].includes(user.role?.roleName?.toLowerCase() || "")) {
+                if (user.role?.roleName?.toLowerCase().includes["worker"]) {
                     setError("Neturite prieigos prie šio puslapio.");
                     return;
                 }

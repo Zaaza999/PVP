@@ -1,8 +1,3 @@
-// src/Pages/Rezervations/AddTime.tsx
-// --------------------------------------------------------------
-// Rodo ir leidžia valdyti TIK prisijungusio darbuotojo langus
-// --------------------------------------------------------------
-
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -13,9 +8,6 @@ import {
 } from "../Axios/apiServises";
 import "../../App.css";
 
-/* ===============================================================
-   Pastovios reikšmės
-   =============================================================== */
 const WORK_DAY_START_HOUR = 8;
 const WORK_DAY_END_HOUR   = 17;
 const STEP_MINUTES        = 30;
@@ -140,9 +132,11 @@ const EmployeeTimeSlotsPage: React.FC = () => {
 
     addTimeSlot({
       employeeId,
-      slotDate: new Date(`${slotDate}T${timeFrom}:00`).toISOString(),
-      timeFrom: `${timeFrom}:00`,
-      timeTo:   `${timeTo}:00`,
+       slotDate: new Date(`${slotDate}T${timeFrom}:00`).toISOString(),
+       timeFrom: `${timeFrom}:00`,
+       timeTo:   `${timeTo}:00`,
+      topic:    "Laikas rezervacijai",  
+      description: null                      
     })
       .then(() => {
         loadTimeSlots();

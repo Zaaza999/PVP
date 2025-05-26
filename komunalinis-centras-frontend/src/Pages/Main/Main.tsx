@@ -206,7 +206,12 @@ const Main: React.FC = () => {
               <li><Link to="/register-worker">Registruoti darbuotoją</Link></li> 
               <li><Link to="/worker-list">Darbuotojų sąrašas</Link></li>
               <li><Link to="/application-list">Prašymų sąrašas</Link></li>
-              <li><Link to="/residents">Gyventojų sąrašas</Link></li>
+              <li><Link to="/residents">Gyventojų sąrašas</Link></li> 
+              {currentUserId && (
+                <li>
+                <Link to={`/workschedule/${currentUserId}`}>Mano tvarkaraštis</Link>
+                </li>
+                )}
             </>
           )}            
           

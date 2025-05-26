@@ -10,13 +10,19 @@ namespace KomunalinisCentras.Backend.Controllers
     {
         private readonly IReservationRepository _reservationRepository;
         private readonly IEmployeeTimeSlotRepository _timeSlotRepository;
+        private readonly IVisitTopicRepository _visitTopicRepository;
+        private readonly IUserRepository _userRepository;
 
         public ReservationsController(
             IReservationRepository reservationRepository,
-            IEmployeeTimeSlotRepository timeSlotRepository)
+            IEmployeeTimeSlotRepository timeSlotRepository,
+            IVisitTopicRepository visitTopicRepository,
+            IUserRepository userRepository)
         {
             _reservationRepository = reservationRepository;
             _timeSlotRepository = timeSlotRepository;
+            _visitTopicRepository = visitTopicRepository;
+            _userRepository = userRepository;
         }
 
         // GET /reservations
@@ -64,13 +70,25 @@ namespace KomunalinisCentras.Backend.Controllers
             if (slot.IsTaken)
                 return Conflict("Šis laiko tarpas jau užimtas.");
 
-            // 3. Pažymime, kad laiko tarpas dabar užimtas
-            slot.IsTaken = true;
+            // 3. Užkrauname temą pagal TopicId
+            var topic = await _visitTopicRepository.GetByIdAsync(newReservation.TopicId);
+            if (topic == null)
+                return BadRequest("Nerasta rezervacijos tema."); 
+            
+             // 3. Užkrauname temą pagal TopicId
+            var user = await _userRepository.GetByIdAsync(newReservation.UserId);
+            if (user == null)
+                return BadRequest("Nerasta rezervacijos tema.");
+
+            // 4. Pažymime, kad laiko tarpas užimtas ir atnaujiname aprašymą
+            slot.IsTaken    = true;
+            slot.Description = "Rezervacijos tema: " + topic.TopicName + ", Vardas: " + user.FirstName + ", Pavardė: " + user.LastName;
             await _timeSlotRepository.UpdateAsync(slot);
 
-            // 4. Sukuriame rezervaciją
+            // 5. Sukuriame rezervaciją
             await _reservationRepository.CreateAsync(newReservation);
 
+            // 6. Grąžiname 201 Created su naujos rezervacijos duomenimis
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = newReservation.ReservationId },

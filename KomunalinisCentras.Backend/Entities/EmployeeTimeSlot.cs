@@ -8,7 +8,7 @@ namespace KomunalinisCentras.Backend.Entities
     {
         [Key] 
         [Column("timeslot_id")]
-        public int TimeSlotId { get; set; }   // <-- EF atpažins kaip PK
+        public int TimeSlotId { get; set; }  
 
         [Column("employee_id")]
         public string EmployeeId { get; set; } 
@@ -23,10 +23,21 @@ namespace KomunalinisCentras.Backend.Entities
         public TimeSpan TimeTo { get; set; }  
 
         [Column("is_taken")]
-        public bool IsTaken { get; set; }
+        public bool IsTaken { get; set; } 
+
+        [Column("topic")]
+        public string? Topic { get; set; }  
+
+
+        [Column("description")]
+        public string? Description { get; set; }   
+
+        [Column("for_rezervation")]
+        public bool ForRezervation { get; set; } = true;
 
         //[Column("topic_id")]
         //public int TopicId { get; set; }
+        // EmployeeTimeSlot.cs 
 
         // Navigacinės savybės 
         [JsonIgnore]
