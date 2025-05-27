@@ -6,6 +6,7 @@ namespace KomunalinisCentras.Backend.Dtos
         decimal Amount,
         decimal Remaining,           // ← NAUJAS laukas
         string Currency,
+        string Topic,
         DateTime DueDate,
         string Status,
         DateTime? PaidAt,

@@ -1,6 +1,7 @@
 // src/pages/bills/Invoice.tsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "../styles.css";  // Įsitikinkite, kad kelias atitinka jūsų projekto struktūrą
 
 interface Invoice {
   id: number;
@@ -9,7 +10,14 @@ interface Invoice {
   currency: string;
   dueDate: string;
   status: string;
+  topic: string;
 }
+
+// Statusų vertimų žemėlapis
+const STATUS_LABELS: Record<string, string> = {
+  Issued: "Neapmokėta",
+  Paid: "Apmokėta",
+};
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5190";
 
@@ -18,7 +26,7 @@ export default function InvoicePage() {
   const [partialAmts, setPartialAmts] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(false);
   const [payingAll, setPayingAll] = useState(false);
-  const [showPaid, setShowPaid] = useState(false); // toggle paid invoices
+  const [showPaid, setShowPaid] = useState(false);
 
   useEffect(() => {
     loadInvoices();
@@ -45,8 +53,7 @@ export default function InvoicePage() {
   async function handlePay(invoiceId: number) {
     const invoice = invoices.find(inv => inv.id === invoiceId);
     if (!invoice) return;
-    const input = partialAmts[invoiceId];
-    const amt = parseFloat(input);
+    const amt = parseFloat(partialAmts[invoiceId]);
     if (isNaN(amt) || amt <= 0 || amt > invoice.remaining) {
       return alert(`Įveskite sumą tarp 0 ir ${invoice.remaining.toFixed(2)}`);
     }
@@ -101,52 +108,61 @@ export default function InvoicePage() {
     showPaid ? inv.remaining === 0 : inv.remaining > 0
   );
 
-  const totalAmount = Object.entries(partialAmts)
-    .reduce((sum, [id, val]) => {
-      const amt = parseFloat(val);
-      const invoice = invoices.find(inv => inv.id === Number(id));
-      if (!isNaN(amt) && invoice && amt > 0 && amt <= invoice.remaining) {
-        return sum + amt;
-      }
-      return sum;
-    }, 0);
+  const totalUnpaid = Object.entries(partialAmts).reduce((sum, [id, val]) => {
+    const amt = parseFloat(val);
+    const inv = invoices.find(i => i.id === Number(id));
+    return (!isNaN(amt) && inv && amt > 0 && amt <= inv.remaining)
+      ? sum + amt
+      : sum;
+  }, 0);
+
+  const totalPaid = filteredInvoices
+    .filter(inv => inv.remaining === 0)
+    .reduce((sum, inv) => sum + inv.amount, 0);
 
   const currency = invoices[0]?.currency || "";
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl">Mano sąskaitos</h1>
+    <div className="invoice-page">
+      <div className="page-header">
+        <h1>Mano sąskaitos</h1>
         <button
-          className="px-3 py-1 bg-gray-600 text-white rounded"
+          className="invoice-toggle-btn"
           onClick={() => setShowPaid(prev => !prev)}
         >
-          {showPaid ? 'Rodyti neapmokėtas' : 'Rodyti apmokėtas'}
+          {showPaid ? "Rodyti neapmokėtas" : "Rodyti apmokėtas"}
         </button>
       </div>
 
       {loading ? (
         <p>Kraunama…</p>
       ) : filteredInvoices.length === 0 ? (
-        <p>{showPaid ? 'Nėra apmokėtų sąskaitų.' : 'Nėra neapmokėtų sąskaitų.'}</p>
+        <p>
+          {showPaid
+            ? "Nėra apmokėtų sąskaitų."
+            : "Nėra neapmokėtų sąskaitų."}
+        </p>
       ) : (
         <>
-          <ul className="space-y-4">
+          <ul className="invoice-list">
             {filteredInvoices.map(inv => (
-              <li
-                key={inv.id}
-                className="border p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center"
-              >
-                <div>
-                  <strong>#{inv.id}</strong> — likutis: {inv.remaining.toFixed(2)} {inv.currency}
-                  <br />
-                  Terminas: {new Date(inv.dueDate).toLocaleDateString()} | Būsena: {inv.status}
+              <li key={inv.id} className="invoice-item">
+                <div className="details">
+                  <strong>#{inv.topic}</strong>
+                  <p>
+                    {showPaid
+                      ? `Sumokėta: ${inv.amount.toFixed(2)} ${inv.currency}`
+                      : `Likutis: ${inv.remaining.toFixed(2)} ${inv.currency}`
+                    }
+                    <br />
+                    Terminas: {new Date(inv.dueDate).toLocaleDateString()} | Būsena:{" "}
+                    {STATUS_LABELS[inv.status] ?? inv.status}
+                  </p>
                 </div>
                 {!showPaid && (
-                  <div className="mt-2 sm:mt-0 flex items-center space-x-2">
+                  <div className="actions">
                     <input
                       type="number"
-                      className="border p-1 w-24"
                       value={partialAmts[inv.id] || ""}
                       onChange={e =>
                         setPartialAmts(prev => ({
@@ -156,7 +172,7 @@ export default function InvoicePage() {
                       }
                     />
                     <button
-                      className="px-3 py-1 bg-blue-600 text-white rounded"
+                      className="btn-pay"
                       onClick={() => handlePay(inv.id)}
                       disabled={payingAll}
                     >
@@ -168,15 +184,21 @@ export default function InvoicePage() {
             ))}
           </ul>
 
-          {!showPaid && (
-            <div className="mt-6 flex justify-end items-center space-x-4">
-              <span className="text-lg">
-                Viso: <strong>{totalAmount.toFixed(2)}</strong> {currency}
+          {showPaid ? (
+            <div className="invoice-summary">
+              <span className="total">
+                Bendra sumokėta: <strong>{totalPaid.toFixed(2)}</strong> {currency}
+              </span>
+            </div>
+          ) : (
+            <div className="invoice-summary">
+              <span className="total">
+                Viso: <strong>{totalUnpaid.toFixed(2)}</strong> {currency}
               </span>
               <button
-                className="px-4 py-2 bg-green-600 text-white rounded"
+                className="btn-pay-all"
                 onClick={handlePayAll}
-                disabled={payingAll || totalAmount === 0}
+                disabled={payingAll || totalUnpaid === 0}
               >
                 Apmokėti viską
               </button>

@@ -787,3 +787,140 @@ a:focus {
 .nav-link.dropbtn {
   white-space: nowrap;
 }
+
+
+/* === Invoice Page Styles === */
+
+.invoice-page {
+  background: #f7f9fc;
+  padding: 2rem;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.invoice-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.invoice-page .page-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+}
+
+.invoice-toggle-btn {
+  background: #FFC107;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+.invoice-toggle-btn:hover {
+  background: #FFB300;
+}
+
+/* Kortelių išdėstymas */
+.invoice-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Vienos sąskaitos kortelė */
+.invoice-item {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.invoice-item .details {
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.invoice-item .details strong {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.invoice-item .details p {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* Veiksmai su sąskaita */
+.invoice-item .actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.invoice-item .actions input[type="number"] {
+  width: 80px;
+  padding: 0.4rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.btn-pay {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.btn-pay:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.btn-pay:hover:not(:disabled) {
+  background: #218838;
+}
+
+/* Mokėti viską blokas */
+.invoice-summary {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 1.5rem;
+}
+
+.invoice-summary .total {
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.btn-pay-all {
+  background: #17a2b8;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.btn-pay-all:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.btn-pay-all:hover:not(:disabled) {
+  background: #138496;
+}

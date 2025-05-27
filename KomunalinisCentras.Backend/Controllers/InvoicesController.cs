@@ -27,7 +27,8 @@ namespace KomunalinisCentras.Backend.Controllers
                     Id: i.Id,
                     Amount:    i.Amount,
                     Remaining: i.Amount - paidSoFar,         // ← čia
-                    Currency:  i.Currency,
+                    Currency:  i.Currency, 
+                    Topic:     i.Topic,
                     DueDate:   i.DueDate,
                     Status:    i.Status.ToString(),
                     PaidAt:    i.PaidAt,
@@ -68,6 +69,7 @@ namespace KomunalinisCentras.Backend.Controllers
                 Amount:    invoice.Amount,
                 Remaining: remaining,           // ← perduodame apskaičiuotą likutį
                 Currency:  invoice.Currency,
+                Topic:     invoice.Topic,
                 DueDate:   invoice.DueDate,
                 Status:    invoice.Status.ToString(),
                 PaidAt:    invoice.PaidAt,

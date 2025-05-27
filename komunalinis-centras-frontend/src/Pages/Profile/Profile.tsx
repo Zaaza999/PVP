@@ -1,7 +1,6 @@
-// src/Pages/UserProfile/UserProfile.tsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import {
   getUser,
   updateUser,
@@ -9,6 +8,13 @@ import {
   deleteReservation,
   cancelSubscription,
 } from "../Axios/apiServises";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import "../styles.css";
 
 /* ---------- Types ---------- */
@@ -16,7 +22,6 @@ interface Role {
   roleName: string;
   id: string;
 }
-
 interface User {
   id: string;
   roleId: number;
@@ -29,14 +34,12 @@ interface User {
   email: string | null;
   subscription: boolean;
 }
-
 interface Reservation {
   reservationId: number;
   timeSlotId: number;
   reservationDate: string;
   status: string;
 }
-
 interface Application {
   id: number;
   formType: string;
@@ -46,6 +49,9 @@ interface Application {
   submittedByUserId?: string;
   submittedBy?: { id: string; firstName?: string; lastName?: string };
 }
+
+/* ---------- Constants ---------- */
+const HISTORY_STATUSES = ["Užbaigta", "Patvirtinta", "Archyvuota"];
 
 /* ---------- Helpers ---------- */
 const getCurrentUserId = (): string | null => {
@@ -58,10 +64,9 @@ const getCurrentUserId = (): string | null => {
     return null;
   }
 };
-
 const formatDate = (iso: string) => {
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "–";
+  if (isNaN(d.getTime())) return "–";
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
@@ -69,7 +74,6 @@ const formatDate = (iso: string) => {
   const min = String(d.getMinutes()).padStart(2, "0");
   return `${y}/${m}/${day} ${h}:${min}`;
 };
-
 const formTitles: Record<string, string> = {
   WasteFeeExemption: "Prašymas – Atleidimas nuo vietinės rinkliavos (fiziniai asmenys)",
   WasteFeeExemptionBusiness: "Prašymas – Atleidimas nuo vietinės rinkliavos (juridiniai asmenys)",
@@ -92,24 +96,25 @@ const UserProfile: React.FC = () => {
 
   const [user, setUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-
   const [firstName, setFirstName] = useState<string | null>(null);
   const [lastName, setLastName] = useState<string | null>(null);
-  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
-
   const [street, setStreet] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
   const [city, setCity] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
 
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [pendingCancelId, setPendingCancelId] = useState<number | null>(null);
+  const [openCancelDialog, setOpenCancelDialog] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
+  /* Fetch user, reservations, and applications */
   useEffect(() => {
     if (!currentUserId) return;
     getUser(currentUserId)
-      .then(u => {
+      .then((u) => {
         setUser(u);
         setFirstName(u.firstName);
         setLastName(u.lastName);
@@ -141,7 +146,7 @@ const UserProfile: React.FC = () => {
         const data: Application[] = await res.json();
         setApplications(
           data.filter(
-            a =>
+            (a) =>
               a.userId === currentUserId ||
               a.submittedByUserId === currentUserId ||
               a.submittedBy?.id === currentUserId
@@ -155,9 +160,12 @@ const UserProfile: React.FC = () => {
 
   if (!user) return <p>Kraunama...</p>;
 
+  /* Format address */
   const formattedAddress = () => `${street.trim()} ${houseNumber.trim()}, ${city.trim()}`;
 
+  /* Save profile changes */
   const save = () => {
+    if (!user) return;
     updateUser(user.id, {
       ...user,
       firstName: firstName ?? "",
@@ -166,13 +174,14 @@ const UserProfile: React.FC = () => {
       phoneNumber: phoneNumber ?? "",
       email: email ?? "",
     })
-      .then(u => {
+      .then((u) => {
         setUser(u);
         setIsEditing(false);
       })
       .catch(console.error);
   };
 
+  /* Cancel edit */
   const cancelEdit = () => {
     if (!user) return;
     setFirstName(user.firstName);
@@ -187,29 +196,36 @@ const UserProfile: React.FC = () => {
         setCity(m[3]);
       } else {
         setStreet(user.address);
+        setHouseNumber("");
+        setCity("");
       }
-    } else {
-      setStreet("");
-      setHouseNumber("");
-      setCity("");
     }
     setIsEditing(false);
   };
 
+  /* Confirm reservation cancel */
   const confirmCancel = () => {
     if (pendingCancelId == null) return;
     deleteReservation(pendingCancelId)
-      .then(() => setReservations(prev => prev.filter(r => r.reservationId !== pendingCancelId)))
+      .then(() =>
+        setReservations((prev) => prev.filter((r) => r.reservationId !== pendingCancelId))
+      )
       .catch(console.error)
-      .finally(() => setPendingCancelId(null));
+      .finally(() => {
+        setPendingCancelId(null);
+        setOpenCancelDialog(false);
+      });
   };
 
+  /* Unsubscribe from subscription */
   const unsubscribe = () => {
+    if (!user) return;
     cancelSubscription(user.id)
       .then(() => setUser({ ...user, subscription: false }))
       .catch(console.error);
   };
 
+  /* Sort lists */
   const sortedReservations = [...reservations].sort(
     (a, b) => new Date(a.reservationDate).getTime() - new Date(b.reservationDate).getTime()
   );
@@ -217,12 +233,20 @@ const UserProfile: React.FC = () => {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
+  /* Partition applications */
+  const activeApps = sortedApplications.filter(
+    (app) => !HISTORY_STATUSES.includes(app.status?.name ?? "")
+  );
+  const historyApps = sortedApplications.filter(
+    (app) => HISTORY_STATUSES.includes(app.status?.name ?? "")
+  );
+
   return (
     <div className="container user-profile">
       <h2>Naudotojo profilis</h2>
       <button className="btn" onClick={() => navigate("/")}>Grįžti</button>
 
-      <div className="card">
+<div className="card">
         {isEditing ? (
           <div className="form">
             <div className="form-group"><label>Vardas</label><input type="text" value={firstName ?? ""} onChange={e => setFirstName(e.target.value)} /></div>
@@ -279,61 +303,93 @@ const UserProfile: React.FC = () => {
         )}
       </div>
 
+      {/* Reservations Section */}
       {localStorage.getItem("userRole") === "client" && (
         <section>
           <h3>Mano rezervacijos</h3>
-          {sortedReservations.length === 0 ? <p>Nėra rezervacijų</p> : (
+          {sortedReservations.length === 0 ? (
+            <p>Nėra rezervacijų</p>
+          ) : (
             <table className="reservations-table">
-              <thead><tr><th>ID</th><th>Langas</th><th>Data ir laikas</th><th>Statusas</th><th>Veiksmai</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Langas</th>
+                  <th>Data ir laikas</th>
+                  <th>Statusas</th>
+                  <th>Veiksmai</th>
+                </tr>
+              </thead>
               <tbody>
-                {sortedReservations.map(r => (
+                {sortedReservations.map((r) => (
                   <tr key={r.reservationId}>
                     <td>{r.reservationId}</td>
                     <td>{r.timeSlotId}</td>
                     <td>{formatDate(r.reservationDate)}</td>
                     <td>{r.status}</td>
                     <td>
-                      <button className="btn btn-delete" onClick={() => setPendingCancelId(r.reservationId)}>Atšaukti</button>
+                      <button
+                        className="btn btn-delete btn-sm"
+                        onClick={() => {
+                          setPendingCancelId(r.reservationId);
+                          setOpenCancelDialog(true);
+                        }}
+                      >
+                        Atšaukti
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
-          {pendingCancelId != null && (
-            <div className="modal-backdrop">
-              <div className="modal">
-                <h3>Patvirtinimas</h3>
-                <p>Ar tikrai norite atšaukti rezervaciją #{pendingCancelId}?</p>
-                <div className="modal-actions">
-                  <button className="btn" onClick={confirmCancel}>Taip, atšaukti</button>
-                  <button className="btn btn-delete" onClick={() => setPendingCancelId(null)}>Ne, grįžti</button>
-                </div>
-              </div>
-            </div>
-          )}
+          <Dialog open={openCancelDialog} onClose={() => setOpenCancelDialog(false)}>
+            <DialogTitle>Patvirtinimas</DialogTitle>
+            <DialogContent>
+              <p>Ar tikrai norite atšaukti šią rezervaciją?</p>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenCancelDialog(false)}>Ne</Button>
+              <Button onClick={confirmCancel} color="error">
+                Taip
+              </Button>
+            </DialogActions>
+          </Dialog>
         </section>
       )}
 
+      {/* Applications Section */}
       <section>
-        <h3>Mano prašymai</h3>
-        {sortedApplications.length === 0 ? <p>Nėra pateiktų prašymų</p> : (
-          <div className="application-list d-flex flex-column gap-3">
-            {sortedApplications.map(app => (
-              <div key={app.id} className="card shadow-sm">
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <h3>{showHistory ? "Prašymų istorija" : "Mano prašymai"}</h3>
+          {historyApps.length > 0 && (
+            <button
+              className="btn btn-outline-secondary btn-sm"
+              onClick={() => setShowHistory(!showHistory)}
+            >
+              {showHistory ? "Rodyti aktyvius prašymus" : "Prašymų istorija"}
+            </button>
+          )}
+        </div>
+        {(showHistory ? historyApps : activeApps).length === 0 ? (
+          <p>{showHistory ? "Nėra istorinių prašymų" : "Nėra pateiktų prašymų"}</p>
+        ) : (
+          <div className="application-list">
+            {(showHistory ? historyApps : activeApps).map((app) => (
+              <div key={app.id} className="card shadow-sm mb-3">
                 <div className="card-body">
                   <h5 className="card-title">{getFormTitle(app.formType)}</h5>
-                  <p className="card-text mb-1"><strong>Pateikta:</strong> {formatDate(app.date)}</p>
-                  <p className="card-text"><strong>Būsena:</strong> {app.status?.name ?? "Nežinoma būsena"}</p>
+                  <p className="card-text mb-1">
+                    <strong>Pateikta:</strong> {formatDate(app.date)}
+                  </p>
+                  <p className="card-text">
+                    <strong>Būsena:</strong> {app.status?.name || "Nežinoma būsena"}
+                  </p>
                   <button
-                        className="btn btn-sm btn-outline-primary"
-                        onClick={() =>
-                          navigate(
-                            `/application-list/${app.formType}/${app.id}`
-                          )
-                        }
-                      >
-                        Peržiūrėti
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={() => navigate(`/application-list/${app.formType}/${app.id}`)}
+                  >
+                    Peržiūrėti
                   </button>
                 </div>
               </div>

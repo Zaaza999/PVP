@@ -1214,7 +1214,7 @@ ALTER TABLE EmployeeTimeSlots
 
 
 CREATE TABLE `Invoices` (
-  `Id`            INT AUTO_INCREMENT PRIMARY KEY,
+  `invoice_id`            INT AUTO_INCREMENT PRIMARY KEY,
   `UserId`        VARCHAR(255) NOT NULL,
   `ApplicationId` INT          NULL,
   `Amount`        DECIMAL(10,2) NOT NULL,
@@ -1230,7 +1230,7 @@ CREATE TABLE `Invoices` (
 
 CREATE TABLE `Payments` (
   `Id`               INT AUTO_INCREMENT PRIMARY KEY,
-  `InvoiceId`        INT          NOT NULL,
+  `invoice_id`        INT          NOT NULL,
   `Provider`         VARCHAR(50)  NOT NULL,      -- „Paysera“, „Stripe“, „BankLink“ …
   `ProviderTxnId`    VARCHAR(128) NOT NULL,      -- mokėjimo šliuzo ID
   `Amount`           DECIMAL(10,2) NOT NULL,
@@ -1240,11 +1240,12 @@ CREATE TABLE `Payments` (
   `CreatedAt`        DATETIME(6)   NOT NULL,
   `UpdatedAt`        DATETIME(6)   NOT NULL,
   `RawPayload`       JSON          NULL,         -- webhook/body saugiam log’ui
-  INDEX `IX_Payments_InvoiceId` (`InvoiceId`),
-  FOREIGN KEY (`InvoiceId`) REFERENCES `Invoices`(`Id`) ON DELETE CASCADE
+  INDEX `IX_Payments_invoice_id` (`invoice_id`),
+  FOREIGN KEY (`invoice_id`) REFERENCES `Invoices`(`invoice_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
+ALTER TABLE Invoices
+	ADD COLUMN `topic` varchar(50) NOT NULL DEFAULT ""
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

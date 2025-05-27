@@ -31,7 +31,10 @@ namespace KomunalinisCentras.Backend.Entities
         public DateTime CreatedAt { get; set; }
 
         [Column("PaidAt")]
-        public DateTime? PaidAt { get; set; }
+        public DateTime? PaidAt { get; set; } 
+
+         [Column("topic")]
+        public string Topic { get; set; } 
 
         [JsonIgnore]
         public ICollection<Payment> Payments { get; set; } 

@@ -175,7 +175,13 @@ using (var scope = app.Services.CreateScope())
     manager.AddOrUpdate<ReminderJob>(
         "waste-reminder",
         job => job.RunAsync(),
-        builder.Configuration["Hangfire:Cron"] ?? "0 17 * * *"); // 17:00 UTC
+        builder.Configuration["Hangfire:Cron"] ?? "0 17 * * *"); // 17:00 UTC 
+
+    // New invoice reminder
+    manager.AddOrUpdate<InvoiceReminderJob>(
+        "invoice-reminder",
+        job => job.RunAsync(),
+        builder.Configuration["Hangfire:InvoiceCron"] ?? "0 9 * * *"); // 09:00 UTC
 } 
 
 app.UseHangfireDashboard("/hangfire");   // 👈 čia

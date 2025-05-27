@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react"; 
-import { Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import dayjs, { Dayjs } from "dayjs";
 import {
   Box,
@@ -28,6 +27,10 @@ import {
 const STEP_MIN = 30;
 const DAY_START_MIN = 8 * 60; // 08:00
 const DAY_END_MIN = 17 * 60;  // 17:00
+// Desired maximum container height in pixels:
+const TARGET_CONTAINER_HEIGHT = 600;
+// Calculate scale so that full day fits into target height:
+const PIXEL_PER_MIN = TARGET_CONTAINER_HEIGHT / (DAY_END_MIN - DAY_START_MIN);
 
 interface SlotDto {
   timeSlotId: number;
@@ -36,8 +39,9 @@ interface SlotDto {
   timeTo: string;
   topic?: string;
   description?: string | null;
-  isTaken: boolean;
-  forRezervation: boolean;
+  isFree: boolean;
+  forRezervation?: boolean;
+  isTaken?: boolean;
 }
 
 interface Segment {
@@ -76,7 +80,7 @@ export default function DaySchedule() {
   const [topic, setTopic] = useState("");
   const [description, setDescription] = useState("");
 
-  /* fetch schedule */
+  // Fetch schedule for selected date
   const fetchSchedule = () => {
     if (!employeeId) return;
     getEmployeeDaySchedule(employeeId, date.format("YYYY-MM-DD")).then((d) =>
@@ -85,7 +89,7 @@ export default function DaySchedule() {
   };
   useEffect(fetchSchedule, [employeeId, date]);
 
-  /* busy segments */
+  // Merge overlapping busy segments
   const busySegments: Segment[] = useMemo(() => {
     const arr = slots.map((s) => ({
       start: parseHHMM(s.timeFrom.slice(0, 5)),
@@ -104,7 +108,7 @@ export default function DaySchedule() {
     return merged;
   }, [slots]);
 
-  /* free segments */
+  // Calculate free segments between busy ones
   const freeSegments: Segment[] = useMemo(() => {
     const free: Segment[] = [];
     let cursor = DAY_START_MIN;
@@ -116,12 +120,13 @@ export default function DaySchedule() {
     return free;
   }, [busySegments]);
 
-  /* combined rows */
+  // Build table rows combining free and busy
   const rows: Row[] = useMemo(() => {
     const list: Row[] = [];
     let cursor = DAY_START_MIN;
     const sorted = [...slots].sort(
-      (a, b) => parseHHMM(a.timeFrom.slice(0, 5)) - parseHHMM(b.timeFrom.slice(0, 5))
+      (a, b) =>
+        parseHHMM(a.timeFrom.slice(0, 5)) - parseHHMM(b.timeTo.slice(0, 5))
     );
     sorted.forEach((s) => {
       const start = parseHHMM(s.timeFrom.slice(0, 5));
@@ -142,7 +147,7 @@ export default function DaySchedule() {
     return list;
   }, [slots]);
 
-  /* from options */
+  // Options for "from" dropdown
   const fromOptions = useMemo<string[]>(() => {
     const opts: string[] = [];
     freeSegments.forEach((seg) => {
@@ -153,7 +158,7 @@ export default function DaySchedule() {
     return opts;
   }, [freeSegments]);
 
-  /* to options */
+  // Options for "to" dropdown
   const toOptions = useMemo<string[]>(() => {
     if (!from) return [];
     const fm = parseHHMM(from);
@@ -166,10 +171,15 @@ export default function DaySchedule() {
     return opts;
   }, [from, freeSegments]);
 
-  /* add task */
   const handleAdd = () => {
     if (!employeeId || !from || !to) return;
-    addEmployeeTask(employeeId, { date: date.format("YYYY-MM-DD"), from, to, topic, description })
+    addEmployeeTask(employeeId, {
+      date: date.format("YYYY-MM-DD"),
+      from,
+      to,
+      topic,
+      description,
+    })
       .then(() => {
         setOpenAdd(false);
         setTopic("");
@@ -194,49 +204,64 @@ export default function DaySchedule() {
         </Box>
 
         {/* schedule table */}
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Laikas</TableCell>
-              <TableCell>Tema</TableCell>
-              <TableCell>Aprašymas</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((r, i) => (
-              <TableRow key={i} sx={{ background: r.isFree ? "#f8fff8" : "inherit" }}>
-                <TableCell>{formatHHMM(r.start)}–{formatHHMM(r.end)}</TableCell>
-                <TableCell>{r.isFree ? "-" : r.topic || "-"}</TableCell>
-                <TableCell>
-                  {r.isFree
-                    ? "Laisva"
-                    : r.forRezervation
-                    ? r.isTaken
-                      ? r.description || "Rezervuota"
-                      : "Laisva klientams"
-                    : r.description || "Vidinis darbas"}
-                </TableCell>
+        <Box sx={{ height: TARGET_CONTAINER_HEIGHT, overflowY: "auto" }}>
+          <Table
+            size="small"
+            sx={{
+              tableLayout: "fixed",
+              height: "100%",
+              "& .MuiTableBody-root": { height: "100%" },
+            }}
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell>Laikas</TableCell>
+                <TableCell>Tema</TableCell>
+                <TableCell>Aprašymas</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {rows.map((r, i) => (
+                <TableRow
+                  key={i}
+                  sx={{
+                    background: r.isFree ? "#f8fff8" : "inherit",
+                    height: (r.end - r.start) * PIXEL_PER_MIN,
+                    minHeight: STEP_MIN * PIXEL_PER_MIN,
+                  }}
+                >
+                  <TableCell>
+                    {formatHHMM(r.start)}–{formatHHMM(r.end)}
+                  </TableCell>
+                  <TableCell>{r.isFree ? "-" : r.topic || "-"}</TableCell>
+                  <TableCell>
+                    {r.isFree
+                      ? "Laisva"
+                      : r.forRezervation
+                      ? r.isTaken
+                        ? r.description || "Rezervuota"
+                        : "Laisva klientams"
+                      : r.description || "Vidinis darbas"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
 
         <Button variant="contained" sx={{ mt: 2 }} onClick={() => setOpenAdd(true)}>
           + Pridėti darbą
         </Button> 
-        {localStorage.getItem("userRole") !== "worker_admin" && (
-        <div className="button-wrapper">
-          <Link to="/" className="back-button">
+
+        <Link to="/" className="back-button" style={{ marginTop: 8, display: 'block' }}>
             Grįžti į pagrindinį puslapį
-          </Link>
-        </div>  
-        )} 
-        {localStorage.getItem("userRole") === "worker_admin" && (
-        <div className="button-wrapper">
-          <Link to={"/worker-list"} className="back-button">
-            Atgal
-          </Link>
-        </div> 
+        </Link>
+        {localStorage.getItem("userRole") !== "worker_admin" ? (
+            <></>
+        ) : (
+          <Link to="/worker-list" className="back-button" style={{ marginTop: 8, display: 'block' }}>
+            Atgal į darbuotojų sąrašą 
+          </Link> 
         )}
 
         {/* dialog */}
@@ -245,15 +270,28 @@ export default function DaySchedule() {
             <TextField label="Tema" value={topic} onChange={(e) => setTopic(e.target.value)} />
             <TextField label="Aprašymas" value={description} onChange={(e) => setDescription(e.target.value)} />
             <Select value={from} onChange={(e) => setFrom(e.target.value as string)} displayEmpty>
-              <MenuItem disabled value="">Nuo</MenuItem>
+              <MenuItem disabled value="">
+                Nuo
+              </MenuItem>
               {fromOptions.map((opt) => (
-                <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                <MenuItem key={opt} value={opt}>
+                  {opt}
+                </MenuItem>
               ))}
             </Select>
-            <Select value={to} onChange={(e) => setTo(e.target.value as string)} displayEmpty disabled={!from}>
-              <MenuItem disabled value="">Iki</MenuItem>
+            <Select
+              value={to}
+              onChange={(e) => setTo(e.target.value as string)}
+              displayEmpty
+              disabled={!from}
+            >
+              <MenuItem disabled value="">
+                Iki
+              </MenuItem>
               {toOptions.map((opt) => (
-                <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                <MenuItem key={opt} value={opt}>
+                  {opt}
+                </MenuItem>
               ))}
             </Select>
           </DialogContent>
@@ -266,6 +304,5 @@ export default function DaySchedule() {
         </Dialog>
       </Box>
     </div>
-    
   );
 }
