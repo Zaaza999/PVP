@@ -5,6 +5,7 @@ using KomunalinisCentras.Backend.Repositories;
 using KomunalinisCentras.Backend.Entities;
 using KomunalinisCentras.Backend.Services;   // EmailService
 using KomunalinisCentras.Backend.Jobs;       // ReminderJob
+using KomunalinisCentras.Backend.Middleware; // UserStatusMiddleware
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -160,6 +161,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<UserStatusMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

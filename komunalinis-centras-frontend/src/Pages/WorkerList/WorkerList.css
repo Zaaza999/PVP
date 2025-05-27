@@ -33,7 +33,7 @@
   margin-top: 10px;
   padding: 8px 16px;
   font-size: 1rem;
-  background-color: #3f51b5;
+  background-color: #FFC107;
   color: white;
   border: none;
   border-radius: 6px;
@@ -42,5 +42,5 @@
 }
 
 .view-worker-button:hover {
-  background-color: #2c3e91;
+  background-color: #CC9900;
 }

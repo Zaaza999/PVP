@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 import "../styles.css";
 import "./workerDropDown.css"
 import {
@@ -76,7 +77,7 @@ const Main: React.FC = () => {
 
   const [username, setUsername] = useState<string>("Svečias");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
+  const navigate = useNavigate();
   /* --- read JWT once on mount --- */
   useEffect(() => {
     setCurrentUserId(getCurrentUserId());
@@ -142,10 +143,38 @@ const Main: React.FC = () => {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");  
-    localStorage.removeItem("userRole"); 
-    window.location.reload();
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:5190/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Nepavyko atsijungti. Bandykite dar kartą.');
+      }
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("userRole");
+
+      setIsLoggedIn(false);
+      setUsername("Svečias");
+      setCurrentUserId(null);
+      setUser(null);
+      setSelectedLoc(null);
+      setSchedules([]);
+
+      alert("Sėkmingai atsijungėte!");
+
+      navigate("/login");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Nežinoma klaida';
+      console.error("Logout error:", err);
+      alert(errorMessage);
+    }
   };
 
   /* --- helper: date -> WasteType[] --- */
@@ -201,25 +230,25 @@ const Main: React.FC = () => {
           )}
           {(localStorage.getItem("userRole")?.toLowerCase().includes("worker") || 
             localStorage.getItem("userRole") === "admin") && (
-            <>  
-              <li><Link to="/addTime">Pridėti laiką</Link></li> 
-              <li><Link to="/register-worker">Registruoti darbuotoją</Link></li> 
-              <li><Link to="/worker-list">Darbuotojų sąrašas</Link></li>
-              <li><Link to="/application-list">Prašymų sąrašas</Link></li>
-              <li><Link to="/residents">Gyventojų sąrašas</Link></li> 
-              {currentUserId && (
-                <li>
-                <Link to={`/workschedule/${currentUserId}`}>Mano tvarkaraštis</Link>
-                </li>
+              <>
+                <li><Link to="/addTime">Pridėti laiką</Link></li>
+                <li><Link to="/register-worker">Registruoti darbuotoją</Link></li>
+                <li><Link to="/worker-list">Darbuotojų sąrašas</Link></li>
+                <li><Link to="/application-list">Prašymų sąrašas</Link></li>
+                <li><Link to="/residents">Gyventojų sąrašas</Link></li>
+                <li><Link to="/worker-statistics">Darbuotojų statistika</Link></li>
+                {currentUserId && (
+                    <li>
+                      <Link to={`/workschedule/${currentUserId}`}>Mano tvarkaraštis</Link>
+                    </li>
                 )}
-            </>
-          )}            
-          
+              </>
+          )}
         </ul>
       </nav>
 
       <main>
-      {/* SKELBIMAI */}
+        {/* SKELBIMAI */}
         <section className="skelbimai">
           <h2>Naujienos</h2>
           <ul>

@@ -77,8 +77,9 @@ namespace KomunalinisCentras.Backend.Controllers
         {
             var roles = await _userManager.GetRolesAsync(user);
             var userRole = roles.FirstOrDefault() ?? "unknown";
-
-
+            user.IsOnline = true;
+            await _userManager.UpdateAsync(user);
+            
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
@@ -94,7 +95,7 @@ namespace KomunalinisCentras.Backend.Controllers
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddHours(3),
+                expires: DateTime.Now.AddHours(1),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
@@ -104,8 +105,29 @@ namespace KomunalinisCentras.Backend.Controllers
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expiration = token.ValidTo,
                 userId = user.Id,
-                userRole 
+                userRole,
+                isOnline = user.IsOnline
             });
+        }
+        return Unauthorized();
+    }
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        if (User.Identity.IsAuthenticated)
+        {
+            var userId = User.FindFirst("userId")?.Value;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user != null)
+                {
+                    user.IsOnline = false;
+                    await _userManager.UpdateAsync(user);
+                    await _signInManager.SignOutAsync();
+                    return Ok("User logged out");
+                }
+            }
         }
         return Unauthorized();
     }

@@ -29,11 +29,11 @@ const WorkersList: React.FC = () => {
         <div key={worker.id} className="card worker-card">
           <p><strong>Vardas:</strong> {worker.firstName} {worker.lastName}</p>
           <p><strong>El. paštas:</strong> {worker.email}</p>
-          <p><strong>Role:</strong> {formatWorkerRoleName(worker.role?.name)}</p>
+          <p><strong>Rolė:</strong> {formatWorkerRoleName(worker.role?.name)}</p>
           {/* Optional button */}
-          <button className="view-worker-button" onClick={() => navigate(`/worker-list/${worker.id}`)}>Peržiūrėti</button> 
+          <button className="view-worker-button" onClick={() => navigate(`/worker-list/${worker.id}`)}>Peržiūrėti</button>
         </div>
-      ))} 
+      ))}
         <div className="button-wrapper">
             <button className="view-worker-button" onClick={() => navigate("/")}>
                 Grįžti į pagrindinį puslapį

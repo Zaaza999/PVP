@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./WorkerDetails.css"; // Optionally rename to WorkerEdit.css
+import { formatWorkerRoleName } from "../../utils/formatWorkerRoleName";
 
 const WorkerEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState<any>(null);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -26,7 +28,21 @@ const WorkerEdit: React.FC = () => {
     fetchWorker();
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Fetch available roles
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const res = await fetch("http://localhost:5190/users/roles");
+        const data = await res.json();
+        setRoles(data);
+      } catch (err) {
+        console.error("Klaida gaunant roles:", err);
+      }
+    };
+    fetchRoles();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
@@ -45,7 +61,7 @@ const WorkerEdit: React.FC = () => {
       if (!response.ok) throw new Error("Nepavyko atnaujinti duomenų");
 
       alert("Darbuotojo duomenys atnaujinti.");
-      navigate(`/worker-list/${id}`);
+      navigate(`/worker-list/`);
     } catch (err) {
       console.error("Klaida atnaujinant darbuotoją:", err);
       alert("Nepavyko atnaujinti duomenų.");
@@ -72,6 +88,25 @@ const WorkerEdit: React.FC = () => {
             />
           </div>
         ))}
+
+         {/* Role selection */}
+        <div className="form-group">
+          <label htmlFor="roleId">Darbuotojo rolė</label>
+          <select
+            id="roleId"
+            name="roleId"
+            value={formData.roleId || ""}
+            onChange={handleChange}
+            required
+          >
+            <option value="">-- Pasirinkite rolę --</option>
+            {roles.map((role: any) => (
+              <option key={role.id} value={role.id}>
+                {formatWorkerRoleName(role.roleName)}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div className="button-group">
           <button type="button" className="worker-back-button" onClick={() => navigate(-1)}>Atšaukti</button>

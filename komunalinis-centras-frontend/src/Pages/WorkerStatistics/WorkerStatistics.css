@@ -1,0 +1,141 @@
+/* WorkerStatistics.css */
+.worker-statistics.container {
+    min-height: 100vh;
+    background-color: #f7fafc;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.worker-statistics .header {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 24px;
+}
+
+/* Statistics Cards */
+.worker-statistics .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.worker-statistics .card {
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.worker-statistics .card:hover {
+    transform: translateY(-2px);
+}
+
+.worker-statistics .card h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 12px;
+}
+
+.worker-statistics .card p {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.worker-statistics .card p.total-workers {
+    color: #3182ce;
+}
+.worker-statistics .card p.active-workers {
+    color: #38a169;
+}
+.worker-statistics .card p.avg-hours {
+    color: #805ad5;
+}
+.worker-statistics .card p.completion-rate {
+    color: #dd6b20;
+}
+
+/* Table */
+.worker-statistics .table-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    overflow-x: auto;
+}
+
+.worker-statistics table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.worker-statistics thead {
+    background-color: #edf2f7;
+}
+
+.worker-statistics th {
+    padding: 14px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #718096;
+    text-transform: uppercase;
+}
+
+.worker-statistics td {
+    padding: 14px;
+    font-size: 15px;
+    color: #2d3748;
+}
+
+.worker-statistics td.name {
+    font-weight: 500;
+}
+
+.worker-statistics .status-active {
+    display: inline-flex;
+    padding: 5px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #276749;
+    background-color: #c6f6d5;
+    border-radius: 20px;
+}
+
+.worker-statistics .status-inactive {
+    display: inline-flex;
+    padding: 5px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #9b2c2c;
+    background-color: #fed7d7;
+    border-radius: 20px;
+}
+
+.worker-statistics tr {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.worker-statistics tr:last-child {
+    border-bottom: none;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .worker-statistics.container {
+        padding: 16px;
+    }
+
+    .worker-statistics .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .worker-statistics th,
+    .worker-statistics td {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
