@@ -237,18 +237,45 @@ const UserProfile: React.FC = () => {
             <div className="button-wrapper"><button className="btn primary" onClick={save}>Išsaugoti</button><button className="btn btn-delete" onClick={cancelEdit}>Atšaukti</button></div>
           </div>
         ) : (
-          <div className="profile-details">
-            <p><strong>Vardas:</strong> {user.firstName ?? "–"}</p>
-            <p><strong>Pavardė:</strong> {user.lastName ?? "–"}</p>
-            <p><strong>Vartotojo vardas:</strong> {user.username}</p>
-            <p><strong>Adresas:</strong> {formattedAddress()}</p>
-            <p><strong>Telefonas:</strong> {user.phoneNumber ?? "–"}</p>
-            <p><strong>El. paštas:</strong> {user.email ?? "–"}</p>
-            <p><strong>Prenumerata:</strong> {user.subscription ? "Aktyvi" : "Neaktyvi"}
-              {user.subscription && <button className="btn btn-delete ml-2" onClick={unsubscribe}>Atsisakyti</button>}
-            </p>
-            <button className="btn" onClick={() => setIsEditing(true)}>Redaguoti profilį</button>
+          <div className="d-flex justify-content-center">
+            <div style={{ maxWidth: "600px", width: "100%" }}>
+              <div className="card-body">
+                <div className="text-center mb-4">
+                  <h4>{user.firstName ?? "–"} {user.lastName ?? "–"}</h4>
+                </div>
+                <ul className="list-group list-group-flush">
+                  <li className="list-group-item">
+                    <strong>Vartotojo vardas:</strong> {user.username ?? "-"}
+                  </li>
+                  <li className="list-group-item">
+                    <strong>Adresas:</strong> {formattedAddress()}
+                  </li>
+                  <li className="list-group-item">
+                    <strong>Telefonas:</strong> {user.phoneNumber ?? "–"}
+                  </li>
+                  <li className="list-group-item">
+                    <strong>El. paštas:</strong> {user.email ?? "–"}
+                  </li>
+                  <li className="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                      <strong>Prenumerata:</strong> {user.subscription ? "Aktyvi" : "Neaktyvi"}
+                    </span>
+                    {user.subscription && (
+                      <button className="btn btn-outline-danger btn-sm" onClick={unsubscribe}>
+                        Atsisakyti
+                      </button>
+                    )}
+                  </li>
+                </ul>
+                <div className="mt-4 text-center">
+                  <button className="btn btn-warning" onClick={() => setIsEditing(true)}>
+                    Redaguoti profilį
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
+
         )}
       </div>
 

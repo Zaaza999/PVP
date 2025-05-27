@@ -4,6 +4,10 @@ import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import "../styles.css";
 import "./workerDropDown.css"
+import Header from '../../components/Header'
+import Footer from '../../components/Footer'
+import FeaturedNewsSection from '../../components/FeaturedNewsSection ';
+import ContactsSection from '../../components/ContactsSection';
 import {
   getLocations,
   getWasteTypes,
@@ -75,8 +79,8 @@ const Main: React.FC = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [user, setUser] = useState<UserDto | null>(null);        // ⇠ SAVE full user
 
-  const [username, setUsername] = useState<string>("Svečias");
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  // const [username, setUsername] = useState<string>("Svečias");
+  // const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const navigate = useNavigate();
   /* --- read JWT once on mount --- */
   useEffect(() => {
@@ -128,54 +132,6 @@ const Main: React.FC = () => {
       .catch(console.error);
   }, [selectedLoc]);
 
-  /* --- Auth display name --- */
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-    try {
-      const decoded: any = jwtDecode(token);
-      const fullName = `${decoded.firstName || ""} ${decoded.lastName || ""}`.trim(); 
-      setUsername(fullName || "Svečias");
-      setIsLoggedIn(true);
-    } catch {
-      setUsername("Svečias");
-      setIsLoggedIn(false);
-    }
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:5190/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("token")}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Nepavyko atsijungti. Bandykite dar kartą.');
-      }
-
-      localStorage.removeItem("token");
-      localStorage.removeItem("userRole");
-
-      setIsLoggedIn(false);
-      setUsername("Svečias");
-      setCurrentUserId(null);
-      setUser(null);
-      setSelectedLoc(null);
-      setSchedules([]);
-
-      alert("Sėkmingai atsijungėte!");
-
-      navigate("/login");
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Nežinoma klaida';
-      console.error("Logout error:", err);
-      alert(errorMessage);
-    }
-  };
 
   /* --- helper: date -> WasteType[] --- */
   const dateWts = new Map<string, WasteTypeDto[]>();
@@ -196,68 +152,12 @@ const Main: React.FC = () => {
    * ==========================================================*/
   return (
     <div>
-      {/* HEADER */}
-      <header>
-        <div className="header-left"><h1>KPC</h1></div>
-        <div className="header-right">
-          <span>{username}</span>
-          {isLoggedIn ? (
-            <div className="dropdown">
-              <button className="dropbtn">[ ☰ ]</button>
-              <div className="dropdown-content">
-                <Link to="/profile">Profilis</Link>
-                <Link to="/" onClick={e => { e.preventDefault(); handleLogout(); }}>Atsijungti</Link>
-              </div>
-            </div>
-          ) : (
-            <div className="auth-buttons">
-              <Link to="/login" className="auth-link">Prisijungti</Link>
-              <Link to="/register" className="auth-link">Registruotis</Link>
-            </div>
-          )}
-        </div>
-      </header>
 
-      {/* NAV (nekeista) */}
-      <nav>
-        <ul> 
-          {localStorage.getItem("userRole") === "client" && (
-            <>
-            <li><Link to="/invoices">Sąskaitos</Link></li>
-            <li><Link to="/application">Prašymai</Link></li>
-            <li><Link to="/reservation">Rezervacijos</Link></li>
-            </> 
-          )}
-          {(localStorage.getItem("userRole")?.toLowerCase().includes("worker") || 
-            localStorage.getItem("userRole") === "admin") && (
-              <>
-                <li><Link to="/addTime">Pridėti laiką</Link></li>
-                <li><Link to="/register-worker">Registruoti darbuotoją</Link></li>
-                <li><Link to="/worker-list">Darbuotojų sąrašas</Link></li>
-                <li><Link to="/application-list">Prašymų sąrašas</Link></li>
-                <li><Link to="/residents">Gyventojų sąrašas</Link></li>
-                <li><Link to="/worker-statistics">Darbuotojų statistika</Link></li>
-                {currentUserId && (
-                    <li>
-                      <Link to={`/workschedule/${currentUserId}`}>Mano tvarkaraštis</Link>
-                    </li>
-                )}
-              </>
-          )}
-        </ul>
-      </nav>
+      <Header />
 
       <main>
-        {/* SKELBIMAI */}
-        <section className="skelbimai">
-          <h2>Naujienos</h2>
-          <ul>
-            <li>Ieškomas santechnikas</li>
-            <li>Parduodamas garažas</li>
-            <li>Nuomojamas 2 kambarių butas</li>
-            <li>Automobilio dalys už gerą kainą</li>
-          </ul>
-        </section>
+
+        <FeaturedNewsSection />
 
         {/* ATLIEKŲ GRAFIKAS */}
         <section className="atliek-isvezimas">
@@ -343,19 +243,10 @@ const Main: React.FC = () => {
           )}
         </section>
 
-        {/* KONTAKTAI */}
-        <section className="kontaktai">
-          <h2>Kontaktai</h2>
-          <ul>
-            <li>El. paštas: info@fake-mail.lt</li>
-            <li>Tel.: +370 600 00000</li>
-            <li>Adresas: Liepų g. 34, Garliava</li>
-            <li>Darbo laikas: I–V 8:00–17:00</li>
-          </ul>
-        </section>
+        <ContactsSection />
       </main>
 
-      <footer><p>© 2025 KPC. Visos teisės saugomos.</p></footer>
+      <Footer />
     </div>
   );
 };

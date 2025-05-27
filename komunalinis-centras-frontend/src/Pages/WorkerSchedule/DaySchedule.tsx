@@ -182,87 +182,90 @@ export default function DaySchedule() {
   };
 
   return (
-    <Box>
-      {/* Date navigation */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-        <Button onClick={() => setDate((d) => d.subtract(1, "day"))}>◀</Button>
-        <Typography variant="h6" sx={{ minWidth: 110, textAlign: "center" }}>
-          {date.format("YYYY-MM-DD")}
-        </Typography>
-        <Button onClick={() => setDate((d) => d.add(1, "day"))}>▶</Button>
-      </Box>
+    <div className="container">
+      <Box>
+        {/* Date navigation */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+          <Button onClick={() => setDate((d) => d.subtract(1, "day"))}>◀</Button>
+          <Typography variant="h6" sx={{ minWidth: 110, textAlign: "center" }}>
+            {date.format("YYYY-MM-DD")}
+          </Typography>
+          <Button onClick={() => setDate((d) => d.add(1, "day"))}>▶</Button>
+        </Box>
 
-      {/* schedule table */}
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Laikas</TableCell>
-            <TableCell>Tema</TableCell>
-            <TableCell>Aprašymas</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((r, i) => (
-            <TableRow key={i} sx={{ background: r.isFree ? "#f8fff8" : "inherit" }}>
-              <TableCell>{formatHHMM(r.start)}–{formatHHMM(r.end)}</TableCell>
-              <TableCell>{r.isFree ? "-" : r.topic || "-"}</TableCell>
-              <TableCell>
-                {r.isFree
-                  ? "Laisva"
-                  : r.forRezervation
-                  ? r.isTaken
-                    ? r.description || "Rezervuota"
-                    : "Laisva klientams"
-                  : r.description || "Vidinis darbas"}
-              </TableCell>
+        {/* schedule table */}
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>Laikas</TableCell>
+              <TableCell>Tema</TableCell>
+              <TableCell>Aprašymas</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <Button variant="contained" sx={{ mt: 2 }} onClick={() => setOpenAdd(true)}>
-        + Pridėti darbą
-      </Button> 
-      {localStorage.getItem("userRole") !== "worker_admin" && (
-       <div className="button-wrapper">
-        <Link to="/" className="back-button">
-          Grįžti į pagrindinį puslapį
-        </Link>
-      </div>  
-      )} 
-      {localStorage.getItem("userRole") === "worker_admin" && (
-      <div className="button-wrapper">
-        <Link to={"/worker-list"} className="back-button">
-          Atgal
-        </Link>
-      </div> 
-      )}
-
-      {/* dialog */}
-      <Dialog open={openAdd} onClose={() => setOpenAdd(false)}>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 300 }}>
-          <TextField label="Tema" value={topic} onChange={(e) => setTopic(e.target.value)} />
-          <TextField label="Aprašymas" value={description} onChange={(e) => setDescription(e.target.value)} />
-          <Select value={from} onChange={(e) => setFrom(e.target.value as string)} displayEmpty>
-            <MenuItem disabled value="">Nuo</MenuItem>
-            {fromOptions.map((opt) => (
-              <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+          </TableHead>
+          <TableBody>
+            {rows.map((r, i) => (
+              <TableRow key={i} sx={{ background: r.isFree ? "#f8fff8" : "inherit" }}>
+                <TableCell>{formatHHMM(r.start)}–{formatHHMM(r.end)}</TableCell>
+                <TableCell>{r.isFree ? "-" : r.topic || "-"}</TableCell>
+                <TableCell>
+                  {r.isFree
+                    ? "Laisva"
+                    : r.forRezervation
+                    ? r.isTaken
+                      ? r.description || "Rezervuota"
+                      : "Laisva klientams"
+                    : r.description || "Vidinis darbas"}
+                </TableCell>
+              </TableRow>
             ))}
-          </Select>
-          <Select value={to} onChange={(e) => setTo(e.target.value as string)} displayEmpty disabled={!from}>
-            <MenuItem disabled value="">Iki</MenuItem>
-            {toOptions.map((opt) => (
-              <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-            ))}
-          </Select>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenAdd(false)}>Atšaukti</Button>
-          <Button onClick={handleAdd} variant="contained" disabled={!from || !to}>
-            Išsaugoti
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+          </TableBody>
+        </Table>
+
+        <Button variant="contained" sx={{ mt: 2 }} onClick={() => setOpenAdd(true)}>
+          + Pridėti darbą
+        </Button> 
+        {localStorage.getItem("userRole") !== "worker_admin" && (
+        <div className="button-wrapper">
+          <Link to="/" className="back-button">
+            Grįžti į pagrindinį puslapį
+          </Link>
+        </div>  
+        )} 
+        {localStorage.getItem("userRole") === "worker_admin" && (
+        <div className="button-wrapper">
+          <Link to={"/worker-list"} className="back-button">
+            Atgal
+          </Link>
+        </div> 
+        )}
+
+        {/* dialog */}
+        <Dialog open={openAdd} onClose={() => setOpenAdd(false)}>
+          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 300 }}>
+            <TextField label="Tema" value={topic} onChange={(e) => setTopic(e.target.value)} />
+            <TextField label="Aprašymas" value={description} onChange={(e) => setDescription(e.target.value)} />
+            <Select value={from} onChange={(e) => setFrom(e.target.value as string)} displayEmpty>
+              <MenuItem disabled value="">Nuo</MenuItem>
+              {fromOptions.map((opt) => (
+                <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+              ))}
+            </Select>
+            <Select value={to} onChange={(e) => setTo(e.target.value as string)} displayEmpty disabled={!from}>
+              <MenuItem disabled value="">Iki</MenuItem>
+              {toOptions.map((opt) => (
+                <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+              ))}
+            </Select>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenAdd(false)}>Atšaukti</Button>
+            <Button onClick={handleAdd} variant="contained" disabled={!from || !to}>
+              Išsaugoti
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </div>
+    
   );
 }

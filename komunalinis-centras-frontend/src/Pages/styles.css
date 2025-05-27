@@ -715,5 +715,75 @@ body {
 .busy { color:#d32f2f; font-weight:600; }
 .free { color:#2e7d32; font-weight:600; }
 
+a:hover,
+a:focus {
+  text-decoration: none !important;
+  color: white !important;
+}
 
+/* Drop down for darbuotojai */
+.dropdown-nav {
+  position: relative;
+}
 
+.dropdown-nav .dropbtn {
+  cursor: pointer;
+  display: inline-block;
+  color: #fff;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.dropdown-nav .dropbtn:hover {
+  background-color: #ffecb3;
+  color: #333;
+}
+
+.dropdown-nav-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #fff;
+  min-width: 200px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  z-index: 10;
+  border-radius: 4px;
+  padding: 0;
+}
+
+.dropdown-nav-content li {
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-nav-content li:last-child {
+  border-bottom: none;
+}
+
+.dropdown-nav-content .nav-link {
+  display: block;
+  color: #333;
+  padding: 10px 15px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 0;
+}
+
+.dropdown-nav-content .nav-link:hover {
+  background-color: #fdf5e6;
+  color: black !important;
+}
+
+.dropdown-nav:hover .dropdown-nav-content {
+  display: block;
+}
+
+.navbar-nav .dropdown:hover > .dropdown-menu {
+  display: block;
+}
+
+.nav-link.dropbtn {
+  white-space: nowrap;
+}

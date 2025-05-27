@@ -76,7 +76,6 @@ const handleDelete = async () => {
     <div className="container">
       <div className="worker-profile">
         <div className="worker-header">
-          <div className="avatar-placeholder">👤</div>
           <div>
             <h2>{worker.firstName || "---------"} {worker.lastName || "---------"}</h2>
             <p className="role-text">{formatWorkerRoleName(worker.role?.name) || "---------"}</p>
