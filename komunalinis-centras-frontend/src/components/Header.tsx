@@ -87,7 +87,6 @@ const Header: React.FC = () => {
               <li className="nav-item"><Link to="/invoices" className="nav-link">Sąskaitos</Link></li>
               <li className="nav-item"><Link to="/application" className="nav-link">Prašymai</Link></li>
               <li className="nav-item"><Link to="/reservation" className="nav-link">Rezervacijos</Link></li>
-              <li className="nav-item"><Link to="/register-worker" className="nav-link">Registruoti darbuotoją</Link></li>
             </>
           )}
 
