@@ -16,8 +16,9 @@ import WorkerEdit from "./Pages/WorkerDetails/WorkerEdit";
 import ApplicationList from "./Pages/ApplicationList/ApplicationList";
 import ApplicationDetail from "./Pages/ApplicationDetail/ApplicationDetail";
 import ResidentsPage from "./Pages/Residents/ResidentsPage";
-import InvoicePage from './Pages/Bills/Bills';  
-import WorkerSchedule from "./Pages/WorkerSchedule/DaySchedule" 
+import InvoicePage from './Pages/Bills/Invoice';  
+import WorkerSchedule from "./Pages/WorkerSchedule/DaySchedule"  
+
 
 function App() {
   return (

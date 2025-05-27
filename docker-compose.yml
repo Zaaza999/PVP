@@ -1,16 +1,61 @@
-version: '3.8'
 services:
-  db:
-    image: mysql:8.0       # Galite pasirinkti norimą versiją
-    container_name: my_mysql_db
+  # -------------------------------------------------------------------
+  # ASP.NET 8 API konteineris
+  # -------------------------------------------------------------------
+  api:
+    image: mcr.microsoft.com/dotnet/aspnet:8.0          # tik runtime image
+    container_name: komunalinis_api
+    working_dir: /app
+    volumes:
+      - ./publish:/app                                  # bind-mount publikuotų DLL
+    entrypoint: ["dotnet", "KomunalinisCentras.Backend.dll"]
+
+    # → Kestrel klauso 8080; hoste girdės 5000
     environment:
-      - MYSQL_ROOT_PASSWORD=supersecret
-      - MYSQL_DATABASE=komunalinis_db
-      - MYSQL_USER=appuser
-      - MYSQL_PASSWORD=appsecret
+      ASPNETCORE_URLS: "http://+:8080"
+
+      # ---- DB connection string (Program.cs → \"DefaultConnection\")
+      ConnectionStrings__DefaultConnection: "server=db;port=3306;database=komunalinis_db;user=appuser;password=appsecret;SslMode=None"
+
+      # ---- Paysera (ar kito tiekėjo) konfigūra
+      PAYMENT_PROVIDER: "Paysera"
+      PAYSERA_PROJECT_ID: "123456"
+      PAYSERA_SIGN_PASSWORD: "superSecret"
+      PAYSERA_ACCEPT_URL: "http://localhost:5000/pay/success"
+      PAYSERA_CANCEL_URL: "http://localhost:5000/pay/cancel"
+      PAYSERA_CALLBACK_URL: "http://localhost:5000/payments/paysera/callback"
+
     ports:
-      - "3306:3306"        # Išorinį 3306 prievadą "išmapinti" į konteinerio 3306
+      - "5000:8080"                                     # host:container
+
+    # Palaukia, kol DB taps „healthy“
+    depends_on:
+      db:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+  # -------------------------------------------------------------------
+  # MySQL 8
+  # -------------------------------------------------------------------
+  db:
+    image: mysql:8.0
+    container_name: komunalinis_db
+    environment:
+      MYSQL_ROOT_PASSWORD: supersecret
+      MYSQL_DATABASE: komunalinis_db
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: appsecret
+    ports:
+      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+
+    # paprastas healthcheck ‘mysqladmin ping’
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uappuser", "-pappsecret"]
+      interval: 10s
+      retries: 10
+
 volumes:
   db_data:
