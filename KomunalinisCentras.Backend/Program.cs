@@ -182,11 +182,6 @@ app.UseHangfireDashboard("/hangfire");   // 👈 čia
 // --------------------------------------------------
 // Endpoints
 // --------------------------------------------------
-app.MapControllers(); 
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
+app.MapControllers();
 
 app.Run();
