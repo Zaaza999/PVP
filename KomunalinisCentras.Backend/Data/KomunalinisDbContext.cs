@@ -37,7 +37,9 @@ namespace KomunalinisCentras.Backend.Data
 
         // END Application forms and their items
         public DbSet<ApplicationStatus> ApplicationStatuses { get; set; }
-        public DbSet<ApplicationGroup> ApplicationGroups { get; set; }
+        public DbSet<ApplicationGroup> ApplicationGroups { get; set; } 
+        public DbSet<Invoice>  Invoices  => Set<Invoice>();
+        public DbSet<Payment>  Payments  => Set<Payment>();
 
 
 
@@ -150,7 +152,10 @@ namespace KomunalinisCentras.Backend.Data
                         je.ToTable("RoleApplicationGroups");
                         je.HasKey("RoleId", "ApplicationGroupId");
                     }
-                );
+                ); 
+
+            modelBuilder.Entity<Invoice>().Property(i => i.Status).HasConversion<string>();
+            modelBuilder.Entity<Payment>().Property(p => p.Status).HasConversion<string>();
 
         }
     }

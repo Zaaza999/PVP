@@ -1210,7 +1210,40 @@ ALTER TABLE EmployeeTimeSlots
     ADD COLUMN for_rezervation       int  NOT NULL DEFAULT '1'  AFTER description;
 
 ALTER TABLE EmployeeTimeSlots
-    MODIFY COLUMN for_rezervation TINYINT(1) NOT NULL DEFAULT 1;
+    MODIFY COLUMN for_rezervation TINYINT(1) NOT NULL DEFAULT 1; 
+
+
+CREATE TABLE `Invoices` (
+  `Id`            INT AUTO_INCREMENT PRIMARY KEY,
+  `UserId`        VARCHAR(255) NOT NULL,
+  `ApplicationId` INT          NULL,
+  `Amount`        DECIMAL(10,2) NOT NULL,
+  `Currency`      CHAR(3)       NOT NULL DEFAULT 'EUR',
+  `DueDate`       DATE          NOT NULL,
+  `Status`        ENUM('issued','pending','paid','cancelled') NOT NULL DEFAULT 'issued',
+  `CreatedAt`     DATETIME(6)   NOT NULL,
+  `PaidAt`        DATETIME(6)   NULL,
+  INDEX `IX_Invoices_UserId` (`UserId`),
+  FOREIGN KEY (`UserId`)        REFERENCES `Users`(`Id`)        ON DELETE CASCADE,
+  FOREIGN KEY (`ApplicationId`) REFERENCES `Applications`(`Id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `Payments` (
+  `Id`               INT AUTO_INCREMENT PRIMARY KEY,
+  `InvoiceId`        INT          NOT NULL,
+  `Provider`         VARCHAR(50)  NOT NULL,      -- „Paysera“, „Stripe“, „BankLink“ …
+  `ProviderTxnId`    VARCHAR(128) NOT NULL,      -- mokėjimo šliuzo ID
+  `Amount`           DECIMAL(10,2) NOT NULL,
+  `Currency`         CHAR(3)       NOT NULL,
+  `Status`           ENUM('initiated','in_progress','succeeded','failed','refunded') 
+                     NOT NULL DEFAULT 'initiated',
+  `CreatedAt`        DATETIME(6)   NOT NULL,
+  `UpdatedAt`        DATETIME(6)   NOT NULL,
+  `RawPayload`       JSON          NULL,         -- webhook/body saugiam log’ui
+  INDEX `IX_Payments_InvoiceId` (`InvoiceId`),
+  FOREIGN KEY (`InvoiceId`) REFERENCES `Invoices`(`Id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

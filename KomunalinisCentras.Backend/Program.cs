@@ -10,7 +10,9 @@ using KomunalinisCentras.Backend.Middleware; // UserStatusMiddleware
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens; 
+using System.Text.Json;
+
 
 using Hangfire;
 using Hangfire.MySql;
@@ -87,6 +89,12 @@ builder.Services.AddScoped<IApplicationRepository<ContainerSizeChangeRequest>, C
 builder.Services.AddScoped<IApplicationRepository<PayerDataChangeRequest>, PayerDataChangeRequestRepository>();
 builder.Services.AddScoped<IApplicationRepository<PropertyUnsuitability>, PropertyUnsuitabilityRepository>();
 builder.Services.AddScoped<IApplicationStatusRepository, ApplicationStatusRepository>();
+builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>(); 
+
+builder.Services.AddScoped<IBillingService, BillingService>();
+// Pavyzdys: PayseraGateway implementuoja IPaymentGateway
+builder.Services.AddScoped<IPaymentGateway, PayseraGateway>();
 
 
 // --------------------------------------------------
@@ -119,7 +127,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(p => p.AddPolicy("AllowAll", policy =>
-    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader())); 
+
+
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.PropertyNamingPolicy  = JsonNamingPolicy.CamelCase;
+        o.JsonSerializerOptions.DictionaryKeyPolicy   = JsonNamingPolicy.CamelCase;
+    });
+
 
 var app = builder.Build();
 
