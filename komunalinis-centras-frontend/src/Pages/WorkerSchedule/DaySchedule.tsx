@@ -21,15 +21,14 @@ import {
 import {
   getEmployeeDaySchedule,
   addEmployeeTask,
+  deleteTimeSlot,   // <-- pridėta
 } from "../Axios/apiServises";
 
 /* -------------------------------------------------- */
 const STEP_MIN = 30;
 const DAY_START_MIN = 8 * 60; // 08:00
 const DAY_END_MIN = 17 * 60;  // 17:00
-// Desired maximum container height in pixels:
 const TARGET_CONTAINER_HEIGHT = 600;
-// Calculate scale so that full day fits into target height:
 const PIXEL_PER_MIN = TARGET_CONTAINER_HEIGHT / (DAY_END_MIN - DAY_START_MIN);
 
 interface SlotDto {
@@ -89,6 +88,16 @@ export default function DaySchedule() {
   };
   useEffect(fetchSchedule, [employeeId, date]);
 
+  // Nauja: atšaukimo funkcija
+  const handleCancel = (slotId: number) => {
+    if (!employeeId) return;
+    deleteTimeSlot(slotId)
+      .then(() => {
+        fetchSchedule();
+      })
+      .catch(console.error);
+  };
+
   // Merge overlapping busy segments
   const busySegments: Segment[] = useMemo(() => {
     const arr = slots.map((s) => ({
@@ -140,7 +149,8 @@ export default function DaySchedule() {
         isFree: false,
         forRezervation: s.forRezervation,
         isTaken: s.isTaken,
-      });
+        timeSlotId: s.timeSlotId, // implicit field for cancel
+      } as any);
       cursor = end;
     });
     if (cursor < DAY_END_MIN) list.push({ start: cursor, end: DAY_END_MIN, isFree: true });
@@ -218,10 +228,11 @@ export default function DaySchedule() {
                 <TableCell>Laikas</TableCell>
                 <TableCell>Tema</TableCell>
                 <TableCell>Aprašymas</TableCell>
+                <TableCell>Veiksmai</TableCell> {/* naujas stulpelis */}
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((r, i) => (
+              {rows.map((r: any, i) => (
                 <TableRow
                   key={i}
                   sx={{
@@ -243,6 +254,17 @@ export default function DaySchedule() {
                         : "Laisva klientams"
                       : r.description || "Vidinis darbas"}
                   </TableCell>
+                  <TableCell>
+                    {!r.isFree && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleCancel(r.timeSlotId)}
+                      >
+                        Atšaukti
+                      </Button>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -254,10 +276,10 @@ export default function DaySchedule() {
         </Button> 
 
         <Link to="/" className="back-button" style={{ marginTop: 8, display: 'block' }}>
-            Grįžti į pagrindinį puslapį
+          Grįžti į pagrindinį puslapį
         </Link>
         {localStorage.getItem("userRole") !== "worker_admin" ? (
-            <></>
+          <></>
         ) : (
           <Link to="/worker-list" className="back-button" style={{ marginTop: 8, display: 'block' }}>
             Atgal į darbuotojų sąrašą 
