@@ -93,16 +93,18 @@ const Header: React.FC = () => {
           {(userRole?.toLowerCase().includes("worker") || userRole === "admin") && (
             <>
               <li className="nav-item"><Link to="/addTime" className="nav-link">Pridėti laiką</Link></li>
-
-              {/* Dropdown for Darbuotojai */}
-              <li className="nav-item dropdown-nav">
-                <span className="nav-link dropbtn block">Darbuotojai ▾</span>
-                <ul className="dropdown-nav-content">
-                  <li><Link to="/register-worker" className="nav-link">Registruoti darbuotoją</Link></li>
-                  <li><Link to="/worker-list" className="nav-link">Darbuotojų sąrašas</Link></li>
-                  <li><Link to="/worker-statistics" className="nav-link">Darbuotojų statistika</Link></li>
-                </ul>
-              </li>
+              {(userRole?.toLowerCase().includes("admin")) && (
+                <>
+                <li className="nav-item dropdown-nav">
+                  <span className="nav-link dropbtn block">Darbuotojai ▾</span>
+                  <ul className="dropdown-nav-content">
+                    <li><Link to="/register-worker" className="nav-link">Registruoti darbuotoją</Link></li>
+                    <li><Link to="/worker-list" className="nav-link">Darbuotojų sąrašas</Link></li>
+                    <li><Link to="/worker-statistics" className="nav-link">Darbuotojų statistika</Link></li>
+                  </ul>
+                </li>  
+               </>
+              )}
 
               <li className="nav-item"><Link to="/application-list" className="nav-link">Prašymų sąrašas</Link></li>
               <li className="nav-item"><Link to="/residents" className="nav-link">Gyventojų sąrašas</Link></li>

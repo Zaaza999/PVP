@@ -1,7 +1,9 @@
 // src/pages/bills/Invoice.tsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../styles.css";  // Įsitikinkite, kad kelias atitinka jūsų projekto struktūrą
+import "../styles.css";  // Įsitikinkite, kad kelias atitinka jūsų projekto struktūrą 
+import { Link, useParams } from "react-router-dom";
+
 
 interface Invoice {
   id: number;
@@ -201,9 +203,17 @@ export default function InvoicePage() {
                 disabled={payingAll || totalUnpaid === 0}
               >
                 Apmokėti viską
-              </button>
-            </div>
-          )}
+              </button>  
+
+            </div> 
+            
+            
+          )} 
+          <div className="button-wrapper">
+                <Link to="/" className="back-button">
+                  Grįžti
+                </Link>
+          </div>
         </>
       )}
     </div>

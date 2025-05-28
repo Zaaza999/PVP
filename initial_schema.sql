@@ -1245,7 +1245,16 @@ CREATE TABLE `Payments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE Invoices
-	ADD COLUMN `topic` varchar(50) NOT NULL DEFAULT ""
+	ADD COLUMN `topic` varchar(50) NOT NULL DEFAULT "" 
+
+
+LOCK TABLES `VisitTopics` WRITE;
+/*!40000 ALTER TABLE `VisitTopics` DISABLE KEYS */;
+INSERT INTO `VisitTopics` VALUES (4,'Sutarčių sudarymas','Pasirašyti naują sutartį ar pratęsti seną', 2);
+INSERT INTO `VisitTopics` VALUES (2,'Klaidos sąskaitose','Sąskaitų tikslinimas, korekcijos', 3);
+INSERT INTO `VisitTopics` VALUES (3,'Bendros konsultacijos','Bendro pobūdžio klausimai ir konsultacijos', 4);
+/*!40000 ALTER TABLE `VisitTopics` ENABLE KEYS */;
+UNLOCK TABLES;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
