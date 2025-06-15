@@ -46,7 +46,11 @@ export const addEmployeeTask = (employeeId: string, data: {
   }
 ) => apiCall( "add", `EmployeeTimeSlots/employee/${employeeId}/add-task`, "", data ); 
 // export const addEmployeeTask = (employeeId: string, data: AddTaskReq) =>
-//   apiCall("post", `EmployeeTimeSlots/employee/${employeeId}/add-task`, "", data);
+//   apiCall("post", `EmployeeTimeSlots/employee/${employeeId}/add-task`, "", data);  
+
+
+
+
 
 
     

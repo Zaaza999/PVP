@@ -20,7 +20,6 @@ namespace KomunalinisCentras.Backend.Data
         public DbSet<WasteType> WasteTypes { get; set; }
         public DbSet<GarbageCollectionSchedule> GarbageCollectionSchedules { get; set; } 
         public DbSet<Application> Applications { get; set; }
-        // START Application forms and their items
         public DbSet<PropertyUsageDeclaration> PropertyUsageDeclarations { get; set; }
         public DbSet<PropertyUsageDeclarationEntry> PropertyUsageDeclarationEntries { get; set; }
         public DbSet<ResidentCountDeclaration> ResidentCountDeclarations { get; set; }
@@ -35,7 +34,6 @@ namespace KomunalinisCentras.Backend.Data
         public DbSet<ContainerRequest> ContainerRequests { get; set; }
         public DbSet<ContainerSizeChangeRequest> ContainerSizeChangeRequests { get; set; }
 
-        // END Application forms and their items
         public DbSet<ApplicationStatus> ApplicationStatuses { get; set; }
         public DbSet<ApplicationGroup> ApplicationGroups { get; set; } 
         public DbSet<Invoice>  Invoices  => Set<Invoice>();
@@ -47,7 +45,6 @@ namespace KomunalinisCentras.Backend.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Map to the new table names from the SQL script
             modelBuilder.Entity<Role>().ToTable("Roles");
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<VisitTopic>().ToTable("VisitTopics");
@@ -72,7 +69,6 @@ namespace KomunalinisCentras.Backend.Data
             modelBuilder.Entity<ApplicationGroup>().ToTable("ApplicationGroups");
 
 
-            // Example relationships (if you want explicit configuration)
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
@@ -84,10 +80,6 @@ namespace KomunalinisCentras.Backend.Data
                 .HasForeignKey(e => e.EmployeeId)
                 .HasPrincipalKey(u => u.Id);
 
-            //modelBuilder.Entity<EmployeeTimeSlot>()
-            //    .HasOne(e => e.Topic)
-            //    .WithMany()
-            //    .HasForeignKey(e => e.TopicId);
 
             modelBuilder.Entity<Reservation>()
                 .HasOne(r => r.User)
@@ -152,10 +144,22 @@ namespace KomunalinisCentras.Backend.Data
                         je.ToTable("RoleApplicationGroups");
                         je.HasKey("RoleId", "ApplicationGroupId");
                     }
-                ); 
+                );
 
             modelBuilder.Entity<Invoice>().Property(i => i.Status).HasConversion<string>();
-            modelBuilder.Entity<Payment>().Property(p => p.Status).HasConversion<string>();
+            modelBuilder.Entity<Payment>().Property(p => p.Status).HasConversion<string>(); 
+            
+            modelBuilder.Entity<Invoice>(cfg =>
+            {
+                cfg.Property(i => i.Amount).HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<Payment>(cfg =>
+            {
+                cfg.Property(p => p.Amount).HasPrecision(18, 2);
+                cfg.Property(p => p.Provider).HasMaxLength(50);
+                cfg.HasIndex(p => new { p.Provider, p.ProviderTxnId }).IsUnique();
+            });
 
         }
     }

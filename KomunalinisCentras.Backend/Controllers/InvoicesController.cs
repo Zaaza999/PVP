@@ -1,4 +1,5 @@
-// Controllers/InvoicesController.cs
+using System.Linq;
+using System.Threading.Tasks;
 using KomunalinisCentras.Backend.Data;
 using KomunalinisCentras.Backend.Dtos;
 using Microsoft.AspNetCore.Mvc;
@@ -13,21 +14,19 @@ namespace KomunalinisCentras.Backend.Controllers
         private readonly KomunalinisDbContext _db;
         public InvoicesController(KomunalinisDbContext db) => _db = db;
 
-        // GET /invoices
+        // GET /invoices – visų sąskaitų sąrašas
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var invoices = await _db.Invoices
-                .Include(i => i.Payments)
-                .ToListAsync();
-
-            var dtos = invoices.Select(i => {
-                var paidSoFar = i.Payments.Sum(p => p.Amount);
+            var invoices = await _db.Invoices.Include(i => i.Payments).ToListAsync();
+            var dtos = invoices.Select(i =>
+            {
+                var paid = i.Payments.Sum(p => p.Amount);
                 return new InvoiceDto(
-                    Id: i.Id,
+                    Id:        i.Id.ToString(),
                     Amount:    i.Amount,
-                    Remaining: i.Amount - paidSoFar,         // ← čia
-                    Currency:  i.Currency, 
+                    Remaining: i.Amount - paid,
+                    Currency:  i.Currency,
                     Topic:     i.Topic,
                     DueDate:   i.DueDate,
                     Status:    i.Status.ToString(),
@@ -40,40 +39,30 @@ namespace KomunalinisCentras.Backend.Controllers
                         p.ProviderTxnId,
                         p.Status.ToString(),
                         p.CreatedAt,
-                        p.UpdatedAt
-                    ))
+                        p.UpdatedAt))
                 );
             });
-
             return Ok(dtos);
         }
-        // GET /invoices/5
+
+        // GET /invoices/{id}
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var invoice = await _db.Invoices
-                .Include(inv => inv.Payments)
-                .FirstOrDefaultAsync(inv => inv.Id == id);
+            var inv = await _db.Invoices.Include(i => i.Payments).FirstOrDefaultAsync(i => i.Id == id);
+            if (inv == null) return NotFound();
 
-            if (invoice is null) 
-                return NotFound();
-
-            // Kiek jau sumokėta
-            var paidSoFar = invoice.Payments.Sum(p => p.Amount);
-
-            // Kiek liko susimokėti
-            var remaining = invoice.Amount - paidSoFar;
-
+            var paid = inv.Payments.Sum(p => p.Amount);
             var dto = new InvoiceDto(
-                Id:        invoice.Id,
-                Amount:    invoice.Amount,
-                Remaining: remaining,           // ← perduodame apskaičiuotą likutį
-                Currency:  invoice.Currency,
-                Topic:     invoice.Topic,
-                DueDate:   invoice.DueDate,
-                Status:    invoice.Status.ToString(),
-                PaidAt:    invoice.PaidAt,
-                Payments:  invoice.Payments.Select(p => new PaymentDto(
+                Id:        inv.Id.ToString(),
+                Amount:    inv.Amount,
+                Remaining: inv.Amount - paid,
+                Currency:  inv.Currency,
+                Topic:     inv.Topic,
+                DueDate:   inv.DueDate,
+                Status:    inv.Status.ToString(),
+                PaidAt:    inv.PaidAt,
+                Payments:  inv.Payments.Select(p => new PaymentDto(
                     p.Id,
                     p.Amount,
                     p.Currency,
@@ -81,10 +70,8 @@ namespace KomunalinisCentras.Backend.Controllers
                     p.ProviderTxnId,
                     p.Status.ToString(),
                     p.CreatedAt,
-                    p.UpdatedAt
-                ))
+                    p.UpdatedAt))
             );
-
             return Ok(dto);
         }
     }

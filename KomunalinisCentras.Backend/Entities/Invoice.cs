@@ -1,8 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;   
-using System.Text.Json.Serialization; 
-
 
 namespace KomunalinisCentras.Backend.Entities
 {
@@ -33,7 +31,7 @@ namespace KomunalinisCentras.Backend.Entities
         [Column("PaidAt")]
         public DateTime? PaidAt { get; set; } 
 
-         [Column("topic")]
+        [Column("topic")]
         public string Topic { get; set; } 
 
         [JsonIgnore]

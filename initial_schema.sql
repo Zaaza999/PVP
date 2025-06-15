@@ -1256,6 +1256,16 @@ INSERT INTO `VisitTopics` VALUES (3,'Bendros konsultacijos','Bendro pobūdžio k
 /*!40000 ALTER TABLE `VisitTopics` ENABLE KEYS */;
 UNLOCK TABLES;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+ALTER TABLE Invoices  MODIFY Amount decimal(18,2) NOT NULL;
+ALTER TABLE Payments  MODIFY Amount decimal(18,2) NOT NULL;
+
+ALTER TABLE Invoices  MODIFY Status ENUM('Issued','Pending','Paid','Cancelled') NOT NULL DEFAULT 'Issued';
+ALTER TABLE Payments  MODIFY Status ENUM('Initiated','InProgress','Succeeded','Failed','Refunded') NOT NULL DEFAULT 'Initiated';
+
+ALTER TABLE Payments  ADD UNIQUE IX_Payments_Provider_Txn (Provider, ProviderTxnId);
+
+ALTER TABLE Payments  MODIFY CreatedAt datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+                      MODIFY UpdatedAt datetime(6) NOT NULL;
+ALTER TABLE Payments
+  DROP INDEX IX_Payments_Provider_Txn,
+  ADD UNIQUE INDEX IX_Payments_Provider_Txn_Inv (Provider, ProviderTxnId, invoice_id);

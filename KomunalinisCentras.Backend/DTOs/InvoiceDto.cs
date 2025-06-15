@@ -2,7 +2,7 @@
 namespace KomunalinisCentras.Backend.Dtos
 {
     public record InvoiceDto(
-        int Id,
+        string Id,
         decimal Amount,
         decimal Remaining,           // ← NAUJAS laukas
         string Currency,

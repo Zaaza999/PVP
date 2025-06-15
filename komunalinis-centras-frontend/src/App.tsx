@@ -18,7 +18,8 @@ import ApplicationDetail from "./Pages/ApplicationDetail/ApplicationDetail";
 import ResidentsPage from "./Pages/Residents/ResidentsPage";
 import InvoicePage from './Pages/Bills/Invoice';
 import WorkerSchedule from "./Pages/WorkerSchedule/DaySchedule"
-import WorkerStatistics from './Pages/WorkerStatistics/WorkerStatistics'
+import WorkerStatistics from './Pages/WorkerStatistics/WorkerStatistics' 
+import PaymentSuccess from "./Pages/Bills/PaymentSuccess";
 
 function App() {
   return (
@@ -40,9 +41,11 @@ function App() {
         <Route path="/application-list/:formType/:formId" element={<ApplicationDetail />} />
         <Route path="/residents" element={<ResidentsPage />} />
         <Route path="/application" element={<Application />} /> 
-        <Route path="/invoices" element={<InvoicePage />} />
+        <Route path="/invoices" element={<InvoicePage />} /> 
+        <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/workschedule/:employeeId" element={<WorkerSchedule />} />
-        <Route path="/worker-statistics" element={<WorkerStatistics />} />
+        <Route path="/worker-statistics" element={<WorkerStatistics />} /> 
+        <Route path="*" element={<p>404 – Nerasta</p>} />
       </Routes>
     </Router>
   );

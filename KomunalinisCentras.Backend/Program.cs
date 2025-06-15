@@ -5,7 +5,10 @@ using KomunalinisCentras.Backend.Repositories;
 using KomunalinisCentras.Backend.Entities;
 using KomunalinisCentras.Backend.Services;   // EmailService
 using KomunalinisCentras.Backend.Jobs;       // ReminderJob
-using KomunalinisCentras.Backend.Middleware; // UserStatusMiddleware
+using KomunalinisCentras.Backend.Middleware; // UserStatusMiddleware 
+using Serilog;
+using KomunalinisCentras.Backend.Gateways;
+
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -90,7 +93,10 @@ builder.Services.AddScoped<IApplicationRepository<PayerDataChangeRequest>, Payer
 builder.Services.AddScoped<IApplicationRepository<PropertyUnsuitability>, PropertyUnsuitabilityRepository>();
 builder.Services.AddScoped<IApplicationStatusRepository, ApplicationStatusRepository>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>(); 
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();  
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+builder.Services.AddScoped<IStripeGateway, KomunalinisCentras.Backend.Gateways.StripeGateway>();
+
 
 builder.Services.AddScoped<IBillingService, BillingService>();
 // Pavyzdys: PayseraGateway implementuoja IPaymentGateway
@@ -116,7 +122,25 @@ builder.Services.AddHangfire(cfg =>
         })));
 
 
-builder.Services.AddHangfireServer();
+builder.Services.AddHangfireServer(); 
+
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateLogger();
+
+// ---- 2. Minimal hosting model: pririšame Serilog prie host ----
+builder.Host.UseSerilog();
+
+// ---- 3. Paslaugos (DI) ----
+builder.Services.AddControllers();
+builder.Services.AddDbContext<KomunalinisDbContext>(opt =>
+    opt.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    ));
 
 // --------------------------------------------------
 // MVC, Swagger, CORS

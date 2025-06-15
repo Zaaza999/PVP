@@ -1,10 +1,8 @@
-// Services/BillingService.cs
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using KomunalinisCentras.Backend.Entities;
 using KomunalinisCentras.Backend.Repositories;
-using KomunalinisCentras.Backend.Services;
 
 namespace KomunalinisCentras.Backend.Services
 {
@@ -12,19 +10,19 @@ namespace KomunalinisCentras.Backend.Services
     {
         private readonly IInvoiceRepository _invoiceRepo;
         private readonly IPaymentRepository _paymentRepo;
-        private readonly IPaymentGateway _gateway;
+        private readonly IPaymentGateway    _gateway;
 
         public BillingService(
             IInvoiceRepository invoiceRepo,
             IPaymentRepository paymentRepo,
-            IPaymentGateway gateway)
+            IPaymentGateway    gateway)
         {
             _invoiceRepo = invoiceRepo;
             _paymentRepo = paymentRepo;
             _gateway     = gateway;
         }
 
-        public async Task<string> InitiatePaymentAsync(int invoiceId, string provider)
+        public async Task<string> InitiatePaymentAsync(int invoiceId, decimal amount)
         {
             var invoice = await _invoiceRepo.GetByIdAsync(invoiceId)
                 ?? throw new KeyNotFoundException("Invoice not found");
@@ -32,59 +30,73 @@ namespace KomunalinisCentras.Backend.Services
             if (invoice.Status == InvoiceStatus.Paid)
                 throw new InvalidOperationException("Invoice already paid");
 
-            // Sukuriame Payment įrašą
+            var paidTotal = invoice.Payments
+                ?.Where(p => p.Status == PaymentStatus.Succeeded)
+                .Sum(p => p.Amount) ?? 0m;
+
+            var remaining = invoice.Amount - paidTotal;
+            if (amount <= 0 || amount > remaining)
+                throw new ArgumentOutOfRangeException(nameof(amount), $"Amount must be between 0 and {remaining:0.00}");
+
             var payment = new Payment
             {
                 InvoiceId = invoice.Id,
-                Provider  = provider,
-                Amount    = invoice.Amount,
+                Provider  = "Paysera",
+                Amount    = amount,
                 Currency  = invoice.Currency,
                 Status    = PaymentStatus.Initiated,
                 CreatedAt = DateTime.UtcNow
             };
-
             await _paymentRepo.CreateAsync(payment);
 
-            // Gauname peradresavimo URL iš gateway
-            var redirectUrl = await _gateway.StartPaymentAsync(invoice, payment);
+            var redirect = await _gateway.StartPaymentAsync(invoice, payment);
 
-            // Pažymime sąskaitą „Pending“ ir išsaugome
             invoice.Status = InvoiceStatus.Pending;
             await _invoiceRepo.UpdateAsync(invoice);
 
-            return redirectUrl;
+            return redirect;
         }
 
         public async Task HandleProviderCallbackAsync(string provider, string payload)
         {
-            // Iš providerio gauname tranzakcijos ID ir statusą
-            var (providerTxnId, status, raw) = _gateway.ParseCallback(payload);
+            var (txnId, status, raw) = _gateway.ParseCallback(payload);
 
-            // Randame Payment pagal providerTxnId
-            var payment = await _paymentRepo.GetByProviderTxnAsync(provider, providerTxnId)
+            var payment = await _paymentRepo.GetByProviderTxnAsync(provider, txnId)
                 ?? throw new KeyNotFoundException("Payment not found");
 
-            // Atnaujiname mokėjimo statusą
-            payment.Status = status;
-            payment.UpdatedAt = DateTime.UtcNow;
+            payment.Status     = status;
+            payment.ProviderTxnId = txnId;
+            payment.UpdatedAt  = DateTime.UtcNow;
             payment.RawPayload = raw;
             await _paymentRepo.UpdateAsync(payment);
 
-            // Jei sėkminga – pažymime ir sąskaitą „Paid“
+            var invoice = await _invoiceRepo.GetByIdAsync(payment.InvoiceId)
+                ?? throw new KeyNotFoundException("Invoice not found");
+
             if (status == PaymentStatus.Succeeded)
             {
-                var invoice = await _invoiceRepo.GetByIdAsync(payment.InvoiceId)
-                    ?? throw new KeyNotFoundException("Invoice not found");
+                var totalPaid = invoice.Payments
+                    .Where(p => p.Status == PaymentStatus.Succeeded)
+                    .Sum(p => p.Amount);
 
-                invoice.Status = InvoiceStatus.Paid;
-                invoice.PaidAt  = DateTime.UtcNow;
-                await _invoiceRepo.UpdateAsync(invoice);
+                if (totalPaid >= invoice.Amount)
+                {
+                    invoice.Status = InvoiceStatus.Paid;
+                    invoice.PaidAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    invoice.Status = InvoiceStatus.Pending;
+                }
             }
-        }
+            else if (status == PaymentStatus.Failed)
+            {
+                var anySucceeded = invoice.Payments
+                    .Any(p => p.Status == PaymentStatus.Succeeded);
+                invoice.Status = anySucceeded ? InvoiceStatus.Pending : InvoiceStatus.Issued;
+            }
 
-        public Task<string> InitiatePaymentAsync(int invoiceId, decimal amount)
-        {
-            throw new NotImplementedException();
+            await _invoiceRepo.UpdateAsync(invoice);
         }
     }
 }
