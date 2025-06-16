@@ -14,7 +14,6 @@ namespace KomunalinisCentras.Backend.Controllers
         private readonly KomunalinisDbContext _db;
         public InvoicesController(KomunalinisDbContext db) => _db = db;
 
-        // GET /invoices – visų sąskaitų sąrašas
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -45,7 +44,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(dtos);
         }
 
-        // GET /invoices/{id}
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {

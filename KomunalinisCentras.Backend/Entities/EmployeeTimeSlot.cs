@@ -35,11 +35,6 @@ namespace KomunalinisCentras.Backend.Entities
         [Column("for_rezervation")]
         public bool ForRezervation { get; set; } = true;
 
-        //[Column("topic_id")]
-        //public int TopicId { get; set; }
-        // EmployeeTimeSlot.cs 
-
-        // Navigacinės savybės 
         [JsonIgnore]
         public User? Employee { get; set; }
         //public VisitTopic? Topic { get; set; }

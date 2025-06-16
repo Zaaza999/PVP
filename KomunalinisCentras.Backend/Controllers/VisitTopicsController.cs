@@ -15,7 +15,6 @@ namespace KomunalinisCentras.Backend.Controllers
             _visitTopicRepository = visitTopicRepository;
         }
 
-        // GET /visittopics
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -23,7 +22,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(topics);
         }
 
-        // GET /visittopics/1
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -34,7 +32,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(topic);
         }
 
-        // POST /visittopics
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] VisitTopic newTopic)
         {
@@ -42,7 +39,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return CreatedAtAction(nameof(GetById), new { id = newTopic.TopicId }, newTopic);
         }
 
-        // PUT /visittopics/1
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] VisitTopic updatedTopic)
         {
@@ -53,7 +49,6 @@ namespace KomunalinisCentras.Backend.Controllers
             if (existingTopic == null)
                 return NotFound();
 
-            // Atnaujiname laukus
             existingTopic.TopicName = updatedTopic.TopicName;
             existingTopic.Description = updatedTopic.Description;
 
@@ -61,7 +56,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        // DELETE /visittopics/1
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

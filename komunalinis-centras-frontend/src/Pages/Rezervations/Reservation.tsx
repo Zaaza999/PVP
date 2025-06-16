@@ -1,4 +1,3 @@
-// src/Pages/Rezervations/Reservation.tsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -10,7 +9,6 @@ import {
 } from "../Axios/apiServises";
 import "../styles.css";
 
-/* ===== helper: JWT → userId (string) ===== */
 const getCurrentUserId = (): string | null => {
   const token = localStorage.getItem("token");
   if (!token) return null;
@@ -22,11 +20,10 @@ const getCurrentUserId = (): string | null => {
   }
 };
 
-/* ===== DTO types ===== */
 export type EmployeeTimeSlot = {
   timeSlotId: number;
   employeeId: number;
-  slotDate: string; // ISO-8601
+  slotDate: string;
   timeFrom: string;
   timeTo: string;
   isTaken: boolean;
@@ -40,7 +37,6 @@ export type VisitTopic = {
 
 type EmployeeNameMap = Record<number, string>;
 
-/* ===== date helpers ===== */
 const setToMidnight = (d: Date) =>
   new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
@@ -57,7 +53,6 @@ const addDays = (date: Date, days: number): Date => {
   return d;
 };
 
-/* ====== COMPONENT ====== */
 const WeeklyScheduleReservation: React.FC = () => {
   const navigate = useNavigate();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -83,7 +78,6 @@ const WeeklyScheduleReservation: React.FC = () => {
 
   const [submitted, setSubmitted] = useState(false);
 
-  /* --- INIT: fetch user + topics --- */
   useEffect(() => {
     setCurrentUserId(getCurrentUserId());
 
@@ -92,7 +86,6 @@ const WeeklyScheduleReservation: React.FC = () => {
       .catch(err => console.error("Klaida gaunant temas:", err));
   }, []);
 
-  /* --- kada pasikeičia tema, gaunam laikus --- */
   useEffect(() => {
     if (selectedTopicId == null) {
       setEmployeeTimeSlots([]);
@@ -108,7 +101,6 @@ const WeeklyScheduleReservation: React.FC = () => {
       .catch(err => console.error("Klaida gaunant laiko langus:", err));
   }, [selectedTopicId]);
 
-  /* --- fetch missing employee names --- */
   useEffect(() => {
     if (employeeTimeSlots.length === 0) return;
 
@@ -131,7 +123,6 @@ const WeeklyScheduleReservation: React.FC = () => {
       .catch(err => console.error("Klaida gaunant vardus:", err));
   }, [employeeTimeSlots, employeeNames]);
 
-  /* --- savaičių navigacija --- */
   const handlePreviousWeek = () => {
     setCurrentWeekStart(addDays(currentWeekStart, -7));
     setSelectedTimeSlotId(null);
@@ -148,7 +139,6 @@ const WeeklyScheduleReservation: React.FC = () => {
     setSubmitted(false);
   };
 
-  /* --- form handlers --- */
   const handleTopicChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = parseInt(e.target.value, 10);
     setSelectedTopicId(isNaN(val) ? null : val);
@@ -188,14 +178,12 @@ const WeeklyScheduleReservation: React.FC = () => {
       .catch(err => console.error("Klaida kuriant rezervaciją:", err));
   };
 
-  /* --- filtruojam pagal savaitę --- */
   const visibleSlots = employeeTimeSlots.filter((slot: EmployeeTimeSlot) => {
     const d = new Date(slot.slotDate.split("T")[0]);
     const weekEnd = addDays(currentWeekStart, 6);
     return d >= currentWeekStart && d <= weekEnd;
   });
 
-  /* ===== render ===== */
   if (submitted) {
     return (
       <div className="weekly-schedule-container">
@@ -298,7 +286,6 @@ const WeeklyScheduleReservation: React.FC = () => {
           </tbody>
         </table>
 
-        {/* Pasirinkimo santrauka */}
         {selectedTimeSlotId && selectedDate && (
           <div className="selected-info">
             <p>Laiko lango ID: {selectedTimeSlotId}</p>

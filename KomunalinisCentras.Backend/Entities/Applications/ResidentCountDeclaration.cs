@@ -20,8 +20,8 @@ namespace KomunalinisCentras.Backend.Entities
         public string ApplicantFullName { get; set; } = null!;
 
         [Required]
-        public double Area { get; set; } // bendrasPlotas
+        public double Area { get; set; } 
 
-        public List<Resident> Residents { get; set; } = new(); // gyventojai
+        public List<Resident> Residents { get; set; } = new(); 
     }
 }

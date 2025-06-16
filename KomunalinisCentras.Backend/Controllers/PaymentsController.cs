@@ -36,10 +36,8 @@ namespace KomunalinisCentras.Backend.Controllers
             if (dto.Amount <= 0 || dto.Amount > remaining)
                 return BadRequest($"Galima apmokėti 0 < suma ≤ {remaining:F2}");
 
-            // 1. Sukuriame Stripe sesiją
             var (url, sessionId) = await _stripe.CreateCheckoutSessionAsync(invoice, dto.Amount);
 
-            // 2. Įrašome Payment su sessionId
             var payment = new Payment
             {
                 InvoiceId = invoiceId,

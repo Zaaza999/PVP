@@ -25,7 +25,6 @@ namespace KomunalinisCentras.Backend.Controllers
         }
 
 
-        // GET /users
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -33,7 +32,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(users);
         }
 
-        // GET /users/workers
         [HttpGet("workers")]
         public async Task<IActionResult> GetAllWorkers()
         {
@@ -41,7 +39,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(workers);
         }
 
-        // GET /users/1
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
@@ -51,7 +48,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(user);
         }
 
-        // POST /users
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] User newUser)
         {
@@ -61,7 +57,6 @@ namespace KomunalinisCentras.Backend.Controllers
                 newUser);
         }
 
-        // PUT /users/1
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] User updatedUser)
         {
@@ -81,7 +76,6 @@ namespace KomunalinisCentras.Backend.Controllers
 
             await _userRepository.UpdateAsync(existing);
 
-            // Synchronize Identity Role
             var identityUser = await _userManager.FindByIdAsync(existing.Id);
             if (identityUser != null)
             {
@@ -102,7 +96,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(existing);
         }
 
-        // DELETE /users/1
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
@@ -125,7 +118,6 @@ namespace KomunalinisCentras.Backend.Controllers
             await _userRepository.UpdateAsync(user);
             return NoContent();
         }
-        // PUT /users/{id}/unsubscribe
         [HttpPut("{id}/unsubscribe")]
         public async Task<IActionResult> Unsubscribe(string id)
         {
@@ -139,7 +131,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        // GET /users/roles
         [HttpGet("roles")]
         public async Task<IActionResult> GetAllRoles()
         {

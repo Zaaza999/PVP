@@ -20,12 +20,12 @@ namespace KomunalinisCentras.Backend.Entities
         public string EmailForInvoices { get; set; } = null!; 
 
         [Required]
-        public int ContainerVolumeLiters { get; set; } // talpa (120, 140, 240)
+        public int ContainerVolumeLiters { get; set; } 
 
         [Required]
-        public int EmptyingFrequencyPerYear { get; set; } // daznumas (12, 26, 52)
+        public int EmptyingFrequencyPerYear { get; set; } 
 
         [Required]
-        public string ApplicantFullName { get; set; } = null!; // pareiskejas
+        public string ApplicantFullName { get; set; } = null!; 
     }
 }

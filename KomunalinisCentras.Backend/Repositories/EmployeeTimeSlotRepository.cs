@@ -13,7 +13,6 @@ namespace KomunalinisCentras.Backend.Repositories
             _context = context;
         }
 
-        /* ---------- CRUD ---------- */
 
         public async Task<IEnumerable<EmployeeTimeSlot>> GetAllAsync()
         {
@@ -50,12 +49,6 @@ namespace KomunalinisCentras.Backend.Repositories
             await _context.SaveChangesAsync();
         }
 
-        /* ---------- Custom queries ---------- */
-
-        /// <summary>
-        ///  Grąžina visus LAISVUS intervalus (IsTaken = false) tam tikrai temai,
-        ///  atsižvelgiant į darbuotojo rolę.
-        /// </summary>
         public async Task<IEnumerable<EmployeeTimeSlot>> GetAvailableByTopicAsync(int topicId)
         {
             var topic = await _context.VisitTopics

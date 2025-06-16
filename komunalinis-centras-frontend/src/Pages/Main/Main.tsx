@@ -13,12 +13,9 @@ import {
   getWasteTypes,
   getSchedules,
   getUser,
-  subscribeUser,            // ⇠ ADD
+  subscribeUser,           
 } from "../Axios/apiServises";
 
-/* ============================================================
- * DTO types
- * ==========================================================*/
 export type LocationDto = { locationId: number; locationName: string };
 export type WasteTypeDto = { wasteId: number; wasteName: string };
 export type ScheduleDto = {
@@ -30,12 +27,10 @@ export type ScheduleDto = {
 export type UserDto = {
   id: string;
   address: string;
-  subscription: boolean;     // ⇠ ensure backend returns this field
+  subscription: boolean;     
 };
 
-/* ============================================================
- * Spalvos & pavadinimai
- * ==========================================================*/
+
 const wasteColor: Record<string, string> = {
   Household: "#71C568",
   "Plastic/Metal/Paper": "#F4C542",
@@ -49,10 +44,6 @@ const wasteNameLt: Record<string, string> = {
 const getColor = (n: string) => wasteColor[n] ?? "#ccc";
 const getNameLt = (n: string) => wasteNameLt[n] ?? n;
 
-
-/* ============================================================
- * JWT helper: extract GUID (string) user id
- * ==========================================================*/
 const getCurrentUserId = (): string | null => {
   const token = localStorage.getItem("token");
   if (!token) return null;
@@ -66,28 +57,22 @@ const getCurrentUserId = (): string | null => {
   }
 };
 
-/* ============================================================
- * MAIN COMPONENT
- * ==========================================================*/
+
 const Main: React.FC = () => {
-  /* --- state declarations --- */
   const [locations, setLocations] = useState<LocationDto[]>([]);
   const [wasteTypes, setWasteTypes] = useState<Map<number, WasteTypeDto>>(new Map());
   const [schedules, setSchedules] = useState<ScheduleDto[]>([]);
   const [selectedLoc, setSelectedLoc] = useState<number | null>(null);
 
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [user, setUser] = useState<UserDto | null>(null);        // ⇠ SAVE full user
+  const [user, setUser] = useState<UserDto | null>(null);        
 
-  // const [username, setUsername] = useState<string>("Svečias");
-  // const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
   const navigate = useNavigate();
-  /* --- read JWT once on mount --- */
   useEffect(() => {
     setCurrentUserId(getCurrentUserId());
   }, []);
 
-  /* --- calendar computations (unchanged) --- */
   const [viewDate, setViewDate] = useState<Date>(() => {
     const t = new Date();
     return new Date(t.getFullYear(), t.getMonth(), 1);
@@ -99,7 +84,6 @@ const Main: React.FC = () => {
   const monthLabel = viewDate.toLocaleDateString("lt-LT", { year: "numeric", month: "long" });
   const changeMonth = (d: number) => setViewDate(v => new Date(v.getFullYear(), v.getMonth() + d, 1));
 
-  /* --- INIT: Locations + WasteTypes --- */
   useEffect(() => {
     Promise.all([getLocations(), getWasteTypes()])
       .then(([locs, wastes]) => {
@@ -109,13 +93,12 @@ const Main: React.FC = () => {
       .catch(console.error);
   }, []);
 
-  /* --- USER & auto‑select address --- */
   useEffect(() => {
     if (!currentUserId || locations.length === 0) return;
 
     getUser(currentUserId)
       .then((u: UserDto) => {
-        setUser(u);                                        // ⇠ save user
+        setUser(u);                            
         if (!u.address) return;
         const addrWords = u.address.toLowerCase().split(/[,\s]+/);
         const match = locations.find(l => addrWords.includes(l.locationName.toLowerCase()));
@@ -124,7 +107,6 @@ const Main: React.FC = () => {
       .catch(console.error);
   }, [currentUserId, locations]);
 
-  /* --- Schedules by selectedLoc --- */
   useEffect(() => {
     if (selectedLoc == null) { setSchedules([]); return; }
     getSchedules()
@@ -133,7 +115,6 @@ const Main: React.FC = () => {
   }, [selectedLoc]);
 
 
-  /* --- helper: date -> WasteType[] --- */
   const dateWts = new Map<string, WasteTypeDto[]>();
   schedules.forEach((s: ScheduleDto) => {
     const key = s.collectionDate.split("T")[0];
@@ -147,9 +128,6 @@ const Main: React.FC = () => {
     }
   });
 
-  /* ============================================================
-   * RENDER
-   * ==========================================================*/
   return (
     <div>
 
@@ -159,7 +137,6 @@ const Main: React.FC = () => {
 
         <FeaturedNewsSection />
 
-        {/* ATLIEKŲ GRAFIKAS */}
         <section className="atliek-isvezimas">
           <h2>Atliekų išvežimas</h2>
           <select value={selectedLoc ?? ""} onChange={e => setSelectedLoc(+e.target.value || null)}>
@@ -212,7 +189,6 @@ const Main: React.FC = () => {
                 </div>
               </div>
 
-              {/* Prenumeruoti grafikos mygtukas */}
               {user && !user.subscription && ( 
                 <div className="subscribe-wrapper">
                   <button

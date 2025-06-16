@@ -32,10 +32,10 @@ namespace KomunalinisCentras.Backend.Entities
         public DateTime PeriodTo { get; set; }
 
         [Required]
-        public string WaterSupplyStatus { get; set; } = null!;// vykdomas / nevykdomas
+        public string WaterSupplyStatus { get; set; } = null!;
 
         [Required]
-        public string ElectricityMeterStatus { get; set; } = null!;// irengtas / neirengtas
+        public string ElectricityMeterStatus { get; set; } = null!;
 
         public double? InitialWaterReading { get; set; }
 

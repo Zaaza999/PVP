@@ -23,7 +23,6 @@ namespace KomunalinisCentras.Backend.Entities
         [Column("comment")]
         public string? Comment { get; set; }
 
-        /* Navigacijos (nebūtina JSON’e) */
         [ForeignKey(nameof(LocationId))] 
         [JsonIgnore]
         public Location? Location { get; set; }

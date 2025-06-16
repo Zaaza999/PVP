@@ -16,12 +16,12 @@ namespace KomunalinisCentras.Backend.Entities
         public string? EmailAddress { get; set; }
 
         [Required]
-        public int CurrentCapacityLiters { get; set; }  // isTalpa
+        public int CurrentCapacityLiters { get; set; }  
 
         [Required]
-        public int NewCapacityLiters { get; set; }  // iTalpa
+        public int NewCapacityLiters { get; set; }  
 
         [Required]
-        public string ApplicantFullName { get; set; } = null!;  // pareiskejas
+        public string ApplicantFullName { get; set; } = null!;  
     }
 }

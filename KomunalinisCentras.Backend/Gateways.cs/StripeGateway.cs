@@ -1,4 +1,3 @@
-// Gateways/StripeGateway.cs
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +21,6 @@ namespace KomunalinisCentras.Backend.Gateways
             StripeConfiguration.ApiKey = _settings.SecretKey;
         }
 
-        /* 1) Vienos sąskaitos sesija */
         public async Task<(string Url, string SessionId)> CreateCheckoutSessionAsync(
             InvoiceEntity invoice, decimal amount)
         {
@@ -55,7 +53,6 @@ namespace KomunalinisCentras.Backend.Gateways
             return (session.Url!, session.Id);
         }
 
-        /* 2) Kelių sąskaitų (batch) sesija */
         public async Task<(string Url, string SessionId)> CreateBatchCheckoutSessionAsync(
             IEnumerable<BatchPaymentItem> items, string currency)
         {
@@ -86,7 +83,6 @@ namespace KomunalinisCentras.Backend.Gateways
         }
     }
 
-    /*────────────────── Konfigūracijos klasė ───────────────*/
     public class StripeSettings
     {
         public string SecretKey      { get; set; } = default!;

@@ -21,7 +21,6 @@ public class PaymentsBatchController : ControllerBase
         _stripe = stripe;
     }
 
-    // POST /payments/batch
     [HttpPost("batch")]
     public async Task<IActionResult> PayMany([FromBody] BatchPaymentDto dto)
     {
@@ -34,7 +33,6 @@ public class PaymentsBatchController : ControllerBase
             .Where(i => ids.Contains(i.Id))
             .ToListAsync();
 
-        // -- Validacija
         foreach (var it in dto.Items)
         {
             var inv = invoices.FirstOrDefault(i => i.Id == it.InvoiceId);
@@ -50,11 +48,9 @@ public class PaymentsBatchController : ControllerBase
         if (invoices.Any(i => i.Currency != currency))
             return BadRequest("All invoices must have same currency");
 
-        // -- Stripe
         (string url, string sessionId) =
             await _stripe.CreateBatchCheckoutSessionAsync(dto.Items, currency);
 
-        // -- Įrašome payments
         var now = DateTime.UtcNow;
         foreach (var it in dto.Items)
         {

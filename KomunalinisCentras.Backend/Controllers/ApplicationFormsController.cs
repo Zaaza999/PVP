@@ -41,11 +41,6 @@ namespace KomunalinisCentras.Backend.Controllers
             _logger = logger;
         }
 
-        /* ========================================================
-           CRUD – bendri metodai
-        ======================================================== */
-
-        // POST /applications
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ApplicationDto dto)
         {
@@ -65,7 +60,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Created(string.Empty, application);
         }
 
-        // GET /applications
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -73,7 +67,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(await repo.GetAllAsync());
         }
 
-        // GET /applications/by-role/{roleName}
         [HttpGet("by-role/{roleName}")]
         public async Task<IActionResult> GetApplicationsByWorkerRole(string roleName)
         {
@@ -89,7 +82,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(await repo.GetByApplicationGroupIdsAsync(allowedGroupIds));
         }
 
-        // GET /applications/{formType}
         [HttpGet("{formType}")]
         public async Task<IActionResult> GetAll(string formType)
         {
@@ -101,7 +93,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(await repo.GetAllAsync());
         }
 
-        // GET /applications/{formType}/{id}
         [HttpGet("{formType}/{id}")]
         public async Task<IActionResult> GetById(string formType, int id)
         {
@@ -114,7 +105,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return app is null ? NotFound() : Ok(app);
         }
 
-        // PUT /applications/{formType}/{id}
         [HttpPut("{formType}/{id}")]
         public async Task<IActionResult> Update(string formType, int id, [FromBody] ApplicationDto dto)
         {
@@ -131,7 +121,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        // DELETE /applications/{formType}/{id}
         [HttpDelete("{formType}/{id}")]
         public async Task<IActionResult> Delete(string formType, int id)
         {
@@ -147,7 +136,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        // PUT /applications/{formType}/{id}/status
         [HttpPut("{formType}/{id}/status")]
         public async Task<IActionResult> UpdateStatus(string formType, int id, [FromBody] StatusUpdateDto dto)
         {
@@ -206,9 +194,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        /* ========================================================
-           Statusų sąrašas – frontend dropdown'ui
-        ======================================================== */
 
         [HttpGet("/applicationstatuses")]
         public async Task<IActionResult> GetStatuses()

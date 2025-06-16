@@ -12,7 +12,6 @@ const WORK_DAY_START_HOUR = 8;
 const WORK_DAY_END_HOUR   = 17;
 const STEP_MINUTES        = 30;
 
-/* ===== JWT helper ============================================ */
 const getCurrentUserId = (): string | null => {
   const token = localStorage.getItem("token");
   if (!token) return null;
@@ -30,17 +29,15 @@ const getCurrentUserId = (): string | null => {
   }
 };
 
-/* ===== DTO ==================================================== */
 interface TimeSlot {
   timeSlotId: number;
   employeeId: string;
-  slotDate: string;   // ISO
-  timeFrom: string;   // HH:mm:ss
-  timeTo: string;     // HH:mm:ss
-  isTaken: 0 | 1;     // 0 = laisvas, 1 = užimtas
+  slotDate: string;   
+  timeFrom: string;   
+  timeTo: string;     
+  isTaken: 0 | 1;    
 }
 
-/* ===== utils ================================================== */
 const pad = (n: number) => n.toString().padStart(2, "0");
 const timeStrToMinutes = (t: string) => {
   const [h, m] = t.split(":").map(Number);
@@ -48,7 +45,6 @@ const timeStrToMinutes = (t: string) => {
 };
 const getDateKey = (iso: string) => iso.slice(0, 10);
 
-/* ===== COMPONENT ============================================= */
 const EmployeeTimeSlotsPage: React.FC = () => {
   const navigate = useNavigate();
   const [employeeId] = useState<string | null>(() => getCurrentUserId());
@@ -58,7 +54,6 @@ const EmployeeTimeSlotsPage: React.FC = () => {
   const [timeFrom, setTimeFrom]   = useState("");
   const [timeTo,   setTimeTo]     = useState("");
 
-  /* --- options 08:00‑17:00 kas 15 min ------------------------- */
   const baseOptions = useMemo(() => {
     const opts: string[] = [];
     for (let h = WORK_DAY_START_HOUR; h <= WORK_DAY_END_HOUR; h++) {
@@ -70,7 +65,6 @@ const EmployeeTimeSlotsPage: React.FC = () => {
     return opts;
   }, []);
 
-  /* --- fetch MY slots ---------------------------------------- */
   const loadTimeSlots = useCallback(() => {
     if (!employeeId) return;
 
@@ -93,7 +87,6 @@ const EmployeeTimeSlotsPage: React.FC = () => {
 
   useEffect(loadTimeSlots, [loadTimeSlots]);
 
-  /* --- overlap helper ---------------------------------------- */
   const isOverlapping = (
     newFrom: number,
     newTo: number,
@@ -101,7 +94,6 @@ const EmployeeTimeSlotsPage: React.FC = () => {
     existingTo: number
   ) => newFrom < existingTo && newTo > existingFrom;
 
-  /* --- create ------------------------------------------------- */
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!employeeId) return;
@@ -148,7 +140,6 @@ const EmployeeTimeSlotsPage: React.FC = () => {
       );
   };
 
-  /* --- delete ------------------------------------------------- */
   const handleDelete = (slot: TimeSlot) => {
     if (slot.isTaken) {
       alert("Negalite ištrinti užimto laiko intervalo.");
@@ -161,7 +152,6 @@ const EmployeeTimeSlotsPage: React.FC = () => {
       );
   };
 
-  /* --- visible table rows ------------------------------------ */
   const visibleSlots = useMemo(() => {
     if (!slotDate) return [];
     return timeSlots
@@ -169,7 +159,6 @@ const EmployeeTimeSlotsPage: React.FC = () => {
       .sort((a, b) => (a.timeFrom < b.timeFrom ? -1 : 1));
   }, [timeSlots, slotDate]);
 
-  /* ===== RENDER ============================================== */
   if (employeeId === null)
     return (
       <div className="container">
@@ -184,7 +173,6 @@ const EmployeeTimeSlotsPage: React.FC = () => {
     <div className="container">
       <h2>Jūsų laiko intervalai</h2>
 
-      {/* CREATE FORM */}
       <div className="card">
         <form onSubmit={handleCreate} className="form">
           <div className="form-group">
@@ -242,7 +230,6 @@ const EmployeeTimeSlotsPage: React.FC = () => {
         </form>
       </div>
 
-      {/* TABLE */}
       <div className="table-container">
         <table className="time-slots-table">
           <thead>

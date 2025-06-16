@@ -21,13 +21,12 @@ import {
 import {
   getEmployeeDaySchedule,
   addEmployeeTask,
-  deleteTimeSlot,   // <-- pridėta
+  deleteTimeSlot,   
 } from "../Axios/apiServises";
 
-/* -------------------------------------------------- */
 const STEP_MIN = 30;
-const DAY_START_MIN = 8 * 60; // 08:00
-const DAY_END_MIN = 17 * 60;  // 17:00
+const DAY_START_MIN = 8 * 60; 
+const DAY_END_MIN = 17 * 60;  
 const TARGET_CONTAINER_HEIGHT = 600;
 const PIXEL_PER_MIN = TARGET_CONTAINER_HEIGHT / (DAY_END_MIN - DAY_START_MIN);
 
@@ -58,7 +57,6 @@ interface Row {
   isTaken?: boolean;
 }
 
-/* helpers */
 const parseHHMM = (t: string): number => {
   const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
@@ -79,7 +77,6 @@ export default function DaySchedule() {
   const [topic, setTopic] = useState("");
   const [description, setDescription] = useState("");
 
-  // Fetch schedule for selected date
   const fetchSchedule = () => {
     if (!employeeId) return;
     getEmployeeDaySchedule(employeeId, date.format("YYYY-MM-DD")).then((d) =>
@@ -88,7 +85,6 @@ export default function DaySchedule() {
   };
   useEffect(fetchSchedule, [employeeId, date]);
 
-  // Nauja: atšaukimo funkcija
   const handleCancel = (slotId: number) => {
     if (!employeeId) return;
     deleteTimeSlot(slotId)
@@ -98,7 +94,6 @@ export default function DaySchedule() {
       .catch(console.error);
   };
 
-  // Merge overlapping busy segments
   const busySegments: Segment[] = useMemo(() => {
     const arr = slots.map((s) => ({
       start: parseHHMM(s.timeFrom.slice(0, 5)),
@@ -117,7 +112,6 @@ export default function DaySchedule() {
     return merged;
   }, [slots]);
 
-  // Calculate free segments between busy ones
   const freeSegments: Segment[] = useMemo(() => {
     const free: Segment[] = [];
     let cursor = DAY_START_MIN;
@@ -129,7 +123,6 @@ export default function DaySchedule() {
     return free;
   }, [busySegments]);
 
-  // Build table rows combining free and busy
   const rows: Row[] = useMemo(() => {
     const list: Row[] = [];
     let cursor = DAY_START_MIN;
@@ -149,7 +142,7 @@ export default function DaySchedule() {
         isFree: false,
         forRezervation: s.forRezervation,
         isTaken: s.isTaken,
-        timeSlotId: s.timeSlotId, // implicit field for cancel
+        timeSlotId: s.timeSlotId,
       } as any);
       cursor = end;
     });
@@ -157,7 +150,6 @@ export default function DaySchedule() {
     return list;
   }, [slots]);
 
-  // Options for "from" dropdown
   const fromOptions = useMemo<string[]>(() => {
     const opts: string[] = [];
     freeSegments.forEach((seg) => {
@@ -168,7 +160,6 @@ export default function DaySchedule() {
     return opts;
   }, [freeSegments]);
 
-  // Options for "to" dropdown
   const toOptions = useMemo<string[]>(() => {
     if (!from) return [];
     const fm = parseHHMM(from);
@@ -204,7 +195,6 @@ export default function DaySchedule() {
   return (
     <div className="container">
       <Box>
-        {/* Date navigation */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
           <Button onClick={() => setDate((d) => d.subtract(1, "day"))}>◀</Button>
           <Typography variant="h6" sx={{ minWidth: 110, textAlign: "center" }}>
@@ -213,7 +203,6 @@ export default function DaySchedule() {
           <Button onClick={() => setDate((d) => d.add(1, "day"))}>▶</Button>
         </Box>
 
-        {/* schedule table */}
         <Box sx={{ height: TARGET_CONTAINER_HEIGHT, overflowY: "auto" }}>
           <Table
             size="small"
@@ -228,7 +217,7 @@ export default function DaySchedule() {
                 <TableCell>Laikas</TableCell>
                 <TableCell>Tema</TableCell>
                 <TableCell>Aprašymas</TableCell>
-                <TableCell>Veiksmai</TableCell> {/* naujas stulpelis */}
+                <TableCell>Veiksmai</TableCell> 
               </TableRow>
             </TableHead>
             <TableBody>
@@ -286,7 +275,6 @@ export default function DaySchedule() {
           </Link> 
         )}
 
-        {/* dialog */}
         <Dialog open={openAdd} onClose={() => setOpenAdd(false)}>
           <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 300 }}>
             <TextField label="Tema" value={topic} onChange={(e) => setTopic(e.target.value)} />

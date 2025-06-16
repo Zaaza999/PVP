@@ -1,5 +1,10 @@
 {
   "dependencies": {
+    "framer-motion": "^12.18.1",
     "jwt-decode": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/styled-jsx": "^2.2.9",
+    "styled-jsx": "^5.1.7"
   }
 }

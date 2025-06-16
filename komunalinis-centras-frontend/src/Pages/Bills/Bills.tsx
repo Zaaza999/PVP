@@ -1,27 +1,26 @@
-// src/Pages/Bills/Bills.tsx
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 
 import "../styles.css";
 
-/* ====== Tipai ====== */
+
 interface Invoice {
   id: string;
-  period: string;    // pvz. 2025‑01
-  date: string;      // išrašymo data
-  amount: number;    // bendra suma (€)
-  paid: number;      // kiek jau apmokėta (€)
+  period: string;    
+  date: string;      
+  amount: number;   
+  paid: number;   
 }
 
-/* ====== Mock duomenys (vietoj API) ====== */
+
 const initialInvoices: Invoice[] = [
   { id: "2025‑01‑001", period: "2025‑01", date: "2025‑02‑01", amount: 18.75, paid: 0 },
   { id: "2024‑12‑002", period: "2024‑12", date: "2025‑01‑01", amount: 18.75, paid: 18.75 },
   { id: "2024‑11‑003", period: "2024‑11", date: "2024‑12‑01", amount: 18.75, paid: 18.75 },
 ];
 
-/* ====== Modalas ====== */
+
 interface PayModalProps {
   invoice: Invoice;
   onClose: () => void;
@@ -67,20 +66,16 @@ const PayModal: React.FC<PayModalProps> = ({ invoice, onClose, onConfirm }) => {
   );
 };
 
-/* ====== Pagrindinis puslapis ====== */
 const InvoicePage: React.FC = () => {
   const navigate = useNavigate();
   const [invoices, setInvoices] = useState<Invoice[]>(initialInvoices);
   const [selected, setSelected] = useState<Invoice | null>(null);
 
-  /* — skaičiuojamosios reikšmės — */
   const totalPaid       = invoices.reduce((s, i) => s + i.paid, 0);
   const totalOutstanding= invoices.reduce((s, i) => s + (i.amount - i.paid), 0);
 
-  /* — mygtuko „Apmokėti“ paspaudimas — */
   const handlePay = (invoice: Invoice) => setSelected(invoice);
 
-  /* — patvirtinimas modale — */
   const confirmPayment = (sum: number) => {
     if (!selected) return;
     setInvoices(prev =>
@@ -93,18 +88,15 @@ const InvoicePage: React.FC = () => {
     setSelected(null);
   };
 
-  /* ====== lentelės renderis ====== */
   return (
     <main className="container">
       <h2>Sąskaitos</h2>
 
-      {/* Suvestinė */}
       <div className="card" style={{ display: "flex", gap: "30px", justifyContent: "space-between" }}>
         <div><strong>Iš viso apmokėta:</strong> € {totalPaid.toFixed(2)}</div>
         <div><strong>Liko apmokėti:</strong> € {totalOutstanding.toFixed(2)}</div>
       </div>
 
-      {/* Lentelė */}
       <div className="table-container">
         <table className="time-slots-table">
           <thead>
@@ -155,7 +147,6 @@ const InvoicePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Modalas */}
       {selected && (
         <PayModal
           invoice={selected}

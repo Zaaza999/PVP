@@ -35,7 +35,7 @@ namespace KomunalinisCentras.Backend.Entities
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         [Column("RawPayload", TypeName = "json")]
-        public string? RawPayload { get; set; }  // saugome JSON tekstą
+        public string? RawPayload { get; set; } 
 
         [JsonIgnore]
         public Invoice? Invoice { get; set; }

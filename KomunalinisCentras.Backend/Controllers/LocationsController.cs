@@ -15,7 +15,6 @@ namespace KomunalinisCentras.Backend.Controllers
             _repository = repository;
         }
 
-        // GET /Locations
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -23,7 +22,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(list);
         }
 
-        // GET /Locations/5
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -31,7 +29,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return loc is null ? NotFound() : Ok(loc);
         }
 
-        // POST /Locations
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Location newLocation)
         {
@@ -41,7 +38,6 @@ namespace KomunalinisCentras.Backend.Controllers
                                    newLocation);
         }
 
-        // PUT /Locations/5
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] Location updated)
         {
@@ -56,7 +52,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        // DELETE /Locations/5
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

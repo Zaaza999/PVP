@@ -17,7 +17,6 @@ import {
 } from "@mui/material";
 import "../styles.css";
 
-/* ---------- Types ---------- */
 interface Role {
   roleName: string;
   id: string;
@@ -50,10 +49,8 @@ interface Application {
   submittedBy?: { id: string; firstName?: string; lastName?: string };
 }
 
-/* ---------- Constants ---------- */
 const HISTORY_STATUSES = ["Užbaigta", "Patvirtinta", "Archyvuota"];
 
-/* ---------- Helpers ---------- */
 const getCurrentUserId = (): string | null => {
   const token = localStorage.getItem("token");
   if (!token) return null;
@@ -89,7 +86,6 @@ const formTitles: Record<string, string> = {
 };
 const getFormTitle = (type: string) => formTitles[type] ?? type;
 
-/* ---------- Component ---------- */
 const UserProfile: React.FC = () => {
   const navigate = useNavigate();
   const currentUserId = getCurrentUserId();
@@ -110,7 +106,6 @@ const UserProfile: React.FC = () => {
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
-  /* Fetch user, reservations, and applications */
   useEffect(() => {
     if (!currentUserId) return;
     getUser(currentUserId)
@@ -160,10 +155,8 @@ const UserProfile: React.FC = () => {
 
   if (!user) return <p>Kraunama...</p>;
 
-  /* Format address */
   const formattedAddress = () => `${street.trim()} ${houseNumber.trim()}, ${city.trim()}`;
 
-  /* Save profile changes */
   const save = () => {
     if (!user) return;
     updateUser(user.id, {
@@ -181,7 +174,6 @@ const UserProfile: React.FC = () => {
       .catch(console.error);
   };
 
-  /* Cancel edit */
   const cancelEdit = () => {
     if (!user) return;
     setFirstName(user.firstName);
@@ -203,7 +195,6 @@ const UserProfile: React.FC = () => {
     setIsEditing(false);
   };
 
-  /* Confirm reservation cancel */
   const confirmCancel = () => {
     if (pendingCancelId == null) return;
     deleteReservation(pendingCancelId)
@@ -217,7 +208,6 @@ const UserProfile: React.FC = () => {
       });
   };
 
-  /* Unsubscribe from subscription */
   const unsubscribe = () => {
     if (!user) return;
     cancelSubscription(user.id)
@@ -225,7 +215,6 @@ const UserProfile: React.FC = () => {
       .catch(console.error);
   };
 
-  /* Sort lists */
   const sortedReservations = [...reservations].sort(
     (a, b) => new Date(a.reservationDate).getTime() - new Date(b.reservationDate).getTime()
   );
@@ -233,7 +222,6 @@ const UserProfile: React.FC = () => {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
-  /* Partition applications */
   const activeApps = sortedApplications.filter(
     (app) => !HISTORY_STATUSES.includes(app.status?.name ?? "")
   );
@@ -303,7 +291,6 @@ const UserProfile: React.FC = () => {
         )}
       </div>
 
-      {/* Reservations Section */}
       {localStorage.getItem("userRole") === "client" && (
         <section>
           <h3>Mano rezervacijos</h3>
@@ -358,7 +345,6 @@ const UserProfile: React.FC = () => {
         </section>
       )}
 
-      {/* Applications Section */}
       <section>
         <div className="d-flex justify-content-between align-items-center mb-2">
           <h3>{showHistory ? "Prašymų istorija" : "Mano prašymai"}</h3>

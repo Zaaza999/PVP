@@ -15,12 +15,10 @@ namespace KomunalinisCentras.Backend.Controllers
             _repo = repo;
         }
 
-        // GET /GarbageCollectionSchedules
         [HttpGet]
         public async Task<IActionResult> GetAll() =>
             Ok(await _repo.GetAllAsync());
 
-        // GET /GarbageCollectionSchedules/5
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -28,7 +26,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return item is null ? NotFound() : Ok(item);
         }
 
-        // POST /GarbageCollectionSchedules
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] GarbageCollectionSchedule model)
         {
@@ -38,7 +35,6 @@ namespace KomunalinisCentras.Backend.Controllers
                                    model);
         }
 
-        // PUT /GarbageCollectionSchedules/5
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] GarbageCollectionSchedule model)
         {
@@ -55,7 +51,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        // DELETE /GarbageCollectionSchedules/5
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {

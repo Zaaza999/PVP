@@ -21,7 +21,6 @@ namespace KomunalinisCentras.Backend.Entities
         [Required]
         public string ApplicantFullName { get; set; } = null!;
 
-        // Navigation property to entries
         public List<PropertyUsageDeclarationEntry> Entries { get; set; } = new();
     }
 }

@@ -15,7 +15,6 @@ namespace KomunalinisCentras.Backend.Controllers
             _employeeTimeSlotRepository = employeeTimeSlotRepository;
         }
 
-        // GET /employeetimeslots
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -23,7 +22,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(slots);
         }
 
-        // GET /employeetimeslots/1
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -33,7 +31,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(slot);
         }
 
-        // POST /employeetimeslots
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] EmployeeTimeSlot newSlot)
         {
@@ -41,7 +38,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return CreatedAtAction(nameof(GetById), new { id = newSlot.TimeSlotId }, newSlot);
         }
 
-        // PUT /employeetimeslots/1
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] EmployeeTimeSlot updatedSlot)
         {
@@ -52,7 +48,6 @@ namespace KomunalinisCentras.Backend.Controllers
             if (existingSlot == null)
                 return NotFound();
 
-            // Atnaujiname tik egzistuojančius laukus
             existingSlot.EmployeeId = updatedSlot.EmployeeId;
             existingSlot.SlotDate = updatedSlot.SlotDate;
             existingSlot.TimeFrom = updatedSlot.TimeFrom;
@@ -62,7 +57,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        // DELETE /employeetimeslots/1
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -74,7 +68,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        // EmployeeTimeSlotsController.cs
         [HttpGet("by-topic/{topicId:int}")]
         public async Task<IActionResult> GetByTopic(int topicId)
         {
@@ -82,7 +75,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(slots);
         }
 
-        // EmployeeTimeSlotsController.cs
         [HttpGet("employee/{employeeId}/by-date")]
         public async Task<IActionResult> GetDaySchedule(string employeeId, [FromQuery] DateOnly date)
         {
@@ -100,7 +92,6 @@ namespace KomunalinisCentras.Backend.Controllers
         [HttpPost("employee/{employeeId}/add-task")]
         public async Task<IActionResult> AddTask(string employeeId, [FromBody] AddTaskDto dto)
         {
-            // leidžiame tiek „HH:mm“, tiek „HH:mm:ss“
             var parseFormats = new[] { "HH:mm", "HH:mm:ss" };
 
             if (!TimeOnly.TryParseExact(dto.From, parseFormats, null, System.Globalization.DateTimeStyles.None, out var from))
@@ -113,7 +104,7 @@ namespace KomunalinisCentras.Backend.Controllers
             {
                 EmployeeId     = employeeId,
                 SlotDate       = dto.Date.ToDateTime(TimeOnly.MinValue),
-                TimeFrom       = from.ToTimeSpan(),   // DB stulpelis TimeSpan
+                TimeFrom       = from.ToTimeSpan(),  
                 TimeTo         = to.ToTimeSpan(),
                 Topic          = dto.Topic,
                 Description    = dto.Description,

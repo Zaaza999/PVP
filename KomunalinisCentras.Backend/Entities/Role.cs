@@ -10,7 +10,6 @@ namespace KomunalinisCentras.Backend.Entities
         [Column("role_name")]
         public string RoleName { get; set; } = null!;
 
-        // Navigation (one Role -> many Users) 
         [JsonIgnore]
         public ICollection<User> Users { get; set; } = new List<User>();
     

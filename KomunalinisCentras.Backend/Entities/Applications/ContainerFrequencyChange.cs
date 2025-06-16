@@ -17,12 +17,12 @@ namespace KomunalinisCentras.Backend.Entities
 
         [Required]
         [DataType(DataType.Date)]
-        public DateTime EffectiveFrom { get; set; } // nuoData
+        public DateTime EffectiveFrom { get; set; } 
 
         [Required]
-        public int FrequencyPerMonth { get; set; } // daznis (1, 2, 4)
+        public int FrequencyPerMonth { get; set; } 
 
         [Required]
-        public string ApplicantFullName { get; set; } = null!; // pareiskejas
+        public string ApplicantFullName { get; set; } = null!; 
     }
 }

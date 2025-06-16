@@ -1,4 +1,3 @@
-// Services/PayseraGateway.cs
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -24,9 +23,7 @@ namespace KomunalinisCentras.Backend.Services
             var signPassword = _config["Paysera:SignPassword"]!;
             var callbackUrl  = _config["Paysera:CallbackUrl"]!;
 
-            // Suma centais
             var amount = ((int)(payment.Amount * 100)).ToString();
-            // CRC eilutė
             var crc = string.Join(";", projectId, payment.Id, amount, invoice.Currency, callbackUrl);
             var sign = ComputeMd5(crc + signPassword);
 

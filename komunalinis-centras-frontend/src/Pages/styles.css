@@ -182,7 +182,6 @@ main {
   font-size: 1.5rem;
 }
 
-/* Kalendorius */
 .calendar {
   margin-top: 20px;
   overflow-x: auto;
@@ -214,7 +213,6 @@ main {
   font-weight: bold;
 }
 
-/* Footer */
 footer {
   background-color: #fff;
   text-align: center;
@@ -224,7 +222,6 @@ footer {
   color: #333;
 } 
 
-/*Reservation*/ 
 .weekly-schedule-container {
   background-color: #fff;
   padding: 30px;
@@ -645,9 +642,8 @@ body {
 .legend-color { width:14px; height:14px; border:1px solid #444; }
 
 
-/* --- Prenumeratos mygtukas --- */
 .btn-subscribe {
-  background-color: #4caf50;          /* žalia ‑ dera su atliekų tema */
+  background-color: #4caf50;         
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -660,7 +656,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* varpelio piktograma (CSS pseudo‑elementu, kad nereiktų svg) */
 .btn-subscribe .bell::before {
   content: \"🔔\";
   font-size: 1rem;
@@ -669,26 +664,22 @@ body {
   margin-top: 1rem;      
 }
 
-/* ---------- FONAS ---------- */
 .modal-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.45);
-  display: flex !important;          /* svarbu – kad nebūtų perrašyta .show */
-  align-items: center;               /* vertikalus centras */
-  justify-content: center;           /* horizontalus */
+  display: flex !important;          
+  align-items: center;               
+  justify-content: center;          
   z-index: 1050;
 }
 
-/* ---------- DIALOGAS ---------- */
 .modal-backdrop .modal {
-  /* numušame Bootstrap pozicionavimą */
   position: relative !important;
   top: auto !important;
   left: auto !important;
   margin: 0 !important;
 
-  /* mūsų dydžiai */
   display: block !important;
   height: auto !important;
   width: 360px;
@@ -696,7 +687,6 @@ body {
   max-height: 90vh;
   overflow-y: auto;
 
-  /* estetika */
   background: #fff;
   padding: 2rem 2.5rem;
   border-radius: 8px;
@@ -721,7 +711,6 @@ a:focus {
   color: white !important;
 }
 
-/* Drop down for darbuotojai */
 .dropdown-nav {
   position: relative;
 }
@@ -789,7 +778,6 @@ a:focus {
 }
 
 
-/* === Invoice Page Styles === */
 
 .invoice-page {
   background: #f7f9fc;
@@ -823,7 +811,6 @@ a:focus {
   background: #FFB300;
 }
 
-/* Kortelių išdėstymas */
 .invoice-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -833,7 +820,6 @@ a:focus {
   margin: 0;
 }
 
-/* Vienos sąskaitos kortelė */
 .invoice-item {
   background: #fff;
   border-radius: 8px;
@@ -860,7 +846,6 @@ a:focus {
   color: #555;
 }
 
-/* Veiksmai su sąskaita */
 .invoice-item .actions {
   display: flex;
   align-items: center;
@@ -893,7 +878,6 @@ a:focus {
   background: #218838;
 }
 
-/* Mokėti viską blokas */
 .invoice-summary {
   display: flex;
   justify-content: flex-end;

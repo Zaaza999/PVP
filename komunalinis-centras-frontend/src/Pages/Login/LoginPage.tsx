@@ -44,7 +44,6 @@ const LoginPage: React.FC = () => {
       <div className="login-box">
         <h2 className="login-title">Prisijunkite prie savitarnos</h2>
         <form className="login-form" onSubmit={handleSubmit}>
-          {/* El. paštas */}
           <div className="form-group">
             <label>Prisijungimo vardas (el. pašto adresas)</label>
             <input
@@ -55,7 +54,6 @@ const LoginPage: React.FC = () => {
             />
           </div>
 
-          {/* Slaptažodis + peržiūros mygtukas */}
           <div className="form-group password-group">
             <label>Slaptažodis</label>
             <div className="password-wrapper">

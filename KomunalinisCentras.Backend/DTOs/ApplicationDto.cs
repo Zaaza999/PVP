@@ -8,7 +8,7 @@ namespace KomunalinisCentras.Backend.DTOs
     public class ApplicationDto
     {
         public string FormType { get; set; } = null!;
-        public JsonElement Data { get; set; } // Raw JSON to deserialize later
+        public JsonElement Data { get; set; } 
     }
 
 

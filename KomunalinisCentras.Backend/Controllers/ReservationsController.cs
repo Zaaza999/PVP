@@ -25,7 +25,6 @@ namespace KomunalinisCentras.Backend.Controllers
             _userRepository = userRepository;
         }
 
-        // GET /reservations
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -33,7 +32,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(reservations);
         }
         
-        // GET /reservations?userId={userId}
         [HttpGet("ByUser")]
         public async Task<IActionResult> GetByUserId([FromQuery] string? userId)
         {
@@ -46,7 +44,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(userReservations);
         }
         
-        // GET /reservations/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -57,38 +54,30 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(reservation);
         }
 
-        // POST /reservations
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Reservation newReservation)
         {
-            // 1. Patikriname, ar egzistuoja laiko tarpas
             var slot = await _timeSlotRepository.GetByIdAsync(newReservation.TimeSlotId);
             if (slot == null)
                 return BadRequest("Nerastas laiko tarpas.");
 
-            // 2. Neleidžiame rezervuoti jau užimto tarpo
             if (slot.IsTaken)
                 return Conflict("Šis laiko tarpas jau užimtas.");
 
-            // 3. Užkrauname temą pagal TopicId
             var topic = await _visitTopicRepository.GetByIdAsync(newReservation.TopicId);
             if (topic == null)
                 return BadRequest("Nerasta rezervacijos tema."); 
             
-             // 3. Užkrauname temą pagal TopicId
             var user = await _userRepository.GetByIdAsync(newReservation.UserId);
             if (user == null)
                 return BadRequest("Nerasta rezervacijos tema.");
 
-            // 4. Pažymime, kad laiko tarpas užimtas ir atnaujiname aprašymą
             slot.IsTaken    = true;
             slot.Description = "Rezervacijos tema: " + topic.TopicName + ", Vardas: " + user.FirstName + ", Pavardė: " + user.LastName;
             await _timeSlotRepository.UpdateAsync(slot);
 
-            // 5. Sukuriame rezervaciją
             await _reservationRepository.CreateAsync(newReservation);
 
-            // 6. Grąžiname 201 Created su naujos rezervacijos duomenimis
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = newReservation.ReservationId },
@@ -96,7 +85,6 @@ namespace KomunalinisCentras.Backend.Controllers
             );
         }
 
-        // PUT /reservations/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Reservation updatedReservation)
         {
@@ -107,7 +95,6 @@ namespace KomunalinisCentras.Backend.Controllers
             if (existingReservation == null)
                 return NotFound();
 
-            // Atnaujiname laukus
             existingReservation.UserId = updatedReservation.UserId;
             existingReservation.TimeSlotId = updatedReservation.TimeSlotId;
             existingReservation.ReservationDate = updatedReservation.ReservationDate;
@@ -118,25 +105,20 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        // DELETE /reservations/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            // 1. Randame rezervaciją
             var existingReservation = await _reservationRepository.GetByIdAsync(id);
             if (existingReservation == null)
                 return NotFound();
 
-            // 2. Paimame susijusį laiko tarpo įrašą
             var slot = await _timeSlotRepository.GetByIdAsync(existingReservation.TimeSlotId);
             if (slot != null)
             {
-                // 3. Pažymime laiko tarpą kaip laisvą
                 slot.IsTaken = false;
                 await _timeSlotRepository.UpdateAsync(slot);
             }
 
-            // 4. Triname rezervaciją
             await _reservationRepository.DeleteAsync(id);
             return NoContent();
         }

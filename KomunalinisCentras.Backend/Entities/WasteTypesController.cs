@@ -15,7 +15,6 @@ namespace KomunalinisCentras.Backend.Controllers
             _repository = repository;
         }
 
-        // GET /WasteTypes
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -23,7 +22,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return Ok(items);
         }
 
-        // GET /WasteTypes/3
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -31,7 +29,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return item is null ? NotFound() : Ok(item);
         }
 
-        // POST /WasteTypes
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] WasteType newItem)
         {
@@ -41,7 +38,6 @@ namespace KomunalinisCentras.Backend.Controllers
                                    newItem);
         }
 
-        // PUT /WasteTypes/3
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] WasteType updated)
         {
@@ -54,7 +50,6 @@ namespace KomunalinisCentras.Backend.Controllers
             return NoContent();
         }
 
-        // DELETE /WasteTypes/3
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
